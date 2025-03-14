@@ -50,6 +50,9 @@ const Sidebar = () => {
           <BsJournalBookmark />
           <span>Report</span>
         </button>
+        <button className="text-primary" >
+          checking color
+        </button>
       </nav>
       
       {/* Logout Button */}
