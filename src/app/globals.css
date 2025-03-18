@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary:#FF0000
+    --color-primary:#FF0000;
+    --color-danger: #ff934f;
+  }
+  
+  .screen-size {
+    @apply max-w-screen-2xl w-[95%] mx-auto;
+  }
+  .center {
+    @apply flex justify-center items-center;
+  }
+  .vertical-center {
+    @apply flex justify-center;
+  }
+  .horizontal-center {
+    @apply flex items-center justify-evenly;
+  }
+  .title {
+    @apply text-[24px] font-semibold;
+  }
+  .text_size_1 {
+    @apply text-3xl font-semibold;
+  }
+  .text_size_2 {
+    @apply text-xl font-semibold;
+  }
+  .text_size_3 {
+    @apply text-lg font-semibold;
+  }
+  .text_size_4 {
+    @apply text-lg font-medium;
+  }
+  .text_size_5 {
+    @apply text-[16px] font-semibold;
+  }
+  .text_size_6 {
+    @apply text-[16px] font-medium;
+  }
+  .text_size_7 {
+    @apply text-sm font-semibold;
+  }
+  .text_size_8 {
+    @apply text-sm font-medium;
+  }
+  .text_size_9 {
+    @apply text-xs font-medium;
+  }
+  .text_size_10 {
+    @apply text-[10px] font-medium;
+  }
+  .text_size_11 {
+    @apply text-[8px] font-medium;
+  }
+  .primary_btn {
+    @apply bg-primary font-bold py-2 px-24 text-dark_grey rounded-md;
+  }
+  .secondary_btn {
+    @apply bg-medium_grey py-2 px-5 text-yellow rounded-md;
+  }
+  .btn_1 {
+    @apply bg-primary py-2 px-10 text-zinc rounded-2xl;
+  }
+  .btn_2 {
+    @apply bg-secondary py-2 px-3 rounded-md text-white;
+  }
+  .input-field {
+    @apply w-full h-[45px] bg-lite_skyBlue pl-3 mt-2 border outline-none border-[#dedddd] rounded pr-12;
+  }
+
+  .form-group {
+    @apply mb-4;
   }

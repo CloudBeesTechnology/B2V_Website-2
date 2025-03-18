@@ -1,0 +1,7 @@
+{
+    "workbench.settings.useSplitJSON": false,
+    "liveServer.settings.AdvanceCustomBrowserCmdLine": "",
+    "liveServer.settings.ChromeDebuggingAttachment": false,
+    "javascript.format.enable": true,
+    "typescript.format.enable": true
+}
