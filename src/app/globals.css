@@ -50,4 +50,7 @@
   .text_size_7 {
     @apply text-xs font-bold;
   }
+  .text_size_8{
+    @apply text-xl font-medium
+  }
 }

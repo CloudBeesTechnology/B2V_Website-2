@@ -1,9 +1,7 @@
-import EmployeeLayout from "./EmployeeLayout";
+import { EmployeeHome } from "./EmployeeHome";
 
 export default function Employee() {
-  return (
-    <div>
-      {/* <EmployeeLayout /> */}
-    </div>
-  );
+  return <div>
+    <EmployeeHome/>
+  </div>
 }
