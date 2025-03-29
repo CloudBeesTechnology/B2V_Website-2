@@ -5,7 +5,7 @@ import { OverviewLeaveApproval } from "./OverviewLeaveApproval";
 import { OverviewHolidays } from "./OverviewHolidays";
 import { Birthday } from "./Birthday";
 import { Weather } from "./Weather";
-import { PersonalCal } from "./PersonalCal";
+import PersonalCal from "./PersonalCal";
 
 export const OverviewHome = () => {
   return (
