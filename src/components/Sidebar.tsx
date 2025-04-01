@@ -16,7 +16,7 @@ const Sidebar = () => {
     {
       icons: overview,
       name: "Overview",
-      path: "/overview",
+      path: "/",
     },
     {
       icons: employee,

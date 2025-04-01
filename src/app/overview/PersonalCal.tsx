@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dayjs from "dayjs";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
@@ -30,7 +30,7 @@ const PersonalCal = () => {
 
   return (
     <div className="rounded-xl shadow-lg p-4">
-      <h2 className="text-gray text-[16px] font-semibold p-4">
+      <h2 className="text-gray text-base font-semibold p-4">
         Personal Calender
       </h2>
       <div className="flex justify-between mb-4 ">

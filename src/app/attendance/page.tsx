@@ -1,8 +1,4 @@
-export default function Attendance() {
-    return (
-      <div>
-        <h1 className="text-2xl font-bold">Attendance</h1>
-        <p>Welcome to the Attendance page.</p>
-      </div>
-    );
-  }
+const Attendance: React.FC = () => {
+  return <div>Attendance</div>;
+};
+export default Attendance;
