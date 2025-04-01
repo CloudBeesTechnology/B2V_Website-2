@@ -3,7 +3,7 @@ import React from "react";
 import { useState } from "react";
 import dayjs from "dayjs";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-
+import { IoIosSquare } from "react-icons/io";
 const PersonalCal = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const daysInMonth = currentDate.daysInMonth();
@@ -67,13 +67,23 @@ const PersonalCal = () => {
               {date.date()}
             </div>
           ) : (
-            <div key={idx}></div> 
+            <div key={idx}></div>
           )
         )}
       </div>
       <div className="flex justify-start font-medium text-mediumlite_grey p-4 gap-5">
-        <span>Govt Holiday</span>
-        <span>Leave</span>
+        <div className="flex gap-2">
+          <span className="center">
+            <IoIosSquare className="text-dark_red " />
+          </span>
+          <span>Govt Holiday</span>
+        </div>
+        <div className="flex gap-2">
+          <span className="center">
+            <IoIosSquare className="text-medium_blue" />
+          </span>
+          <span>Leave</span>
+        </div>
       </div>
     </div>
   );
