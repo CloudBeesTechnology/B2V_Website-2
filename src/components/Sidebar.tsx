@@ -49,7 +49,8 @@ const Sidebar = () => {
       path: "/report",
     },
   ];
-
+ 
+  
   return (
     <section className="p-5 space-y-2 h-full " >
       <div className="max-w-[100px] w-full h-20 mx-auto center">
