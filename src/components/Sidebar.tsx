@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import attendance from "../assets/sidebar/attendance.png";
+import internship from "../assets/sidebar/internship.png";
 import overview from "../assets/sidebar/overview.png";
 import employee from "../assets/sidebar/employee.png";
 import leavemanagement from "../assets/sidebar/leavemanagement.png";
@@ -27,6 +28,11 @@ const Sidebar = () => {
       icons: attendance,
       name: "Attendance",
       path: "/attendance",
+    },
+    {
+      icons: internship,
+      name: "Internship",
+      path: "/internship",
     },
     {
       icons: leavemanagement,
