@@ -21,7 +21,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
       <label className="text-[#7E7D7D] text_size_5">{label}</label>
       <select
         {...register(name)}
-        className="border border-[#9D9393] text-[#202020] text_size_5  p-2 rounded outline-none"
+        className="border border-[#9D9393] text-[#202020] text_size_5  px-2 py-3 rounded-md outline-none"
       >
         <option value="">Select {label}</option>
         {options.map((option) => (
@@ -30,7 +30,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
           </option>
         ))}
       </select>
-      {errors && <span className="text-dark_red text-xs">{errors}</span>}
+      {errors && <span className="text-dark_red text-xs pt-1">{errors}</span>}
     </div>
   );
 };

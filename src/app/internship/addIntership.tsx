@@ -27,7 +27,7 @@ const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
   };
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 ">
-      <div className="bg-white p-20 rounded-xl w-full max-w-6xl ">
+      <div className="bg-white p-20 rounded-xl w-fit  ">
         <header className="flex justify-between items-center pb-4 ">
           <h2 className="text-xl font-semibold text-[#202020]">
             Add Internship
@@ -36,7 +36,7 @@ const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
             <MdOutlineCancel size={28} />
           </button>
         </header>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-15  mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10  mt-4">
           <RowFirst register={register} errors={errors} />
           <RowSecond register={register} errors={errors} />
           <RowThree register={register} errors={errors} />
