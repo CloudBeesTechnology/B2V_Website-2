@@ -79,7 +79,6 @@ const LeavePolicyForAttend: React.FC = () => {
             </div>
           </div>
 
-
           {/* Unpaid Leave Section */}
           <div>
             <div className="flex justify-between items-center space-y-2">
