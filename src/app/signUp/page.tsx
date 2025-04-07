@@ -36,7 +36,7 @@ export default function SignUp() {
      <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="block text_size_10 mb-1 text-gray">Email Address</label>
-          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 hover:border-2">
+          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaEnvelope className="text-primary mr-2" />
             <input
               type="email"
@@ -50,7 +50,7 @@ export default function SignUp() {
 
         <div>
           <label className="block text_size_10 mb-1 text-gray">Select Type</label>
-          <div className="flex items-center gap-5 border border-primary rounded-md px-3 py-3 hover:border-2">
+          <div className="flex items-center gap-5 border border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaUser className="text-primary mr-2" />
             <select
               className="w-full focus:outline-none bg-transparent text-[14px]"
@@ -66,7 +66,7 @@ export default function SignUp() {
 
         <div>
           <label className="block text_size_10 mb-1 text-gray">Your Password</label>
-          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 hover:border-2">
+          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaLock className="text-primary mr-2" />
             <input
               type="password"
@@ -88,7 +88,7 @@ export default function SignUp() {
           type="submit"
           className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10"
         >
-          SIGN IN
+          SIGN Up
         </button>
       </form>
     </AuthLayout>

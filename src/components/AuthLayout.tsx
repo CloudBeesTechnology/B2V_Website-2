@@ -25,7 +25,7 @@ export default function AuthLayout({
   image: StaticImageData; 
 }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen w-full">
       {/* Left Side Image & Text */}
       <div className="hidden lg:flex w-1/2 bg-blue-50 justify-center items-center">
         <div className="text-center">
@@ -56,7 +56,7 @@ export default function AuthLayout({
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 py-12">
+      <div className="w-full  lg:w-1/2 flex flex-col bg-white justify-center items-center px-6 py-12">
         <div className="text-center mb-24">
           <Image src={logo} priority alt="Logo" className="mx-auto w-36 mb-4" />
           <h2 className="text_size_9 text-gray">{title}</h2>

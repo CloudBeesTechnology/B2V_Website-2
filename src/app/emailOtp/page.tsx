@@ -30,7 +30,7 @@ export default function EmailOtp() {
   const handleSubmit = () => {
     const enteredCode = codes.join('');
     console.log("Entered OTP:", enteredCode);
-    alert(`Code entered: ${enteredCode}`);
+    // alert(`Code entered: ${enteredCode}`);
   };
 
   return (
@@ -63,7 +63,7 @@ export default function EmailOtp() {
          <div className="mb-5 text-end">
           <button
             onClick={() => alert('Resend code')}
-            className="text-primary text-sm underline "
+            className="text-primary text-sm underline cursor-pointer"
           >
             Re-send
           </button>

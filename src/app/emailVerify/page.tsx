@@ -1,4 +1,4 @@
-import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
 import emailImg from "../../assets/sign/emailImg.png";
 
@@ -14,7 +14,7 @@ export default function EmailVerify() {
       <form className="w-full max-w-md space-y-4">
         <div>
           <label className="block text_size_10 mb-1 text-gray">Email Address</label>
-          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 hover:border-2">
+          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaEnvelope className="text-primary mr-2" />
             <input
               type="email"
