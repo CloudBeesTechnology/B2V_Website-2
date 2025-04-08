@@ -1,8 +1,15 @@
+"use client"
 import { FaLock } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
 import passwordImg from "../../assets/sign/passwordImg.png";
+import { useRouter } from "next/navigation"; 
 
 export default function PasswordSet() {
+   const router = useRouter();
+      const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // prevent page reload  
+        router.push("/signIn");
+      };
   return (
     <AuthLayout
       title="Set Password"
@@ -11,7 +18,7 @@ export default function PasswordSet() {
       backHref="Back"
       image={passwordImg}
     >
-      <form className="w-full max-w-md space-y-4">
+      <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="block text_size_10 mb-1 text-gray">New Password</label>
           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">

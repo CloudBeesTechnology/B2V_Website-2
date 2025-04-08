@@ -1,17 +1,25 @@
+"use client"
 import { FaEnvelope } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
 import emailImg from "../../assets/sign/emailImg.png";
+import { useRouter } from "next/navigation"; 
 
 export default function EmailVerify() {
+  const router = useRouter();
+      const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // prevent page reload
+    
+        router.push("/emailOtp");
+      };
   return (
     <AuthLayout
       title="Enter your Email Address"
       subtitle="A verification code will be sent to your registered email ID."
-      linkHref="/signUp"
+      linkHref="/signIn"
       backHref="Back"
       image={emailImg}
     >
-      <form className="w-full max-w-md space-y-4">
+      <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="block text_size_10 mb-1 text-gray">Email Address</label>
           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">

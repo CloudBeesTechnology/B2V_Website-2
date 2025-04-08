@@ -77,7 +77,7 @@ export default function SignIn() {
             />
           </div>
           <Link
-            href="/forgot-password"
+            href="/emailVerify"
             className="text_size_5 font-semibold text-primary float-right mt-3"
           >
             Forgot password?

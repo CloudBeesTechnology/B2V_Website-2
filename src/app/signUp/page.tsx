@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
-import Link from "next/link";
 import AuthLayout from "@/components/AuthLayout";
 import signUpImg from "../../assets/sign/signUpImg.png";
 import { useRouter } from "next/navigation"; 
@@ -76,12 +75,6 @@ export default function SignUp() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Link
-            href="/forgot-password"
-            className="text_size_5 font-semibold text-primary float-right mt-3"
-          >
-            Forgot password?
-          </Link>
         </div>
 
         <button
