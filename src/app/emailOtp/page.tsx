@@ -2,6 +2,7 @@
 import AuthLayout from "@/components/AuthLayout";
 import emailImg from "../../assets/sign/emailImg.png";
 import { useState } from 'react';
+import { useRouter } from "next/navigation"; 
 
 export default function EmailOtp() {
   const [codes, setCodes] = useState(Array(5).fill(''));
@@ -27,10 +28,13 @@ export default function EmailOtp() {
     }
   };
 
+  const router = useRouter();
   const handleSubmit = () => {
     const enteredCode = codes.join('');
     console.log("Entered OTP:", enteredCode);
-    alert(`Code entered: ${enteredCode}`);
+    // alert(`Code entered: ${enteredCode}`);
+    router.push("/passwordSet");
+
   };
 
   return (
@@ -63,7 +67,7 @@ export default function EmailOtp() {
          <div className="mb-5 text-end">
           <button
             onClick={() => alert('Resend code')}
-            className="text-primary text-sm underline "
+            className="text-primary text-sm underline cursor-pointer"
           >
             Re-send
           </button>
