@@ -12,7 +12,7 @@ type CardType = {
   route: string;
 };
 
-const cards: CardType[] = [
+const tiles: CardType[] = [
   {
     image: employeeDetails,
     title: "Employee Details",
@@ -30,7 +30,7 @@ const cards: CardType[] = [
   },
 ];
 
-const ReportTails: React.FC = () => {
+const ReportTiles: React.FC = () => {
   const router = useRouter();
 
   const handleClick = (route: string) => {
@@ -40,7 +40,7 @@ const ReportTails: React.FC = () => {
     <section className="py-10 bg-gray-100 min-h-screen flex items-start justify-start">
       {/* grid grid-cols-1 md:grid-cols-3 */}
       <div className="flex justify-start gap-10 max-w-5xl w-full">
-        {cards.map((card, index) => (
+        {tiles.map((card, index) => (
           <article
             key={index}
             onClick={() => handleClick(card.route)}
@@ -61,4 +61,4 @@ const ReportTails: React.FC = () => {
   );
 };
 
-export default ReportTails;
+export default ReportTiles;

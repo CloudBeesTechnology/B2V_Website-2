@@ -1,10 +1,10 @@
 import ReportDetails from "./reportDetails/page";
-import ReportTails from "./reportTails";
+import ReportTiles from "./reportTiles";
 
 const Report: React.FC = () => {
   return (
     <main>
-      <ReportTails />
+      <ReportTiles />
       <ReportDetails />
     </main>
   );

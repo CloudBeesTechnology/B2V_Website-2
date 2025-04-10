@@ -23,7 +23,9 @@ const EmpApplyLeaveTable: React.FC<Props> = ({
   return (
     <section className="mt-10">
       <form onSubmit={handleSubmit(onSubmit)}>
+      <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3>
         <div className="bg-white border-[#D7D5D5] rounded-md border">
+          
           <table className="w-full py-2">
             <thead className="border-b border-[#D7D5D5]">
               <tr className="text_size_4 text-gray">
