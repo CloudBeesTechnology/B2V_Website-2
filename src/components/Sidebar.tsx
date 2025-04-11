@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React from "react";
 import attendance from "../assets/sidebar/attendance.svg";
+import internship from "../assets/sidebar/internship.svg";
 import overview from "../assets/sidebar/overview.svg";
 import employee from "../assets/sidebar/employee.svg";
 import leavemanagement from "../assets/sidebar/leavemanagement.svg";
@@ -35,6 +36,11 @@ const Sidebar = () => {
       path: "/attendance",
     },
     {
+      icons: internship,
+      name: "Internship",
+      path: "/internship",
+    },
+    {
       icons: leavemanagement,
       name: "Leave Management",
       path: "/leavemanagement",
@@ -55,7 +61,8 @@ const Sidebar = () => {
       path: "/report",
     },
   ];
-
+ 
+  
   return (
     <section className="p-5 space-y-2 h-full ">
       <div className="max-w-[100px] w-full h-20 mx-auto center">

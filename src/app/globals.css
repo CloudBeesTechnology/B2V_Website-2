@@ -54,6 +54,21 @@
     @apply text-xl font-medium
   }
   .text_size_9{
-    @apply text-xl font-semibold
+    @apply text-2xl font-extrabold
   }
+  .text_size_10{
+    @apply text-lg font-medium
+  }
+}
+
+/* =========================== */
+/* ✅ Chrome Autofill Override */
+/* =========================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: #000 !important; /* black text */
+  box-shadow: 0 0 0 1000px #F9FBFD inset !important; /* match your input bg */
 }
