@@ -4,8 +4,11 @@ import EmpLeaveCounts from "./empLeaveCounts";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LeaveFormData, leaveSchema } from "@/app/services/validations/empPortalValidation/applyLeaveValitaion";
-
+import {
+  LeaveFormData,
+  leaveSchema,
+} from "@/app/services/validations/empPortalValidation/applyLeaveValitaion";
+import EmpHistoryOfLeave from "./empHistoryOfLeave";
 
 const EmpApplyLeave: React.FC = () => {
   const {
@@ -32,6 +35,7 @@ const EmpApplyLeave: React.FC = () => {
         errors={errors}
         onSubmit={onSubmit}
       />
+      <EmpHistoryOfLeave />
     </main>
   );
 };
