@@ -36,7 +36,7 @@ export default function AuthLayout({
             className="mx-auto w-2/3" 
             />
           {linkText && linkHref && (
-            <p className="mt-4 text_size_10 flex justify-evenly">
+            <p className="mt-4 text_size_10 flex justify-evenly text-medium_gray">
               {linkText}{" "}
               <Link href={linkHref} className="text-primary font-semibold ml-1">
                 {linkName}
