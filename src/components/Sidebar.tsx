@@ -1,17 +1,23 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
-import attendance from "../assets/sidebar/attendance.png";
-import overview from "../assets/sidebar/overview.png";
-import employee from "../assets/sidebar/employee.png";
-import leavemanagement from "../assets/sidebar/leavemanagement.png";
-import timesheet from "../assets/sidebar/timesheet.png";
-import setting from "../assets/sidebar/settings.png";
-import report from "../assets/sidebar/report.png";
-import logout from "../assets/sidebar/Logout.png";
+import attendance from "../assets/sidebar/attendance.svg";
+import overview from "../assets/sidebar/overview.svg";
+import employee from "../assets/sidebar/employee.svg";
+import leavemanagement from "../assets/sidebar/leavemanagement.svg";
+import timesheet from "../assets/sidebar/timesheet.svg";
+import setting from "../assets/sidebar/setting.svg";
+import report from "../assets/sidebar/report.svg";
+import logout from "../assets/sidebar/Logout.svg";
 import logo from "../assets/logo/logo.png";
 import Link from "next/link";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
+  const pathname = usePathname();
+ 
   const navList = [
     {
       icons: overview,
@@ -51,15 +57,20 @@ const Sidebar = () => {
   ];
 
   return (
-    <section className="p-5 space-y-2 h-full " >
+    <section className="p-5 space-y-2 h-full ">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
         <Image src={logo} alt="logo not found" />
       </div>
       <div className="h-[calc(100%-5rem)] flex flex-col justify-between">
-        <div className=" space-y-10 mt-3">
+        <div className=" space-y-5 mt-3">
           {navList.map((link, index) => {
             return (
-              <div key={index}>
+              <div
+                key={index}
+                className={clsx(
+                  pathname === link.path ? "bg-primary px-2 py-2 rounded-sm text-white" : "px-2 py-2"
+                )}
+              >
                 <Link href={link.path} className="flex items-center gap-3">
                   <Image
                     src={link.icons}

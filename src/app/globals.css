@@ -53,4 +53,7 @@
   .text_size_8{
     @apply text-xl font-medium
   }
+  .text_size_9{
+    @apply text-xl font-semibold
+  }
 }
