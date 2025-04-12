@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 import { IoNotificationsOutline, IoSearchSharp, IoMicOutline } from "react-icons/io5";
 import { FaSortDown } from "react-icons/fa";
