@@ -18,13 +18,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAuthPage = pathList.includes(pathname);
   let IsSignedIn = null;
   if (typeof window !== "undefined") {
-    IsSignedIn = localStorage.getItem("signIN");
+    IsSignedIn = localStorage.getItem("SignIn");
   }
   // IsSignedIn=localStorage.getItem("signIN")
 
-  return isAuthPage && IsSignedIn ? (
+  return isAuthPage  ? (
     <main >{children}</main>
-  ) : (
+  ) : IsSignedIn && (
     <section className="flex h-screen">
       <div className="w-64 fixed top-0 left-0 h-screen overflow-hidden shadow-[3px_0px_13px_rgba(128,128,128,0.4)]">
         <Sidebar />

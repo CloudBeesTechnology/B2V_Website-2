@@ -1,11 +1,31 @@
-'use client'
+"use client";
 
 import Image from "next/image";
-import { IoNotificationsOutline, IoSearchSharp, IoMicOutline } from "react-icons/io5";
+import {
+  IoNotificationsOutline,
+  IoSearchSharp,
+  IoMicOutline,
+} from "react-icons/io5";
 import { FaSortDown } from "react-icons/fa";
 import avatar from "../assets/navbar/Missing_avatar.svg.png";
+import { auth } from "@/lib/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("User signed out");
+        router.push("/signIn");
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      }); 
+    }
+
   return (
     <section className="bg-morelite_grey px-5 py-3 flex">
       <div className="flex justify-end items-center w-full gap-4">
@@ -13,10 +33,16 @@ const Navbar = () => {
           <span className="text-gray">
             <IoSearchSharp />
           </span>
-          <input type="text" placeholder="Search" className="text_size_6 text-lite_gray outline-none py-1"/>
-          <span className="text-approved_blue text-lg"><IoMicOutline /></span>
+          <input
+            type="text"
+            placeholder="Search"
+            className="text_size_6 text-lite_gray outline-none py-1"
+          />
+          <span className="text-approved_blue text-lg">
+            <IoMicOutline />
+          </span>
         </div>
-        <article >
+        <article>
           <p className="text-gray text-2xl">
             <IoNotificationsOutline />
           </p>
@@ -27,14 +53,18 @@ const Navbar = () => {
             <p className="text-medium_gray font-medium">Position</p>
           </article>
           <div className="bg-white rounded-md max-w-[50px] w-full">
-          <Image src={avatar} alt="profile not found" className="bg-cover w-full"  />
+            <Image
+              src={avatar}
+              alt="profile not found"
+              className="bg-cover w-full"
+            />
           </div>
-          <p className="text-gray text-xl">
+          <p className="text-gray text-xl cursor-pointer" onClick={handleLogout}> 
             <FaSortDown />
+            Logout
           </p>
         </article>
       </div>
-
     </section>
   );
 };
