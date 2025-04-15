@@ -1,31 +1,45 @@
-import { LeaveFormData } from "@/app/services/validations/empPortalValidation/applyLeaveValitaion";
 import {
-  UseFormRegister,
-  FieldErrors,
-  UseFormHandleSubmit,
-} from "react-hook-form";
+  LeaveFormData,
+  leaveSchema,
+} from "@/app/services/validations/empPortalValidation/applyLeaveValitaion";
+import { db } from "@/lib/firebaseConfig";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { doc, setDoc } from "firebase/firestore";
+import { log } from "node:console";
+import { useForm } from "react-hook-form";
 
+const EmpApplyLeaveTable = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LeaveFormData>({
+    resolver: zodResolver(leaveSchema),
+  });
 
-// ✅ Define Props Type
-interface Props {
-  register: UseFormRegister<LeaveFormData>;
-  handleSubmit: UseFormHandleSubmit<LeaveFormData>;
-  errors: FieldErrors<LeaveFormData>;
-  onSubmit: (data: LeaveFormData) => void;
-}
+  const onSubmit = async (data: LeaveFormData) => {
+    // console.log("✅ Submitted Data:", data);
+    const createdAt=new Date().toISOString()
+    await setDoc(doc(db,"leaveStatus",createdAt),{
+      endDate: data.endDate,
+      leaveReason: data.leaveReason,
+      leaveType: data.leaveType,
+      startDate: data.startDate,
+      createdAt:createdAt
+    }).then((res)=>{
+      console.log(res,"res");
+      
+    }).catch((error)=>{
+      console.log(error);
+      
+    })
+  };
 
-const EmpApplyLeaveTable: React.FC<Props> = ({
-  register,
-  handleSubmit,
-  errors,
-  onSubmit,
-}) => {
   return (
     <section className="mt-10">
       <form onSubmit={handleSubmit(onSubmit)}>
-      <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3>
+        <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3>
         <div className="bg-white border-[#D7D5D5] rounded-md border">
-          
           <table className="w-full py-2">
             <thead className="border-b border-[#D7D5D5]">
               <tr className="text_size_4 text-gray">

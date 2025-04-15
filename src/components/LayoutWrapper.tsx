@@ -1,8 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import { useEffect, useState } from 'react';
 
 const pathList = [
   "/signIn",
@@ -14,17 +15,26 @@ const pathList = [
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router=useRouter()
 
   const isAuthPage = pathList.includes(pathname);
-  let IsSignedIn = null;
-  if (typeof window !== "undefined") {
-    IsSignedIn = localStorage.getItem("SignIn");
-  }
-  // IsSignedIn=localStorage.getItem("signIN")
+  const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const signInStatus = localStorage.getItem('SignIn');
+      setIsSignedIn(!!signInStatus);
+
+      // If not signed in and not already on an auth page, redirect
+      if (!signInStatus && !isAuthPage) {
+        router.replace('/signIn');
+      }
+    }
+  }, [pathname]);
+  if (isSignedIn === null && !isAuthPage) return null;
 
   return isAuthPage  ? (
     <main >{children}</main>
-  ) : IsSignedIn && (
+  ) : isSignedIn && (
     <section className="flex h-screen">
       <div className="w-64 fixed top-0 left-0 h-screen overflow-hidden shadow-[3px_0px_13px_rgba(128,128,128,0.4)]">
         <Sidebar />
