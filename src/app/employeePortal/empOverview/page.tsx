@@ -11,6 +11,7 @@ const EmpOverview: React.FC = () => {
       <EmpBasicDetails />
       <EmpAvailableLeaves />
       <EmpLeaveStatusTable />
+      
     </main>
   );
 };
