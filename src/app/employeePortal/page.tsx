@@ -1,9 +1,9 @@
-import Overview from "./empOverview/page";
+import EmpOverview from "../empOverview/page";
 
 const Home: React.FC = () => {
   return (
     <main>
-      <Overview />
+      <EmpOverview/>
     </main>
   );
 };

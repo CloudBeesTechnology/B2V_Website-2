@@ -38,8 +38,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { DMSans } from "./ui/font";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
+import LayoutWrapper from "@/components/LayoutWrapper";
+
 
 export const metadata: Metadata = {
   title: "B2V TECH",
@@ -51,24 +51,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body className={` ${DMSans.className} antialiased `}>
         {/* <Layout>{children}</Layout> */}
-
-        <section className="flex  h-screen">
-          <div className="w-64 fixed top-0 left-0 h-screen overflow-hidden shadow-[3px_0px_13px_rgba(128,128,128,0.4)]" >
-            <Sidebar />
-          </div>
-          <div className="fixed top-0 h-screen ml-64 w-[calc(100%-16rem)] bg-[#F5F5F5] overflow-auto">
-            <div className="w-full h-20 sticky top-0">
-              <Navbar />
-            </div>
-            <main className="px-10">{children}</main>
-          </div>
-        </section>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
 }
-

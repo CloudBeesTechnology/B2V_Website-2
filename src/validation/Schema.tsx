@@ -12,7 +12,10 @@ export const SignInSchema = Yup.object().shape({
 export const signUpSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Email is required"),
     role: Yup.string().required("Role is required"),
-    password: Yup.string()
+    number: Yup.string()
+    .required("Phone Number is required")
+    .matches(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
+      password: Yup.string()
     .required("Password is required")
     .min(6, "Password must be at least 6 characters")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")

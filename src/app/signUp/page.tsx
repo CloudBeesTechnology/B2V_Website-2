@@ -1,4 +1,3 @@
-// SignUp.tsx
 "use client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -29,6 +28,7 @@ export default function SignUp() {
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: data.email,
+        number: data.number,
         password: hashedPassword,
         role: data.role,
         status: "Pending",
@@ -65,6 +65,19 @@ export default function SignUp() {
             />
           </div>
           <p className="text-red-500 text-[16px] mt-1">{errors.email?.message}</p>
+        </div>
+        <div>
+          <label className="block text_size_10 mb-1 text-gray">Phone Number</label>
+          <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
+            <FaEnvelope className="text-primary mr-2" />
+            <input
+              type="number"
+              placeholder="Enter your Phone Number"
+              {...register("number")}
+              className="w-full focus:outline-none text-lg"
+            />
+          </div>
+          <p className="text-red-500 text-[16px] mt-1">{errors.number?.message}</p>
         </div>
 
         {/* Role */}
@@ -223,4 +236,3 @@ export default function SignUp() {
 //     </AuthLayout>
 //   );
 // }
-
