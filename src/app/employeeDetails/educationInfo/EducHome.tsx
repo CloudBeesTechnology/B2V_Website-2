@@ -96,7 +96,7 @@ export const EducHome = () => {
         
           <div className="mb-20 pt-10 center">
             <button className="text-[15px] text-white bg-primary px-5 py-3 w-[20%] rounded-md">
-              Save
+              Next
             </button>
           </div>
         </section>
