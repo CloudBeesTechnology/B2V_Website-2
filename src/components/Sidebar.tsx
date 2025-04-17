@@ -28,10 +28,11 @@ import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
   const pathname = usePathname();
-  type UserRole = 'EMPLOYEE' | 'INTERN' | 'ADMIN';
-  const userRole = (typeof window !== "undefined"
-    ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
-    : null);
+  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN";
+  const userRole =
+    typeof window !== "undefined"
+      ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
+      : null;
   const navList = [
     {
       icons: overview,
@@ -107,7 +108,13 @@ const Sidebar = () => {
     },
   ];
   const roleAccessMap = {
-    EMPLOYEE: ["Overview", "Upcoming Holidays", "Apply Leave", "Timesheet", "Settings"],
+    EMPLOYEE: [
+      "Overview",
+      "Upcoming Holidays",
+      "Apply Leave",
+      "Timesheet",
+      "Settings",
+    ],
     INTERN: ["Overview", "Task", "Timesheet", "Settings"],
     ADMIN: [
       "Overview",
@@ -123,9 +130,9 @@ const Sidebar = () => {
   };
 
   const filteredNavList =
-  typeof userRole === 'string' && roleAccessMap[userRole]
-    ? navList.filter(item => roleAccessMap[userRole].includes(item.name))
-    : [];
+    typeof userRole === "string" && roleAccessMap[userRole]
+      ? navList.filter((item) => roleAccessMap[userRole].includes(item.name))
+      : [];
 
   return (
     <section className="p-5 h-full overflow-y-auto">

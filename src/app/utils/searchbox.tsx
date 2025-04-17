@@ -7,7 +7,7 @@ const Searchbox: React.FC = () => {
     <div className="center">
       <input
         type="text"
-        className="w-full p-2 font-semibold border border-[#DCE0E5] rounded-l-md outline-none"
+        className="w-auto  p-2 font-semibold border border-[#DCE0E5] rounded-l-md outline-none"
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

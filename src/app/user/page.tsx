@@ -1,8 +1,10 @@
+import UserHome from "./userHome";
 
-
-export default function UserPage  ()  {
+const UserPage: React.FC = () => {
   return (
-    <div>USer page</div>
-  )
-}
-
+    <>
+      <UserHome />
+    </>
+  );
+};
+export default UserPage;
