@@ -1,32 +1,21 @@
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from 'zod';
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { personalInfoSchema } from "@/validation/Schema"
 import profileIcon from '../../../assets/employee/profileIcon.png';
 
 interface PersonalInfoFormData {
   name: string;
   contact: string;
   email: string;
-  address: string;
-  phone: string;
+  department: string;
+  position: string;
   proof: string;
   profilePhoto?: File | string | null;
 }
-
-// ✅ Zod schema
-const personalInfoSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  contact: z.string().min(1, 'Contact is required'),
-  email: z.string().email('Invalid email address'),
-  address: z.string().min(1, 'Address is required'),
-  phone: z.string().min(1, 'Phone number is required'),
-  proof: z.string().min(1, 'Proof is required'),
-  profilePhoto: z.any().optional(),
-});
 
 export const PersonalInfoForm = () => {
   
@@ -156,35 +145,35 @@ export const PersonalInfoForm = () => {
 
           <div className="flex justify-between mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="address" className="text-[15px] text-gray">
-                Address<sup className="text-red">*</sup>
+              <label htmlFor="department" className="text-[15px] text-gray">
+              Department<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="address"
+                  id="department"
                   className="outline-none py-1 w-full"
-                  {...register('address')}
+                  {...register('department')}
                 />
               </div>
-              {errors.address && (
-                <span className="text-red text-sm">{errors.address.message}</span>
+              {errors.department && (
+                <span className="text-red text-sm">{errors.department.message}</span>
               )}
             </div>
 
             <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="phone" className="text-[15px] text-gray">
-                Phone No<sup className="text-red">*</sup>
+              <label htmlFor="position" className="text-[15px] text-gray">
+                Position<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="phone"
+                  id="position"
                   type="tel"
                   className="outline-none py-1 w-full"
-                  {...register('phone')}
+                  {...register('position')}
                 />
               </div>
-              {errors.phone && (
-                <span className="text-red text-sm">{errors.phone.message}</span>
+              {errors.position && (
+                <span className="text-red text-sm">{errors.position.message}</span>
               )}
             </div>
 
@@ -208,7 +197,7 @@ export const PersonalInfoForm = () => {
           <div className="mb-20 pt-10 center">
             <button
               type="submit"
-              className="text-[15px] text-white bg-primary px-5 py-3 w-[20%] rounded-md"
+              className="text-[15px] cursor-pointer text-white bg-primary px-5 py-3 w-[20%] rounded-md"
             >
               Next
             </button>

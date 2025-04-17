@@ -1,6 +1,16 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { familySchema } from "@/validation/Schema"; // Make sure this schema is defined
+// import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore"; 
 
 interface FamilyDetails {
   father: string;
@@ -8,7 +18,7 @@ interface FamilyDetails {
   siblings: string;
   fatherOcc: string;
   motherocc: string;
-  contactNO: string;
+  homeNumber: string;
   address: string;
 }
 
@@ -21,9 +31,53 @@ export const FamilyHome = () => {
     resolver: yupResolver(familySchema),
   });
 
+
   const onSubmit = async (data: FamilyDetails) => {
     console.log("Family Data:", data);
-    localStorage.setItem("familyData", JSON.stringify(data));
+    try {
+      const isBrowser = typeof window !== "undefined";
+  
+      const experienceData = isBrowser ? localStorage.getItem("experienceData") : null;
+      const personalInfo = isBrowser ? localStorage.getItem("personalInfo") : null;
+      const educationInfo = isBrowser ? localStorage.getItem("educationData") : null;
+  
+      const parsedExperienceData = experienceData ? JSON.parse(experienceData) : {};
+      const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
+      const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
+  
+      // 🔽 Step 1: Fetch the latest empID
+      const empQuery = query(
+        collection(db, "employeeDetails"),
+        orderBy("empID", "desc"), // or use createdAt if empID isn't reliable
+        limit(1)
+      );
+  
+      const querySnapshot = await getDocs(empQuery);
+  
+      let newCBTID = "CBT0001"; // default if no record found
+      if (!querySnapshot.empty) {
+        const lastCBT = querySnapshot.docs[0].data().CBTID;
+        const lastNumber = parseInt(lastCBT.replace("CBT", ""), 10);
+        const nextNumber = lastNumber + 1;
+        newCBTID = `CBT${String(nextNumber).padStart(4, "0")}`;
+      }
+  
+      // 🔁 Combine all data with new empID
+      const combinedData = {
+        ...parsedExperienceData,
+        ...parsedPersonalInfo,
+        ...parsedEducationInfo,
+        ...data,
+        empID: newCBTID,
+        createdAt: new Date().toISOString(),
+      };
+  
+      const docRef = await addDoc(collection(db, "employeeDetails"), combinedData);
+      console.log("Data successfully written with ID:", docRef.id);
+    } catch (error) {
+      console.error("Error writing document to Firestore:", error);
+      throw error;
+    }
   };
 
   return (
@@ -117,18 +171,18 @@ export const FamilyHome = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="contactNO" className="text-[15px] text-gray">
+              <label htmlFor="homeNumber" className="text-[15px] text-gray">
                 Contact Number <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="contactNO"
-                  {...register("contactNO")}
+                  id="homeNumber"
+                  {...register("homeNumber")}
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.contactNO && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.contactNO.message}</p>
+              {errors.homeNumber && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.homeNumber.message}</p>
               )}
             </div>
           </div>
@@ -158,3 +212,35 @@ export const FamilyHome = () => {
     </section>
   );
 };
+
+
+
+// const onSubmit = async (data: FamilyDetails) => {
+  //   console.log("Family Data:", data);
+  //   try {
+  //     const isBrowser = typeof window !== "undefined";
+  
+  //     const experienceData = isBrowser ? localStorage.getItem("experienceData") : null;
+  //     const personalInfo = isBrowser ? localStorage.getItem("personalInfo") : null;
+  //     const educationInfo = isBrowser ? localStorage.getItem("educationData") : null;
+  
+  //     const parsedExperienceData = experienceData ? JSON.parse(experienceData) : {};
+  //     const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
+  //     const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
+  
+  //     const combinedData = {
+  //       ...parsedExperienceData,
+  //       ...parsedPersonalInfo,
+  //       ...parsedEducationInfo,
+  //       ...data,
+  //       createdAt: new Date().toISOString(),
+  //     };
+  
+  //     const docRef = await addDoc(collection(db, "employeeDetails"), combinedData);
+  //     console.log("Data successfully written with ID:", docRef.id);
+  //   } catch (error) {
+  //     console.error("Error writing document to Firestore:", error);
+  //     throw error;
+  //   }
+  // };
+  

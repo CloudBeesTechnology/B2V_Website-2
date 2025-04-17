@@ -3,7 +3,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { MdOutlineAddBox } from "react-icons/md";
 import { experienceSchema } from "@/validation/Schema"
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Experience {
   year: string;
@@ -24,7 +24,7 @@ export const ExperienceHome = () => {
     control,
     formState: { errors },
   } = useForm<ExperienceDetails>({
-    resolver: yupResolver(experienceSchema),
+    resolver: zodResolver(experienceSchema),
     defaultValues: {
       experiences: [{  
         year:"", 
@@ -40,15 +40,19 @@ export const ExperienceHome = () => {
     control,
     name: "experiences",
   });
-
+  
   const onSubmit = (data: ExperienceDetails) => {
-    const dataToStore = {
+    console.log("Experience Data:", data);
+    // const educationInfo = localStorage.getItem("educationData");
+    // const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
+
+    const combinedData = {
+      // educationInfo: parsedEducationInfo,
       ...data,
     };
-    console.log("Experience Data:", dataToStore);
-    localStorage.setItem("experienceData", JSON.stringify(dataToStore));
-  };
-
+      localStorage.setItem("experienceData", JSON.stringify(combinedData));
+  }; 
+  
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col  w-full justify-between ">

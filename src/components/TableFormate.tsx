@@ -22,8 +22,9 @@ interface allEmployee {
   empID: string;
   name: string;
   position: string;
-  role: string;
-  contactNo: string;
+  department: string;
+  // role: string;
+  contact: string;
   email: string;
 }
 interface TableProps {
@@ -78,10 +79,11 @@ export const TableFormate = ({
                   />
                   {val.empID}
                 </td>
-                <td className="text-start py-2 px-4">{val.name}</td>
+                <td className="text-start py-2 px-4">{val.name }</td>
+                {/* <td className="text-start py-2 px-4">{val.role}</td> */}
                 <td className="text-start py-2 px-4">{val.position}</td>
-                <td className="text-start py-2 px-4">{val.role}</td>
-                <td className="text-start py-2 px-4">{val.contactNo}</td>
+                <td className="text-start py-2 px-4">{val.department}</td>
+                <td className="text-start py-2 px-4">{val.contact}</td>
                 <td className="text-start py-2 px-4">{val.email}</td>
                 <td className="text-start py-2 px-4">
                   <FaEdit />
