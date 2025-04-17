@@ -47,6 +47,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     </section>
   ) : null;
 }
+
 // 'use client';
 
 // import { usePathname } from 'next/navigation';
