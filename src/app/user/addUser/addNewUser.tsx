@@ -12,10 +12,11 @@ import { IoArrowBack } from "react-icons/io5";
 import SetPermissionBox from "./setPermission";
 import { useState } from "react";
 
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+
 const AddNewUser: React.FC = () => {
-  const [selectedModules, setSelectedModules] = useState<{
-    [module: string]: string[];
-  }>({});
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
 
   const {
     register,
@@ -25,13 +26,26 @@ const AddNewUser: React.FC = () => {
     resolver: yupResolver(addUserSchema),
   });
 
-  const onSubmit = (data: AddUserFormData) => {
-    let finalData = {
-      ...data,
-      permission: JSON.stringify(selectedModules),
-    };
+  const onSubmit = async (data: AddUserFormData) => {
+    try {
+      let finalData = {
+        empId: data.empId,
+        // position: data.position,
+        // department: data.department,
+        permission: selectedModules,
+        createdAt: serverTimestamp(),
+      };
+      const userRes = await addDoc(collection(db, "userDetails"), {
+        finalData,
+      });
 
-    console.log("finalData : ", finalData);
+      if (userRes.id) {
+        alert("User created successfully!");
+      }
+    } catch (error) {
+      console.error("Error adding user:", error);
+      alert("Failed to create user.");
+    }
   };
 
   const router = useRouter();
@@ -100,7 +114,7 @@ const AddNewUser: React.FC = () => {
           <div className="center mt-10">
             <button
               type="submit"
-              className="text-center text_size_3  px-8 py-2 bg-primary text-white rounded"
+              className="text-center text_size_3  px-8 py-2 bg-primary text-white rounded cursor-pointer"
             >
               SAVE
             </button>
