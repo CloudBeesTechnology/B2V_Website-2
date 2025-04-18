@@ -41,7 +41,7 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
             <div
               key={sub}
               onClick={() => handleToggle(sub)}
-              className="flex justify-between items-center text-gray text_size_4 cursor-pointer p-2 rounded-md"
+              className="flex justify-between items-center text-gray text_size_3 cursor-pointer p-2 rounded-md"
             >
               <span>{sub}</span>
               {isChecked ? (
