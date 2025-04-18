@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -22,8 +21,7 @@ export default function EmployeeLayout() {
         {selectedTab === "personalInfo" && <PersonalPage />}
         {selectedTab === "educationInfo" && <EducationPage />}
         {selectedTab === "experience" && <ExperiencePage />}
-        {selectedTab === "familyInfo" && <FamilyPage />}
-      
+        {selectedTab === "familyInfo" && <FamilyPage />} 
       </div>
     </section>
   );

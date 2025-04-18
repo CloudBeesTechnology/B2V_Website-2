@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import * as z from 'zod';
 
 export const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -34,23 +35,34 @@ export const signUpSchema = Yup.object().shape({
       .oneOf([Yup.ref("password")], "Passwords must match"),
   });
 
-  export const educationSchema = Yup.object().shape({
-    degree: Yup.string().required("Bachelor’s degree is required"),
-    study: Yup.string().required("Field of study is required"),
-    school: Yup.string().required("School is required"),
-    master: Yup.string().required("Master’s degree is required"),
-    field: Yup.string().required("Field of study is required"),
-    highSchool: Yup.string().required("High school is required"),
-    courses: Yup
-      .array()
-      .of(
-        Yup.object().shape({
-          course: Yup.string().required("Course certificate is required"),
-          academic: Yup.string().required("Academic name is required"),
+
+  export const personalInfoSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    contact: z.string().min(1, 'Contact is required'),
+    email: z.string().email('Invalid email address'),
+    department: z.string().min(1, 'Department is required'),
+    position: z.string().min(1, 'Position is required'),
+    proof: z.string().min(1, 'Proof is required'),
+    profilePhoto: z.any().optional(),
+  });
+
+  export const educationSchema = z.object({
+    degree: z.string().nonempty("Bachelor’s degree is required"),
+    study: z.string().nonempty("Field of study is required"),
+    school: z.string().nonempty("School is required"),
+    master: z.string().nonempty("Master’s degree is required"),
+    field: z.string().nonempty("Field of study is required"),
+    highSchool: z.string().nonempty("High school is required"),
+    courses: z
+      .array(
+        z.object({
+          course: z.string().nonempty("Course certificate is required"),
+          academic: z.string().nonempty("Academic name is required"),
         })
       )
       .min(1, "At least one course is required"),
   });
+
 
   export const familySchema = Yup.object().shape({
     father: Yup.string().required("Father's name is required"),
@@ -58,22 +70,24 @@ export const signUpSchema = Yup.object().shape({
     siblings: Yup.string().required("Siblings info is required"),
     fatherOcc: Yup.string().required("Father's occupation is required"),
     motherocc: Yup.string().required("Mother's occupation is required"),
-    contactNO: Yup
+    homeNumber: Yup
       .string()
       .matches(/^[0-9]{10}$/, "Contact number must be 10 digits")
       .required("Contact number is required"),
     address: Yup.string().required("Address is required"),
   });
 
-  export const experienceSchema = Yup.object().shape({
-    experiences: Yup.array().of(
-      Yup.object().shape({
-        year: Yup.string().required("Year of experience is required"),
-        company: Yup.string().required("Company name is required"),
-        work: Yup.string().required("Work type is required"),
-        manager: Yup.string().required("Manager name is required"),
-        dept: Yup.string().required("Department is required"),
-        location: Yup.string().required("Location is required"),
+
+  export const experienceSchema = z.object({
+    experiences: z.array(
+      z.object({
+        year: z.string().nonempty("Year of experience is required"),
+        company: z.string().nonempty("Company name is required"),
+        work: z.string().nonempty("Work type is required"),
+        manager: z.string().nonempty("Manager name is required"),
+        dept: z.string().nonempty("Department is required"),
+        location: z.string().nonempty("Location is required"),
       })
     ),
   });
+  

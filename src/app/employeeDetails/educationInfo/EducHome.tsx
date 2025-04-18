@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { MdOutlineAddBox } from "react-icons/md";
 import { educationSchema } from "@/validation/Schema";
 
@@ -28,7 +28,7 @@ export const EducHome = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<EducationDetails>({
-    resolver: yupResolver(educationSchema),
+    resolver: zodResolver(educationSchema),
     defaultValues: {
       degree: "",
       study: "",
@@ -47,8 +47,17 @@ export const EducHome = () => {
 
   const onSubmit = (data: EducationDetails) => {
     console.log("Education Data:", data);
-    localStorage.setItem("educationData", JSON.stringify(data));
+
+    // const personalInfo = localStorage.getItem("personalInfo");
+    // const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
+
+    const combinedData = {
+      // personalInfo: parsedPersonalInfo,
+      ...data,
+    };
+      localStorage.setItem("educationData", JSON.stringify(combinedData));
   };
+  
 
   return (
     <section className="bg-white py-5 px-10 rounded-xl ">
@@ -58,7 +67,7 @@ export const EducHome = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col justify-between my-5">
         <section className="flex flex-col gap-4">
           <div className="flex gap-10 flex-wrap">
-            {/* Bachelor's Degree */}
+
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="degree" className="text-[15px] text-gray-600">
                 Bachelor’s degree<sup className="text-red-500">*</sup>
@@ -73,7 +82,6 @@ export const EducHome = () => {
               )}
             </div>
 
-            {/* Field of Study */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="study" className="text-[15px] text-gray-600">
                 Field of study<sup className="text-red-500">*</sup>
@@ -229,5 +237,3 @@ export const EducHome = () => {
     </section>
   );
 };
-
-
