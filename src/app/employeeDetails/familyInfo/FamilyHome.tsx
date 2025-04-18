@@ -35,61 +35,54 @@ export const FamilyHome = () => {
 
 
   const onSubmit = async (data: FamilyDetails) => {
-    console.log("Family Data:", data);
     try {
       const isBrowser = typeof window !== "undefined";
-  
+
       const experienceData = isBrowser ? localStorage.getItem("experienceData") : null;
       const personalInfo = isBrowser ? localStorage.getItem("personalInfo") : null;
       const educationInfo = isBrowser ? localStorage.getItem("educationData") : null;
-  
+
       const parsedExperienceData = experienceData ? JSON.parse(experienceData) : {};
       const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
       const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
-  
-      //  Step 1: Fetch the latest empID...
+
       const empQuery = query(
         collection(db, "employeeDetails"),
-        orderBy("empID", "desc"), // or use createdAt if empID isn't reliable
+        orderBy("empID", "desc"),
         limit(1)
       );
-  
+
       const querySnapshot = await getDocs(empQuery);
-  
-      let newCBTID = "CBT0001"; // default if no record found...
+
+      let newEmpID = "CBT0001";
       if (!querySnapshot.empty) {
-        const lastCBT = querySnapshot.docs[0].data().CBTID;
-        const lastNumber = parseInt(lastCBT.replace("CBT", ""), 10);
+        const lastEmpID = querySnapshot.docs[0].data().empID;
+        const lastNumber = parseInt(lastEmpID.replace("CBT", ""), 10);
         const nextNumber = lastNumber + 1;
-        newCBTID = `CBT${String(nextNumber).padStart(4, "0")}`;
+        newEmpID = `CBT${String(nextNumber).padStart(4, "0")}`;
       }
-  
-      //  Combine all data with new empID Dazta.....
+
       const combinedData = {
         ...parsedExperienceData,
         ...parsedPersonalInfo,
         ...parsedEducationInfo,
         ...data,
-        empID: newCBTID,
+        empID: newEmpID,
         createdAt: new Date().toISOString(),
       };
-  
+
       const docRef = await addDoc(collection(db, "employeeDetails"), combinedData);
       console.log("Data successfully written with ID:", docRef.id);
 
-      // Submit Button click its true remove all local store ....
       localStorage.removeItem("experienceData");
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("educationData");
 
-      router.push('/employee');
-
+      // router.push("/employee"); // Uncomment if you want to redirect
     } catch (error) {
       console.error("Error writing document to Firestore:", error);
-      throw error;
     }
   };
-
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
       <div>

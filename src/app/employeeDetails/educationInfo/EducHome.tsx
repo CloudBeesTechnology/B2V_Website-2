@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdOutlineAddBox } from "react-icons/md";
@@ -28,7 +28,7 @@ export const EducHome = () => {
   const {
     register,
     control,
-    handleSubmit,
+    handleSubmit,reset,
     formState: { errors },
   } = useForm<EducationDetails>({
     resolver: zodResolver(educationSchema),
@@ -40,8 +40,19 @@ export const EducHome = () => {
       field: "",
       highSchool: "",
       courses: [{ course: "", academic: "" }],
+      
     },
   });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedValues = JSON.parse(localStorage.getItem("educationData") || "{}");
+      reset((prev) => ({
+        ...prev,
+        ...storedValues,
+      }));
+    }
+  }, [reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,
