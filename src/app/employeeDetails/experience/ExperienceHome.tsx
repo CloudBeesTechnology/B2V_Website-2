@@ -1,74 +1,164 @@
+'use client';
+
+import { useForm, useFieldArray } from "react-hook-form";
 import { MdOutlineAddBox } from "react-icons/md";
+import { experienceSchema } from "@/validation/Schema"
+import { yupResolver } from "@hookform/resolvers/yup";
+
+interface Experience {
+  year: string;
+  company: string;
+  work: string;
+  manager: string;
+  dept: string;
+  location: string;
+}
+interface ExperienceDetails {
+  experiences: Experience[];
+}
 
 export const ExperienceHome = () => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ExperienceDetails>({
+    resolver: yupResolver(experienceSchema),
+    defaultValues: {
+      experiences: [{  
+        year:"", 
+        company: "",
+        work: "",
+        manager: "",
+        dept: "",
+        location: "", }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "experiences",
+  });
+
+  const onSubmit = (data: ExperienceDetails) => {
+    const dataToStore = {
+      ...data,
+    };
+    console.log("Experience Data:", dataToStore);
+    localStorage.setItem("experienceData", JSON.stringify(dataToStore));
+  };
+
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
-      <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col  w-full justify-between ">
+      <div className="flex justify-between items-center my-5">
         <h3 className="text-mediumlite_grey text-[22px]">Experience</h3>
+             <button
+                      type="button"
+                      onClick={() => append({ 
+                        year:"", 
+                        company: "",
+                        work: "",
+                        manager: "",
+                        dept: "",
+                        location: "", })}
+                      className="text-lg"
+                      // title="Add Experiences"
+                    >
+                      <MdOutlineAddBox />
+                    </button>
       </div>
-      <form className="flex flex-col justify-between my-5">
-        <section className="flex flex-col gap-4">
-          <div className="flex gap-24">
+      {fields.map((field, index) => (
+        <section key={field.id} className="flex w-full flex-col gap-4 my-5 relative ">
+          <div className="grid grid-cols-3 gap-10  ">
             <div className="flex flex-col gap-2">
               <label htmlFor="year" className="text-[15px] text-gray ">
                 No of years experience<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="year" className="outline-none py-1" />
+                <input id="year" {...register(`experiences.${index}.year` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.year && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.year?.message}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="company" className="text-[15px] text-gray ">
                 Company Name <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="company" className="outline-none py-1" />
+                <input id="company" {...register(`experiences.${index}.company` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.company && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.company?.message}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="work" className="text-[15px] text-gray ">
                 Work type<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="work" className="outline-none py-1" />
+                <input id="work" {...register(`experiences.${index}.work` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.work && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.work?.message}</p>
+              )}
             </div>
-            <article className="my-auto">
-              <MdOutlineAddBox />
-            </article>
           </div>
-          <div className="flex gap-24 mt-5">
-            <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-3 gap-10 mt-5 pr-20">
+            <div className="flex flex-col gap-2 ">
               <label htmlFor="manager" className="text-[15px] text-gray ">
                 Manager <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="manager" className="outline-none py-1" />
+                <input id="manager" {...register(`experiences.${index}.manager` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.manager && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.manager?.message}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="dept" className="text-[15px] text-gray ">
                 Department<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="dept" className="outline-none py-1" />
+                <input id="dept" {...register(`experiences.${index}.dept` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.dept && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.dept?.message}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="location" className="text-[15px] text-gray ">
                 Work location<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input id="location" className="outline-none py-1" />
+                <input id="location" {...register(`experiences.${index}.location` as const)} className="outline-none py-1 w-full" />
               </div>
+              {errors.experiences?.[index]?.location && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.experiences?.[index]?.location?.message}</p>
+              )}
             </div>
           </div>
-          <div className="mb-20 pt-10 center">
-            <button className="text-[15px] text-white bg-primary px-5 py-3 w-[20%] rounded-md">
+          {/* Remove Button */}
+          {fields.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => remove(index)}
+                  className="text-red-500 text-[30px] font-medium  mt-7 absolute right-5  bottom-1 "
+                  // title="Remove Experiences"
+                >
+                  ×
+                </button>
+              )}
+        </section>
+        ))}
+         <div className="mb-20 pt-10 center">
+            <button type="submit" className="text-[15px] text-white bg-primary px-5 py-3 w-[20%] rounded-md">
               Next
             </button>
           </div>
-        </section>
       </form>
     </section>
   );

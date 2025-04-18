@@ -34,6 +34,7 @@ export default function SignIn() {
         data.password
       );
       const user = userCredential.user;
+      
   
       const q = query(collection(db, "users"), where("email", "==", data.email));
       const querySnapshot = await getDocs(q);

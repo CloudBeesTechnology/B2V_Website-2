@@ -29,6 +29,7 @@ const personalInfoSchema = z.object({
 });
 
 export const PersonalInfoForm = () => {
+  
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);

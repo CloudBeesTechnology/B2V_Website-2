@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from "next/navigation"; 
 
 export default function EmailOtp() {
-  const [codes, setCodes] = useState(Array(5).fill(''));
+  const [codes, setCodes] = useState(Array(6).fill(''));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const val = e.target.value;
@@ -87,6 +87,7 @@ export default function EmailOtp() {
     </AuthLayout>
   );
 }
+
 // 'use client';
 // import AuthLayout from "@/components/AuthLayout";
 // import emailImg from "../../assets/sign/emailImg.png";
