@@ -4,6 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { MdOutlineAddBox } from "react-icons/md";
 import { experienceSchema } from "@/validation/Schema"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 interface Experience {
   year: string;
@@ -18,6 +19,8 @@ interface ExperienceDetails {
 }
 
 export const ExperienceHome = () => {
+      const router = useRouter();
+  
   const {
     register,
     handleSubmit,
@@ -51,6 +54,8 @@ export const ExperienceHome = () => {
       ...data,
     };
       localStorage.setItem("experienceData", JSON.stringify(combinedData));
+      router.push('/employeeDetails?tab=educationInfo');
+
   }; 
   
   return (

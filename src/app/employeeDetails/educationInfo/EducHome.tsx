@@ -5,6 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdOutlineAddBox } from "react-icons/md";
 import { educationSchema } from "@/validation/Schema";
+import { useRouter } from "next/navigation";
 
 interface Course {
   course: string;
@@ -22,6 +23,8 @@ interface EducationDetails {
 }
 
 export const EducHome = () => {
+    const router = useRouter();
+  
   const {
     register,
     control,
@@ -56,6 +59,7 @@ export const EducHome = () => {
       ...data,
     };
       localStorage.setItem("educationData", JSON.stringify(combinedData));
+      router.push('/employeeDetails?tab=experience');
   };
   
 

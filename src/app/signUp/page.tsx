@@ -64,6 +64,7 @@ export default function SignUp() {
       alert(error.message);
     }
   };
+  
   return (
     <AuthLayout
       title="Create New Account"
@@ -145,5 +146,3 @@ export default function SignUp() {
     </AuthLayout>
   );
 }
-
-
