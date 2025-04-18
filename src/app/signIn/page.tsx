@@ -34,7 +34,6 @@ export default function SignIn() {
         data.password
       );
       const user = userCredential.user;
-      
   
       const q = query(collection(db, "users"), where("email", "==", data.email));
       const querySnapshot = await getDocs(q);
@@ -51,23 +50,49 @@ export default function SignIn() {
         return;
       }
   
-      // ✅ Store in localStorage
+      // ✅ Store basic user info in localStorage
       localStorage.setItem("userEmail", userData.email);
       localStorage.setItem("userRole", userData.role);
       localStorage.setItem("userStatus", userData.status);
       localStorage.setItem("SignIn", JSON.stringify(true));
   
+      // Ensure empID is available before querying employeeDetails
+      if (!userData.empID) {
+        alert("Employee ID not found for this user.");
+        return;
+      }
+  
+      // Query employeeDetails collection by empID
+      const empQ = query(
+        collection(db, "employeeDetails"),
+        where("empID", "==", userData.empID)
+      );
+      const empQuerySnapshot = await getDocs(empQ);
+  
+      if (empQuerySnapshot.empty) {
+        alert("No employee details found for this user.");
+        return;
+      }
+  
+      const employeeData = empQuerySnapshot.docs[0].data();
+  
+      // ✅ Store employee name and empID in localStorage
+      localStorage.setItem("employeeName", employeeData.name);
+      localStorage.setItem("empID", employeeData.empID);
+  
+      // Redirect based on user role
       if (userData.role === "Admin" || userData.role === "Employee" || userData.role === "Intern") {
         router.push("/");
       } else {
         alert("Invalid user role.");
       }
-      
+  
     } catch (error: any) {
       console.error("Sign in error:", error.message);
       alert("Sign in failed. Please check your email and password.");
     }
   };
+  
   
 
   return (
