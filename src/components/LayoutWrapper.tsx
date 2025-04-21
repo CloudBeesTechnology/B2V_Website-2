@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+
 
 const pathList = [
   "/signIn",
@@ -15,14 +16,19 @@ const pathList = [
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isAuthPage = pathList.includes(pathname);
 
   const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const storedSignIn = localStorage.getItem("SignIn");
-    setIsSignedIn(!!storedSignIn); // convert to boolean
-  }, []);
+    const signedInStatus = !!storedSignIn;
+    setIsSignedIn(signedInStatus);
+    if (!signedInStatus && !isAuthPage) {
+      router.replace("/signIn");
+    }
+  }, [isAuthPage, router]);
 
   if (isAuthPage) {
     return <main>{children}</main>;
