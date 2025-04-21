@@ -91,6 +91,7 @@ export const TableFormate = ({
               </tr>
             );
           })}
+          
         {list === "leaveApproval" &&
           leaveApproval.map((val, index) => {
             return (

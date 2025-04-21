@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/navigation";
 import { familySchema } from "@/validation/Schema"; // Make sure this schema is defined
-// import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import {
   collection,
@@ -23,6 +23,8 @@ interface FamilyDetails {
 }
 
 export const FamilyHome = () => {
+      const router = useRouter();
+  
   const {
     register,
     handleSubmit,
@@ -45,7 +47,7 @@ export const FamilyHome = () => {
       const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
       const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
   
-      // 🔽 Step 1: Fetch the latest empID
+      //  Step 1: Fetch the latest empID...
       const empQuery = query(
         collection(db, "employeeDetails"),
         orderBy("empID", "desc"), // or use createdAt if empID isn't reliable
@@ -54,7 +56,7 @@ export const FamilyHome = () => {
   
       const querySnapshot = await getDocs(empQuery);
   
-      let newCBTID = "CBT0001"; // default if no record found
+      let newCBTID = "CBT0001"; // default if no record found...
       if (!querySnapshot.empty) {
         const lastCBT = querySnapshot.docs[0].data().CBTID;
         const lastNumber = parseInt(lastCBT.replace("CBT", ""), 10);
@@ -62,7 +64,7 @@ export const FamilyHome = () => {
         newCBTID = `CBT${String(nextNumber).padStart(4, "0")}`;
       }
   
-      // 🔁 Combine all data with new empID
+      //  Combine all data with new empID Dazta.....
       const combinedData = {
         ...parsedExperienceData,
         ...parsedPersonalInfo,
@@ -74,6 +76,14 @@ export const FamilyHome = () => {
   
       const docRef = await addDoc(collection(db, "employeeDetails"), combinedData);
       console.log("Data successfully written with ID:", docRef.id);
+
+      // Submit Button click its true remove all local store ....
+      localStorage.removeItem("experienceData");
+      localStorage.removeItem("personalInfo");
+      localStorage.removeItem("educationData");
+
+      router.push('/employee');
+
     } catch (error) {
       console.error("Error writing document to Firestore:", error);
       throw error;
@@ -212,35 +222,3 @@ export const FamilyHome = () => {
     </section>
   );
 };
-
-
-
-// const onSubmit = async (data: FamilyDetails) => {
-  //   console.log("Family Data:", data);
-  //   try {
-  //     const isBrowser = typeof window !== "undefined";
-  
-  //     const experienceData = isBrowser ? localStorage.getItem("experienceData") : null;
-  //     const personalInfo = isBrowser ? localStorage.getItem("personalInfo") : null;
-  //     const educationInfo = isBrowser ? localStorage.getItem("educationData") : null;
-  
-  //     const parsedExperienceData = experienceData ? JSON.parse(experienceData) : {};
-  //     const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
-  //     const parsedEducationInfo = educationInfo ? JSON.parse(educationInfo) : {};
-  
-  //     const combinedData = {
-  //       ...parsedExperienceData,
-  //       ...parsedPersonalInfo,
-  //       ...parsedEducationInfo,
-  //       ...data,
-  //       createdAt: new Date().toISOString(),
-  //     };
-  
-  //     const docRef = await addDoc(collection(db, "employeeDetails"), combinedData);
-  //     console.log("Data successfully written with ID:", docRef.id);
-  //   } catch (error) {
-  //     console.error("Error writing document to Firestore:", error);
-  //     throw error;
-  //   }
-  // };
-  

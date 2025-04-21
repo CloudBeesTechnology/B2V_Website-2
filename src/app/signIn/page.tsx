@@ -34,7 +34,6 @@ export default function SignIn() {
         data.password
       );
       const user = userCredential.user;
-      
   
       const q = query(collection(db, "users"), where("email", "==", data.email));
       const querySnapshot = await getDocs(q);
@@ -51,23 +50,49 @@ export default function SignIn() {
         return;
       }
   
-      // ✅ Store in localStorage
+      // ✅ Store basic user info in localStorage
       localStorage.setItem("userEmail", userData.email);
       localStorage.setItem("userRole", userData.role);
       localStorage.setItem("userStatus", userData.status);
       localStorage.setItem("SignIn", JSON.stringify(true));
   
+      // Ensure empID is available before querying employeeDetails
+      if (!userData.empID) {
+        alert("Employee ID not found for this user.");
+        return;
+      }
+  
+      // Query employeeDetails collection by empID
+      const empQ = query(
+        collection(db, "employeeDetails"),
+        where("empID", "==", userData.empID)
+      );
+      const empQuerySnapshot = await getDocs(empQ);
+  
+      if (empQuerySnapshot.empty) {
+        alert("No employee details found for this user.");
+        return;
+      }
+  
+      const employeeData = empQuerySnapshot.docs[0].data();
+  
+      // ✅ Store employee name and empID in localStorage
+      localStorage.setItem("employeeName", employeeData.name);
+      localStorage.setItem("empID", employeeData.empID);
+  
+      // Redirect based on user role
       if (userData.role === "Admin" || userData.role === "Employee" || userData.role === "Intern") {
         router.push("/");
       } else {
         alert("Invalid user role.");
       }
-      
+  
     } catch (error: any) {
       console.error("Sign in error:", error.message);
       alert("Sign in failed. Please check your email and password.");
     }
   };
+  
   
 
   return (
@@ -129,116 +154,4 @@ export default function SignIn() {
   );
 }
 
-// "use client";
-// import { useState } from "react";
-// import { FaEnvelope, FaLock } from "react-icons/fa";
-// import Link from "next/link";
-// import AuthLayout from "@/components/AuthLayout";
-// import signImg from "../../assets/sign/signInImg.png";
-// import { useRouter } from "next/navigation";
-// import { signInWithEmailAndPassword } from "firebase/auth";
-// import { collection, getDocs, query, where } from "firebase/firestore";
-// import { auth, db } from "@/lib/firebaseConfig"; // adjust if path is different
-
-// export default function SignIn() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const router = useRouter();
-
-//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-
-//     try {
-//       // Step 1: Firebase sign in
-//       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-//       const user = userCredential.user;
-
-//       // Step 2: Firestore query for user info
-//       const q = query(collection(db, "users"), where("email", "==", email));
-//       const querySnapshot = await getDocs(q);
-
-//       if (querySnapshot.empty) {
-//         alert("No user found with this email in the database.");
-//         return;
-//       }
-
-//       const userData = querySnapshot.docs[0].data();
-
-//       // Step 3: Check status
-//       if (userData.status !== "Active") {
-//         alert("Oops! You Don’t Have Access . Please Reach Out to Your Administrator.");
-//         return;
-//       }
-
-//       // Step 4: Check role and navigate
-//       if (userData.role === "Admin") {
-//         router.push("/");
-//       } else if (userData.role === "Employee") {
-//         router.push("/emailVerif");
-//       } else {
-//         alert("Invalid user role.");
-//       }
-
-//     } catch (error: any) {
-//       console.error("Sign in error:", error.message);
-//       alert("Sign in failed. Please check your email and password.");
-//     }
-//   };
-
-//   return (
-//     <AuthLayout
-//       title="SIGN IN"
-//       subtitle="Welcome back! Please enter your details"
-//       linkText="Don't have an account?"
-//       linkHref="/signUp"
-//       linkName="Sign Up"
-//       image={signImg}
-//     >
-//       <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit}>
-//         <div>
-//           <label className="block text_size_10 mb-1 text-gray">Email Address</label>
-//           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
-//             <FaEnvelope className="text-primary mr-2" />
-//             <input
-//               type="email"
-//               placeholder="Enter your email"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               className="w-full focus:outline-none text-lg h-full"
-//               required
-//             />
-//           </div>
-//         </div>
-
-//         <div>
-//           <label className="block text_size_10 mb-1 text-gray">Your Password</label>
-//           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
-//             <FaLock className="text-primary mr-2" />
-//             <input
-//               type="password"
-//               placeholder="Enter your password"
-//               value={password}
-//               onChange={(e) => setPassword(e.target.value)}
-//               className="w-full focus:outline-none text-lg"
-//               required
-//             />
-//           </div>
-//           <Link
-//             href="/emailVerify"
-//             className="text_size_5 font-semibold text-primary float-right mt-3"
-//           >
-//             Forgot password?
-//           </Link>
-//         </div>
-
-//         <button
-//           type="submit"
-//           className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10"
-//         >
-//           SIGN IN
-//         </button>
-//       </form>
-//     </AuthLayout>
-//   );
-// }
 
