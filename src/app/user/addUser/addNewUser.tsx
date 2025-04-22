@@ -10,37 +10,68 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { IoArrowBack } from "react-icons/io5";
 import SetPermissionBox from "./setPermission";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
-const AddNewUser: React.FC = () => {
-  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+interface User {
+  id: string;
+  [key: string]: any;
+}
 
+interface Alluser {
+  id: string;
+  [key: string]: any;
+}
+
+const AddNewUser: React.FC = () => {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [allUser, setAllUser] = useState<Alluser[]>([]);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<AddUserFormData>({
     resolver: yupResolver(addUserSchema),
   });
 
-  const onSubmit = async (data: AddUserFormData) => {
+  // Create User
+  const createUser = async (data: any) => {
     try {
       let finalData = {
-        empId: data.empId,
-        // position: data.position,
-        // department: data.department,
+        empID: data.empID,
         permission: selectedModules,
-        createdAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
       };
       const userRes = await addDoc(collection(db, "userDetails"), {
-        finalData,
+        ...finalData,
       });
 
       if (userRes.id) {
         alert("User created successfully!");
+        reset({
+          name: "",
+          empID: "",
+          email: "",
+          department: "",
+          position: "",
+          phone: "",
+        });
+        setSelectedModules([]);
       }
     } catch (error) {
       console.error("Error adding user:", error);
@@ -48,16 +79,132 @@ const AddNewUser: React.FC = () => {
     }
   };
 
-  const router = useRouter();
+  // Update User
+  const updateUser = async (checkDataIsExistsOrNot: any, data: any) => {
+    const existingUser = checkDataIsExistsOrNot as {
+      empId: string;
+      [key: string]: any;
+    };
+    try {
+      if (existingUser.id) {
+        const userRef = doc(db, "userDetails", existingUser.id);
+
+        let updatedData = {
+          empID: data.empID,
+          permission: selectedModules,
+          createdAt: new Date().toISOString(),
+        };
+        await updateDoc(userRef, {
+          ...updatedData,
+        });
+
+        alert("User updated successfully!");
+        reset({
+          name: "",
+          empID: "",
+          email: "",
+          department: "",
+          position: "",
+          phone: "",
+        });
+
+        setSelectedModules([]);
+      } else {
+        console.log("No user found with the given empId.");
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  // Check user exists or not
+  const fetchDataByEmpID = async (empID: string) => {
+    const fetchQuery = query(
+      collection(db, "userDetails"),
+      where("empID", "==", empID)
+    );
+
+    const querySnapshot = await getDocs(fetchQuery);
+
+    if (!querySnapshot.empty) {
+      const results = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      console.log("Matched data:", results);
+      return results[0];
+    } else {
+      console.log("No matching documents.");
+      return false;
+    }
+  };
+
+  const onSubmit = async (data: AddUserFormData) => {
+    const checkDataIsExistsOrNot = await fetchDataByEmpID(data.empID);
+
+    if (checkDataIsExistsOrNot) {
+      updateUser(checkDataIsExistsOrNot, data);
+    } else if (checkDataIsExistsOrNot === false) {
+      createUser(data);
+    }
+  };
+
+  useEffect(() => {
+    const getUsers = async () => {
+      const querySnapshot = await getDocs(collection(db, "employeeDetails"));
+      const users = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAllUser(users);
+      console.log(users);
+    };
+    getUsers();
+  }, []);
+
+  const handleSelect = async (user: User) => {
+    // get data by using 'where' clause
+    try {
+      const fetchQuery = query(
+        collection(db, "userDetails"),
+        where("empID", "==", user?.empID)
+      );
+
+      console.log("fetchQuery : ", fetchQuery);
+      const querySnapshot = await getDocs(fetchQuery);
+      const getUserDetails = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const result = getUserDetails[0];
+
+      reset({
+        name: user.name || "",
+        empID: user.empID || "",
+        email: user.email || "",
+        department: user.department || "",
+        position: user.position || "",
+        phone: user.contact || "",
+      });
+
+      setSelectedModules((result as any)?.permission || []);
+    } catch (error) {
+      console.error("Error fetching users by empId:", error);
+      alert("Something wrong in the code");
+    }
+  };
+
   return (
-    <main>
-      <section className="flex justify-between items-center my-10 ">
+    <main ref={parentRef}>
+      <section  className="flex justify-between items-center my-10 ">
         <IoArrowBack
           onClick={() => router.back()}
           className="text-[22px] text-gray cursor-pointer"
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
-        <Searchbox />
+        <Searchbox allUser={allUser} handleSelect={handleSelect} parentRef={parentRef}/>
       </section>
       <section className=" w-full center rounded-xl bg-white my-10">
         <form onSubmit={handleSubmit(onSubmit)} className="w-full m-15 ">
@@ -70,11 +217,11 @@ const AddNewUser: React.FC = () => {
               errors={errors?.name?.message}
             />
             <FormField
-              label="Employee Id"
-              name="empId"
+              label="Employee ID"
+              name="empID"
               type="text"
               register={register}
-              errors={errors?.empId?.message}
+              errors={errors?.empID?.message}
             />
             <FormField
               label="Phone Number"
@@ -84,7 +231,7 @@ const AddNewUser: React.FC = () => {
               errors={errors?.phone?.message}
             />
             <FormField
-              label="Email Id"
+              label="Email ID"
               name="email"
               type="text"
               register={register}

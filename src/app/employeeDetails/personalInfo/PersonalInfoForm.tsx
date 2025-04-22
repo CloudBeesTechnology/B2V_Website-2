@@ -31,10 +31,6 @@ export const PersonalInfoForm = () => {
     setValue,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues:
-      typeof window !== 'undefined'
-        ? JSON.parse(localStorage.getItem('personalInfo') || '{}')
-        : {},
   });
 
   useEffect(() => {
