@@ -5,6 +5,7 @@ import { MdOutlineAddBox } from "react-icons/md";
 import { experienceSchema } from "@/validation/Schema"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface Experience {
   year: string;
@@ -24,7 +25,7 @@ export const ExperienceHome = () => {
   const {
     register,
     handleSubmit,
-    control,
+    control,reset,
     formState: { errors },
   } = useForm<ExperienceDetails>({
     resolver: zodResolver(experienceSchema),
@@ -38,6 +39,16 @@ export const ExperienceHome = () => {
         location: "", }],
     },
   });
+
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const storedValues = JSON.parse(localStorage.getItem("experienceData") || "{}");
+        reset((prev) => ({
+          ...prev,
+          ...storedValues,
+        }));
+      }
+    }, [reset]); 
 
   const { fields, append, remove } = useFieldArray({
     control,

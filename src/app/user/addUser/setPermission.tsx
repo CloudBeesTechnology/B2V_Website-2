@@ -23,9 +23,9 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
   setSelectedModules,
 }) => {
   const handleToggle = (submodule: string) => {
-    const exists = selectedModules.includes(submodule);
+    const exists = selectedModules?.includes(submodule);
     const updated = exists
-      ? selectedModules.filter((item) => item !== submodule)
+      ? selectedModules?.filter((item) => item !== submodule)
       : [...selectedModules, submodule];
 
     setSelectedModules(updated);

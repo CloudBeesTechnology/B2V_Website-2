@@ -19,12 +19,13 @@ const FormField: React.FC<FormFieldProps> = ({
 }) => {
   return (
     <div className="flex flex-col ">
-      <label className="text-[#303030] text_size_4">{label}</label>
+      <label className="text-[#303030] text_size_4 pb-1">{label}</label>
       <input
         type={type}
         {...register(name)}
-        className="border border-[#E2E2E2] text-[#202020] bg-[#f5f7fb] text_size_5 px-2 rounded outline-none py-3"
-        placeholder={`Enter ${label.toLowerCase()}`}
+        className="border border-[#E2E2E2] text-[#202020] bg-[#f5f7fb] text_size_4 p-2 rounded outline-none "
+        readOnly
+        // placeholder={`Enter ${label.toLowerCase()}`}
       />
       {errors && <span className="text-dark_red text-sm pt-1">{errors}</span>}
     </div>
