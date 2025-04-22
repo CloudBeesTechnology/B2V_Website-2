@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { IoArrowBack } from "react-icons/io5";
 import SetPermissionBox from "./setPermission";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   collection,
@@ -36,6 +36,7 @@ interface Alluser {
 }
 
 const AddNewUser: React.FC = () => {
+  const parentRef = useRef<HTMLDivElement>(null);
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [allUser, setAllUser] = useState<Alluser[]>([]);
   const router = useRouter();
@@ -196,14 +197,14 @@ const AddNewUser: React.FC = () => {
   };
 
   return (
-    <main>
-      <section className="flex justify-between items-center my-10 ">
+    <main ref={parentRef}>
+      <section  className="flex justify-between items-center my-10 ">
         <IoArrowBack
           onClick={() => router.back()}
           className="text-[22px] text-gray cursor-pointer"
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
-        <Searchbox allUser={allUser} handleSelect={handleSelect} />
+        <Searchbox allUser={allUser} handleSelect={handleSelect} parentRef={parentRef}/>
       </section>
       <section className=" w-full center rounded-xl bg-white my-10">
         <form onSubmit={handleSubmit(onSubmit)} className="w-full m-15 ">

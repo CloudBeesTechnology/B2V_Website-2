@@ -20,7 +20,7 @@
 // };
 // export default Searchbox;
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 
 interface User {
@@ -31,39 +31,48 @@ interface User {
 interface SearchboxProps {
   allUser: User[]; // Array of users
   handleSelect: (selectedUser: User) => void; // Callback to parent
+  parentRef: React.RefObject<HTMLDivElement>;
 }
 
-const Searchbox: React.FC<SearchboxProps> = ({ allUser, handleSelect }) => {
+const Searchbox: React.FC<SearchboxProps> = ({
+  allUser,
+  handleSelect,
+  parentRef,
+}) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const matchFields = ["empID", "name"];
+
+  const getMatchPriority = (value: string, searchTerm: string): number => {
+    const lowerVal = value?.toLowerCase() || "";
+    const lowerSearch = searchTerm?.toLowerCase() || "";
+
+    if (lowerVal.startsWith(lowerSearch)) return 1;
+    if (lowerVal.includes(lowerSearch)) return 2;
+    return 3;
+  };
+
+  const compareUsersByPriority = (a: User, b: User): number => {
+    for (const field of matchFields) {
+      const aPriority = getMatchPriority(a[field], searchTerm);
+      const bPriority = getMatchPriority(b[field], searchTerm);
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+    }
+    return 0; // They're equally relevant
+  };
 
   const filteredUsers = allUser
     ?.filter((user) =>
-      user?.empID?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+      matchFields.some((field) =>
+        user[field]?.toLowerCase()?.includes(searchTerm.toLowerCase())
+      )
     )
-    .sort((a, b) => {
-      const aStarts = a.empID
-
-        .toLowerCase()
-        .startsWith(searchTerm?.toLowerCase());
-      const bStarts = b.empID
-
-        ?.toLowerCase()
-        ?.startsWith(searchTerm?.toLowerCase());
-
-      // const aNameStarts = a.name
-
-      //   .toLowerCase()
-      //   .startsWith(searchTerm?.toLowerCase());
-      // const bNameStarts = b.name
-
-      //   ?.toLowerCase()
-      //   ?.startsWith(searchTerm?.toLowerCase());
-
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      return 0;
-    });
+    .sort(compareUsersByPriority);
 
   const handleDropdownSelect = (user: User) => {
     handleSelect(user);
@@ -71,8 +80,26 @@ const Searchbox: React.FC<SearchboxProps> = ({ allUser, handleSelect }) => {
     setShowDropdown(false);
   };
 
+  useEffect(() => {
+    const handleClickInsideParent = (event: MouseEvent) => {
+      const clickedInsideParent = parentRef.current.contains(
+        event.target as Node
+      );
+      const clickedInsideInput = inputRef.current?.contains(
+        event.target as Node
+      );
+      if (clickedInsideParent && !clickedInsideInput) {
+        setShowDropdown(false); // Hide dropdown when clicking inside parent
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickInsideParent);
+    return () =>
+      document.removeEventListener("mousedown", handleClickInsideParent);
+  }, [parentRef]);
+
   return (
-    <div className="relative w-72">
+    <div className="relative w-72" ref={inputRef}>
       <div className="flex">
         <input
           type="text"
