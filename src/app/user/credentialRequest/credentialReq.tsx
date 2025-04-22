@@ -15,7 +15,7 @@ const CredentialReq: React.FC = () => {
     <section>
       <header className="flex justify-start items-center text-[22px] text-gray gap-10 m-10">
         <IoArrowBack onClick={() => router.back()} className="cursor-pointer" />
-        <h3>Leave History</h3>
+        <h3>Credential Request</h3>
       </header>
 
       <div className="center">
