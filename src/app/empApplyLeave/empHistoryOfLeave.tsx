@@ -1,38 +1,76 @@
-const EmpHistoryOfLeave: React.FC = () => {
+"use client";
+
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+import { TableFormate } from "@/components/TableFormate";
+
+const EmpHistoryOfLeave = () => {
+  const Heading = ["EmpID", "Duration", "Start Date", "End Date", "leaveType", "Status"];
+  const [empLeave, setEmpLeave] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    const fetchLeaves = async () => {
+      try {
+        const empID = localStorage.getItem("empID"); // Example: "CBT0002"
+        if (!empID) return;
+
+        const querySnapshot = await getDocs(collection(db, "leaveStatus"));
+
+        const leaveList = querySnapshot.docs
+          .map((doc) => doc.data())
+          .filter((item) => item.empID === empID); // Only that person's data
+
+        setEmpLeave(leaveList);
+      } catch (error) {
+        console.error("Error fetching leave data:", error);
+      }
+    };
+
+    fetchLeaves();
+  }, []);
+
   return (
-    <section className="p-7 bg-white rounded-xl my-10">
-      <h3 className="text-gray text-xl font-semibold pb-5">History of leave</h3>
-      <table className="table-fixed  w-full">
-        <thead>
-          <tr className="text-center text-gray font-semibold border-b border-[#D2D2D240]">
-            <th className="py-4">Emp id</th>
-            <th className="py-4">Duration</th>
-            <th className="py-4">Start Date</th>
-            <th className="py-4">End Date</th>
-            <th className="py-4">Type</th>
-            <th className="py-4">Reason</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="text-center text-gray text_size_6 border-b border-[#D2D2D240]">
-            <td className="py-4">C2562</td>
-            <td className="py-4">1</td>
-            <td className="py-4">22/04/2024</td>
-            <td className="py-4">28/06/2025</td>
-            <td className="py-4">Maternity</td>
-            <td className="py-4">Child Care</td>
-          </tr>
-          <tr className="text-center text-gray text_size_6 border-b border-[#D2D2D240]">
-            <td className="py-4">B2562</td>
-            <td className="py-4">2</td>
-            <td className="py-4">22/04/2024</td>
-            <td className="py-4">28/06/2025</td>
-            <td className="py-4">Maternity</td>
-            <td className="py-4">Child Care</td>
-          </tr>
-        </tbody>
-      </table>
+    <section>
+      <div className="flex justify-between items-center mt-10 mb-5">
+        <h4 className="text-primary border-b-2 border-primary pb-2 px-2 w-48 mb-7 mt-5 text_size_2">
+          History of Leave
+        </h4>
+        <div className="flex justify-center items-center gap-12">
+          <div>
+            <label htmlFor="start-date" className="block text-[16px] font-medium text-primary">
+              Start Date
+            </label>
+            <input
+              id="start-date"
+              type="date"
+              className="outline-none text-gray border rounded-md p-2 border-primary"
+            />
+          </div>
+          <div>
+            <label htmlFor="end-date" className="block text-[16px] font-medium text-primary">
+              End Date
+            </label>
+            <input
+              id="end-date"
+              type="date"
+              className="outline-none text-gray border rounded-md p-2 border-primary"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="bg-white px-10 py-5 rounded-lg">
+        <TableFormate
+          heading={Heading}
+          list="empLeave"
+          empLeave={empLeave}
+          ovla={[]}
+          allEmp={[]}
+          leaveApproval={[]}
+        />
+      </div>
     </section>
   );
 };
+
 export default EmpHistoryOfLeave;

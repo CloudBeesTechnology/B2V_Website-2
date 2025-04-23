@@ -19,12 +19,15 @@ const EmpApplyLeaveTable = () => {
 
   const onSubmit = async (data: LeaveFormData) => {
     // console.log("✅ Submitted Data:", data);
+    const empID = localStorage.getItem("empID");
     const createdAt=new Date().toISOString()
     await setDoc(doc(db,"leaveStatus",createdAt),{
       endDate: data.endDate,
       leaveReason: data.leaveReason,
       leaveType: data.leaveType,
       startDate: data.startDate,
+      status:"Pending",
+      empID:empID,
       createdAt:createdAt
     }).then((res)=>{
       console.log(res,"res");
