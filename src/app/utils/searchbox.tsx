@@ -31,7 +31,7 @@ interface User {
 interface SearchboxProps {
   allUser: User[]; // Array of users
   handleSelect: (selectedUser: User) => void; // Callback to parent
-  parentRef: React.RefObject<HTMLDivElement>;
+  parentRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const Searchbox: React.FC<SearchboxProps> = ({
@@ -82,7 +82,7 @@ const Searchbox: React.FC<SearchboxProps> = ({
 
   useEffect(() => {
     const handleClickInsideParent = (event: MouseEvent) => {
-      const clickedInsideParent = parentRef.current.contains(
+      const clickedInsideParent = parentRef.current?.contains(
         event.target as Node
       );
       const clickedInsideInput = inputRef.current?.contains(
