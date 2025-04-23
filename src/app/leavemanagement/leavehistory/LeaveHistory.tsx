@@ -34,7 +34,7 @@ const LeaveHistory: React.FC = () => {
           </div>
         </div>
         <div className="mt-auto">
-          <Searchbox />
+          {/* <Searchbox /> */}
         </div>
       </section>
       <section className="py-7 bg-white rounded-xl px-10 space-y-7 my-10">

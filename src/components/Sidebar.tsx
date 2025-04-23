@@ -188,11 +188,10 @@
 
 // export default Sidebar;
 
-
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import attendance from "../assets/sidebar/attendance.svg";
 import overview from "../assets/sidebar/overview.svg";
 import internship from "../assets/sidebar/internship.svg";
@@ -216,14 +215,23 @@ import logo from "../assets/logo/logo.png";
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const [storedPermissions, setStoredPermissions] = useState<string[]>([]);
   type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN";
   const userRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
       : null;
+
+  const userID =
+    typeof window !== "undefined"
+      ? localStorage.getItem("empID")?.toString()?.toUpperCase()
+      : null;
+
   const navList = [
     {
       icons: overview,
@@ -247,7 +255,7 @@ const Sidebar = () => {
       icons: internship,
       icons2: whiteinternship,
       name: "Internship",
-      path: "/internship",
+      path: "/internship/request",
     },
     {
       icons: user,
@@ -320,53 +328,88 @@ const Sidebar = () => {
     ],
   };
 
-  console.log("userRole : ",userRole)
+  console.log("userRole : ", userRole);
   const filteredNavList =
     typeof userRole === "string" && roleAccessMap[userRole]
       ? navList.filter((item) => roleAccessMap[userRole].includes(item.name))
       : [];
-      
-  console.log("filteredNavList : ",filteredNavList)
 
+  console.log("filteredNavList : ", filteredNavList);
 
+  useEffect(() => {
+    const getUserAndPermissions = async (empID: string, role: string) => {
+      const empQuery = query(
+        collection(db, "users"),
+        where("empID", "==", empID),
+        where("role", "==", role)
+      );
+      const userQuery = query(
+        collection(db, "userDetails"),
+        where("empID", "==", empID)
+      );
+
+      const [listEmpDetails, listUserDetails] = await Promise.all([
+        getDocs(empQuery),
+        getDocs(userQuery),
+      ]);
+
+      const empData = listEmpDetails.docs[0]?.data() || {};
+      const userData = listUserDetails.docs[0]?.data() || {};
+
+      return { ...empData, ...userData };
+    };
+
+    let userRole =
+      typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+
+    if (userID && userRole) {
+      getUserAndPermissions(userID, userRole).then((data) => {
+        setStoredPermissions(data.permission);
+      });
+    }
+  }, []);
+
+  console.log("storedPermissions : ", storedPermissions);
   return (
     <section className="p-5 h-full overflow-y-auto">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
         <Image src={logo} alt="logo not found" />
       </div>
-      <div className="h-[calc(100%-5rem)] flex flex-col justify-between">
+      <div className="h-[calc(100%-5rem)] flex flex-col justify-between ">
         <div className=" space-y-5 mt-3">
           {filteredNavList.map((link, index) => {
             return (
-              <div
-                key={index}
-                className={clsx(
-                  pathname === link.path
-                    ? "bg-primary px-2 py-2 rounded-sm text-white"
-                    : "px-2 py-2"
+              <>
+                {storedPermissions?.includes(link.name) && (
+                  <div
+                    key={index}
+                    className={clsx(
+                      pathname === link.path
+                        ? "bg-primary px-2 py-2 rounded-sm text-white"
+                        : "px-2 py-2"
+                    )}
+                  >
+                    <Link href={link.path} className="flex items-center gap-3">
+                      {pathname === link.path ? (
+                        <Image
+                          src={link.icons2}
+                          alt={`${link.name} not found`}
+                          width={24}
+                          height={24}
+                        />
+                      ) : (
+                        <Image
+                          src={link.icons}
+                          alt={`${link.name} not found`}
+                          width={24}
+                          height={24}
+                        />
+                      )}
+                      <p className="text_size_4">{link.name}</p>
+                    </Link>
+                  </div>
                 )}
-              >
-
-                <Link href={link.path} className="flex items-center gap-3">
-                  {pathname === link.path ? (
-                    <Image
-                      src={link.icons2}
-                      alt={`${link.name} not found`}
-                      width={24}
-                      height={24}
-                    />
-                  ) : (
-                    <Image
-                      src={link.icons}
-                      alt={`${link.name} not found`}
-                      width={24}
-                      height={24}
-                    />
-                  )}
-                  <p className="text_size_4">{link.name}</p>
-                </Link>
-
-              </div>
+              </>
             );
           })}
         </div>
@@ -382,7 +425,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-
-
-

@@ -67,6 +67,7 @@ const EmpHistoryOfLeave = () => {
           ovla={[]}
           allEmp={[]}
           leaveApproval={[]}
+   
         />
       </div>
     </section>
