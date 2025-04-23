@@ -12,6 +12,7 @@ import EmpLeaveStatusTable from "./empLeaveStatusTable";
 
 const EmpOverview: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
+  const [empDetails, setempDetails] = useState<any>(null);
 
   useEffect(() => {
     const empID = localStorage.getItem("empID");
@@ -28,6 +29,7 @@ const EmpOverview: React.FC = () => {
           
           const empData = docSnap.docs[0].data();
           // console.log("Employee Data:", empData);
+          setempDetails(empData)
           setUserName(empData?.name || "No name found");
         } catch (error) {
           console.error("Error fetching employee data:", error);
@@ -45,8 +47,8 @@ const EmpOverview: React.FC = () => {
           Welcome {userName || "Employee"}
         </h3>
       </header>
-      <EmpBasicDetails />
-      <EmpAvailableLeaves />
+      <EmpBasicDetails data={empDetails} />
+      <EmpAvailableLeaves data={empDetails} />
       <EmpLeaveStatusTable />
     </main>
   );

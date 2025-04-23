@@ -32,34 +32,34 @@ const EmpHistoryOfLeave = () => {
 
   return (
     <section>
-      <div className="flex justify-between items-center mt-10 mb-5">
-        <h4 className="text-primary border-b-2 border-primary pb-2 px-2 w-48 mb-7 mt-5 text_size_2">
+      <div className="flex justify-between items-center  mt-10 mb-5">
+        <h4 className="pb-2 px-2 w-48 mb-7 mt-5 text_size_2">
           History of Leave
         </h4>
-        <div className="flex justify-center items-center gap-12">
+        <div className="flex justify-center items-center gap-12 ">
           <div>
-            <label htmlFor="start-date" className="block text-[16px] font-medium text-primary">
+            <label htmlFor="start-date" className="block text-[16px] font-medium ">
               Start Date
             </label>
             <input
               id="start-date"
               type="date"
-              className="outline-none text-gray border rounded-md p-2 border-primary"
+              className="outline-none text-gray border rounded-md p-1"
             />
           </div>
           <div>
-            <label htmlFor="end-date" className="block text-[16px] font-medium text-primary">
+            <label htmlFor="end-date" className="block text-[16px] font-medium ">
               End Date
             </label>
             <input
               id="end-date"
               type="date"
-              className="outline-none text-gray border rounded-md p-2 border-primary"
+              className="outline-none text-gray border rounded-md p-1 "
             />
           </div>
         </div>
       </div>
-      <div className="bg-white px-10 py-5 rounded-lg">
+      <div className="bg-white  py-5 rounded-lg">
         <TableFormate
           heading={Heading}
           list="empLeave"

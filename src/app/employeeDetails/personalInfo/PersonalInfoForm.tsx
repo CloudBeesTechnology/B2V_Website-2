@@ -14,6 +14,8 @@ interface PersonalInfoFormData {
   department: string;
   position: string;
   proof: string;
+  totalLeave: string;
+  manager: string;
   profilePhoto?: File | string | null;
 }
 
@@ -77,6 +79,8 @@ export const PersonalInfoForm = () => {
       ...data,
       profilePhotoUrl: previewImage,
     };
+    // console.log(dataToStore,"dataToStore");
+    
     localStorage.setItem('personalInfo', JSON.stringify(dataToStore));
     router.push('/employeeDetails?tab=educationInfo');
   };
@@ -188,6 +192,38 @@ export const PersonalInfoForm = () => {
                 <span className="text-red text-sm">{errors.proof.message}</span>
               )}
             </div>
+          </div>
+          <div className="flex  gap-10 mt-5">
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="leave" className="text-[15px] text-gray">
+             Total Leave
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="leave"
+                  className="outline-none py-1 w-full"
+                  {...register('totalLeave')}
+                />
+              </div>
+
+            </div>
+
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="manager" className="text-[15px] text-gray">
+               Assign Manager
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="manager"
+                  type="tel"
+                  className="outline-none py-1 w-full"
+                  {...register('manager')}
+                />
+              </div>
+           
+            </div>
+
+           
           </div>
 
           <div className="mb-20 pt-10 center">

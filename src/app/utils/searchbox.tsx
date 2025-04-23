@@ -75,7 +75,7 @@ const Searchbox: React.FC<SearchboxProps> = ({
     .sort(compareUsersByPriority);
 
   const handleDropdownSelect = (user: User) => {
-    handleSelect(user);
+    handleSelect?.(user);
     setSearchTerm(`${user.empID}`);
     setShowDropdown(false);
   };
@@ -104,7 +104,7 @@ const Searchbox: React.FC<SearchboxProps> = ({
         <input
           type="text"
           className="w-full p-2 font-semibold border border-[#DCE0E5] rounded-l-md outline-none"
-          placeholder="Search by User ID..."
+          placeholder="Search by EmpID..."
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);

@@ -23,12 +23,13 @@ interface EducationDetails {
 }
 
 export const EducHome = () => {
-    const router = useRouter();
-  
+  const router = useRouter();
+
   const {
     register,
     control,
-    handleSubmit,reset,
+    handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<EducationDetails>({
     resolver: zodResolver(educationSchema),
@@ -40,13 +41,14 @@ export const EducHome = () => {
       field: "",
       highSchool: "",
       courses: [{ course: "", academic: "" }],
-      
     },
   });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedValues = JSON.parse(localStorage.getItem("educationData") || "{}");
+      const storedValues = JSON.parse(
+        localStorage.getItem("educationData") || "{}"
+      );
       reset((prev) => ({
         ...prev,
         ...storedValues,
@@ -69,20 +71,23 @@ export const EducHome = () => {
       // personalInfo: parsedPersonalInfo,
       ...data,
     };
-      localStorage.setItem("educationData", JSON.stringify(combinedData));
-      router.push('/employeeDetails?tab=experience');
+    localStorage.setItem("educationData", JSON.stringify(combinedData));
+    router.push("/employeeDetails?tab=experience");
   };
-  
 
   return (
     <section className="bg-white py-5 px-10 rounded-xl ">
       <div>
-        <h3 className="text-gray-700 text-[22px] font-semibold">Education info</h3>
+        <h3 className="text-gray-700 text-[22px] font-semibold">
+          Education info
+        </h3>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col justify-between my-5">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col justify-between my-5"
+      >
         <section className="flex flex-col gap-4">
           <div className="flex gap-10 flex-wrap">
-
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="degree" className="text-[15px] text-gray-600">
                 Bachelor’s degree<sup className="text-red-500">*</sup>
@@ -93,7 +98,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.degree && (
-                <p className="text-red-500 text-[14px]">{errors.degree.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.degree.message}
+                </p>
               )}
             </div>
 
@@ -107,7 +114,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.study && (
-                <p className="text-red-500 text-[14px]">{errors.study.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.study.message}
+                </p>
               )}
             </div>
 
@@ -122,7 +131,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.school && (
-                <p className="text-red-500 text-[14px]">{errors.school.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.school.message}
+                </p>
               )}
             </div>
           </div>
@@ -140,7 +151,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.master && (
-                <p className="text-red-500 text-[14px]">{errors.master.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.master.message}
+                </p>
               )}
             </div>
 
@@ -155,7 +168,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.field && (
-                <p className="text-red-500 text-[14px]">{errors.field.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.field.message}
+                </p>
               )}
             </div>
 
@@ -170,7 +185,9 @@ export const EducHome = () => {
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
               {errors.highSchool && (
-                <p className="text-red-500 text-[14px]">{errors.highSchool.message}</p>
+                <p className="text-red-500 text-[14px]">
+                  {errors.highSchool.message}
+                </p>
               )}
             </div>
           </div>

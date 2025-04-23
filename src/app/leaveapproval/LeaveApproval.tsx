@@ -44,19 +44,23 @@ const LeaveApproval = () => {
     const fetchEmployees = async () => {
       try {
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
-        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map((doc) => ({
-          docId: doc.id,
-          empID: doc.data().empID,
-          leaveStatus: doc.data().leaveStatus,
-          leaveType: doc.data().leaveType,
-          duration: doc.data().duration,
-          startDate: doc.data().startDate,
-          endDate: doc.data().endDate,
-          createdDate: doc.data().createdDate,
-          name: "", 
-        }));
+        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map(
+          (doc) => ({
+            docId: doc.id,
+            empID: doc.data().empID,
+            leaveStatus: doc.data().leaveStatus,
+            leaveType: doc.data().leaveType,
+            duration: doc.data().duration,
+            startDate: doc.data().startDate,
+            endDate: doc.data().endDate,
+            createdDate: doc.data().createdDate,
+            name: "",
+          })
+        );
 
-        const employeeSnapshot = await getDocs(collection(db, "employeeDetails"));
+        const employeeSnapshot = await getDocs(
+          collection(db, "employeeDetails")
+        );
         const employeeDetails = employeeSnapshot.docs.map((doc) => ({
           empID: doc.id,
           ...(doc.data() as { name: string }),
@@ -67,10 +71,12 @@ const LeaveApproval = () => {
           empMap.set(emp.empID, emp.name);
         });
 
-        const enrichedList = leaveList .filter((leave) => leave.leaveStatus === "Pending").map((leave) => ({
-          ...leave,
-          name: empMap.get(leave.empID) || "Unknown",
-        }));
+        const enrichedList = leaveList
+          .filter((leave) => leave.leaveStatus === "Pending")
+          .map((leave) => ({
+            ...leave,
+            name: empMap.get(leave.empID) || "Unknown",
+          }));
 
         setLeaveApproval(enrichedList);
       } catch (error) {
@@ -117,28 +123,42 @@ const LeaveApproval = () => {
             </tr>
           </thead>
           <tbody>
-            {leaveApproval.map((item, index) => (
-              <tr key={index} className="">
-                <td className="px-4 py-2 ">{item.empID}</td>
-                <td className="px-4 py-2 ">{item.name}</td>
-                <td className="px-4 py-2 ">{item.duration}</td>
-                <td className="px-4 py-2 ">{item.startDate}</td>
-                <td className="px-4 py-2 ">{item.endDate}</td>
-                <td className="px-4 py-2 ">{item.leaveType}</td>
-                {/* <td className="px-4 py-2 ">{item.createdDate}</td> */}
-                <td className="px-4 py-2 ">
-                  <select
-                    value={item.leaveStatus}
-                    onChange={(e) => handleStatusChange(item.docId, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
+            {leaveApproval.map((item, index) => {
+              let durationInDays = "-"; // default value if dates are missing
+
+              if (item?.startDate && item?.endDate) {
+                const startDate = new Date(item.startDate);
+                const endDate = new Date(item.endDate);
+                const durationInMs = endDate.getTime() - startDate.getTime();
+                durationInDays = Math.ceil(
+                  durationInMs / (1000 * 60 * 60 * 24)
+                ).toString();
+              }
+              return (
+                <tr key={index} className="">
+                  <td className="px-4 py-2 ">{item.empID}</td>
+                  <td className="px-4 py-2 ">{item.name}</td>
+                  <td className="px-4 py-2 ">{durationInDays}</td>
+                  <td className="px-4 py-2 ">{item.startDate}</td>
+                  <td className="px-4 py-2 ">{item.endDate}</td>
+                  <td className="px-4 py-2 ">{item.leaveType}</td>
+                  {/* <td className="px-4 py-2 ">{item.createdDate}</td> */}
+                  <td className="px-4 py-2 ">
+                    <select
+                      value={item.leaveStatus}
+                      onChange={(e) =>
+                        handleStatusChange(item.docId, e.target.value)
+                      }
+                      className="border border-gray-300 rounded px-2 py-1"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

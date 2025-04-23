@@ -1,3 +1,4 @@
+"use client";
 import Searchbox from "@/app/utils/searchbox";
 import { useState } from "react";
 
@@ -52,7 +53,7 @@ const AttendanceTab: React.FC = () => {
         </div>
       </div>
       <div className="center gap-7 py-7">
-        <Searchbox />
+        {/* <Searchbox /> */}
       </div>
     </section>
   );
