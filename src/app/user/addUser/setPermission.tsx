@@ -9,13 +9,13 @@ type SetPermissionBoxProps = {
 const submodulesList: string[] = [
   "Overview",
   "Employee",
+  "Leave Management",
   "Attendance",
-  "Internship",
   "User",
-  "Leave  Management",
   "Timesheet",
-  "Settings",
+  "Internship",
   "Report",
+  "Settings",
 ];
 
 const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({

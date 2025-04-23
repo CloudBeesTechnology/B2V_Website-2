@@ -46,7 +46,7 @@ const EmpOverview: React.FC = () => {
         </h3>
       </header>
       <EmpBasicDetails data={empDetails} />
-      <EmpAvailableLeaves />
+      <EmpAvailableLeaves data={empDetails} />
       <EmpLeaveStatusTable />
     </main>
   );
