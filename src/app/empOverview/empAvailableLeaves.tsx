@@ -3,7 +3,7 @@ const EmpAvailableLeaves:React.FC=()=>{
         <section className="flex justify-between items-center mt-20 gap-10 ">
         <article className="flex  w-2/3 justify-around p-5 gap-5 border h-48 border-[#E4E4E4] bg-white rounded-md">
           <div className="center flex-col gap-2 border border-[#D4EBDC] w-full rounded-md">
-            <p className="text-gray text_size_4">Annual Leave</p>
+            <p className="text-gray text_size_4">Total Leave</p>
             <p className="text-2xl font-medium text-[#01C441]">12</p>
             <p className="text-12px font-medium text-medium_gray">
               Available

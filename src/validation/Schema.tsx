@@ -44,6 +44,8 @@ export const signUpSchema = Yup.object().shape({
     position: z.string().min(1, 'Position is required'),
     proof: z.string().min(1, 'Proof is required'),
     profilePhoto: z.any().optional(),
+    totalLeave:z.string(),
+    manager:z.string()
   });
 
   export const educationSchema = z.object({
