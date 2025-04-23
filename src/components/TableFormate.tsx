@@ -41,12 +41,12 @@ interface allEmployee {
 }
 
 interface TableProps {
-  heading: string[];
-  ovla: Ovla[];
-  list: string;
-  allEmp: allEmployee[];
-  leaveApproval: LA[];
-  empLeave: EmpLeave[];
+  heading?: string[];
+  ovla?: Ovla[];
+  list?: string;
+  allEmp?: allEmployee[];
+  leaveApproval?: LA[];
+  empLeave?: EmpLeave[];
 }
 
 export const TableFormate = ({
@@ -71,7 +71,7 @@ export const TableFormate = ({
     <table className="w-full border-collapse">
       <thead className="text-mediumlite_grey text-sm font-bold text-start w-full">
         <tr>
-          {heading.map((val, index) => (
+          {heading?.map((val, index) => (
             <th key={index} className="text-start py-2 px-4">
               {val}
             </th>
@@ -80,7 +80,7 @@ export const TableFormate = ({
       </thead>
       <tbody>
         {list === "OVLA" &&
-          ovla.slice(0, 4).map((val, index) => (
+          ovla?.slice(0, 4).map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
               <td className="text-start py-2 px-4">{val.date}</td>
               <td className="text-start py-2 px-4">{val.appType}</td>
@@ -90,7 +90,7 @@ export const TableFormate = ({
           ))}
 
         {list === "AllEmp" &&
-          allEmp.map((val, index) => (
+          allEmp?.map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
               <td className="text-start py-2 px-4 flex gap-1 items-center">
                 <Image
@@ -113,7 +113,7 @@ export const TableFormate = ({
           ))}
 
         {list === "LeaveApproval" &&
-          leaveApproval.map((val, index) => (
+          leaveApproval?.map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
               <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">{val.empID}</td>
               <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">{val?.name}</td>
@@ -136,7 +136,7 @@ export const TableFormate = ({
           ))}
 
         {list === "empLeave" &&
-          empLeave.map((val, index) => (
+          empLeave?.map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
               <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">{val.empID}</td>
               <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">{val.duration}</td>
