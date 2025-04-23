@@ -1,6 +1,6 @@
+"use client"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter } from "next/navigation";
 import { familySchema } from "@/validation/Schema"; // Make sure this schema is defined
 import { db } from "@/lib/firebaseConfig";
 import {
@@ -23,7 +23,7 @@ interface FamilyDetails {
 }
 
 export const FamilyHome = () => {
-  const router = useRouter();
+
 
   const {
     register,
