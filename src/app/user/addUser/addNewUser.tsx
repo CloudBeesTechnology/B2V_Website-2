@@ -132,7 +132,6 @@ const AddNewUser: React.FC = () => {
         ...doc.data(),
       }));
 
-      console.log("Matched data:", results);
       return results[0];
     } else {
       console.log("No matching documents.");
@@ -158,7 +157,6 @@ const AddNewUser: React.FC = () => {
         ...doc.data(),
       }));
       setAllUser(users);
-      console.log(users);
     };
     getUsers();
   }, []);
@@ -171,7 +169,6 @@ const AddNewUser: React.FC = () => {
         where("empID", "==", user?.empID)
       );
 
-      console.log("fetchQuery : ", fetchQuery);
       const querySnapshot = await getDocs(fetchQuery);
       const getUserDetails = querySnapshot.docs.map((doc) => ({
         id: doc.id,
