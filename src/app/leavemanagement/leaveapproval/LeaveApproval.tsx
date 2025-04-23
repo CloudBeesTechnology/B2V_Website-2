@@ -19,7 +19,7 @@ const LeaveApproval: React.FC = () => {
             <p>Export</p>
             <IoIosArrowDropdownCircle />
           </div>
-        </section>    
+        </section>
         <LeaveTable />
       </div>
     </main>
