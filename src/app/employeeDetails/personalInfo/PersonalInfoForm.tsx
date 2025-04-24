@@ -32,21 +32,38 @@ export const PersonalInfoForm = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('personalInfo');
       if (savedData) {
         const parsedData = JSON.parse(savedData);
-        if (parsedData.profilePhotoUrl) {
-          setPreviewImage(parsedData.profilePhotoUrl);
+        
+        // Set all form values from localStorage
+        reset({
+          name: parsedData.name,
+          contact: parsedData.contact,
+          alternateNo: parsedData.alternateNo,
+          email: parsedData.email,
+          department: parsedData.department,
+          position: parsedData.position,
+          proof: parsedData.proof,
+          totalLeave: parsedData.totalLeave,
+          manager: parsedData.manager,
+          profilePhoto: parsedData.profilePhoto || null,
+        });
+
+        // Set the preview image if it exists
+        if (parsedData.profilePhoto) {
+          setPreviewImage(parsedData.profilePhoto);
         }
       }
     }
-  }, []);
+  }, [reset]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
