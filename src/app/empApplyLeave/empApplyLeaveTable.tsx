@@ -54,7 +54,7 @@ const EmpApplyLeaveTable = () => {
       leaveReason: data.leaveReason,
       leaveType: data.leaveType,
       startDate: data.startDate,
-      status: "Pending",
+      leaveStatus: "Pending",
       empID: empID,
       halfDay: halfDayValue,
       remarks:"",
