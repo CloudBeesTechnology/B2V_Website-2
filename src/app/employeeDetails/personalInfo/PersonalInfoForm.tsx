@@ -17,6 +17,9 @@ interface PersonalInfoFormData {
   proof: string;
   totalLeave: string;
   manager: string;
+  nationality:string;
+  dob:string;
+  doj:string;
   profilePhoto?: File | string | null;
 }
 
@@ -154,8 +157,57 @@ useEffect(() => {
                 />
               </div>
             </div>
+          </div>
 
-            
+          <div className="flex justify-between">
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="dob" className="text-[15px] text-gray">
+                Date of Birth<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="dob"
+                  type="date"
+                  className="outline-none py-1 w-full"
+                  {...register('dob')}
+                />
+              </div>
+              {errors.dob && (
+                <span className="text-red text-sm">{errors.dob.message}</span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="doj" className="text-[15px] text-gray">
+                Date of Join<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="doj"
+                  type="date"
+                  className="outline-none py-1 w-full"
+                  {...register('doj')}
+                />
+              </div>
+              {errors.doj && (
+                <span className="text-red text-sm">{errors.doj.message}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="nationality" className="text-[15px] text-gray">
+              Nationality<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="nationality"
+                  className="outline-none py-1 w-full"
+                  {...register('nationality')}
+                />
+              </div>
+              {errors.nationality && (
+                <span className="text-red text-sm">{errors.nationality.message}</span>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-between mt-5">
@@ -210,6 +262,7 @@ useEffect(() => {
 
           
           </div>
+
           <div className="flex  gap-10 mt-5">
           <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="proof" className="text-[15px] text-gray">

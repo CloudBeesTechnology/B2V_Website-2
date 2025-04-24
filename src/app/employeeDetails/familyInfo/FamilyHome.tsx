@@ -217,7 +217,7 @@ export const FamilyHome = () => {
             </div>
           </div>
 
-          <div className="flex flex-col mt-5 w-[73%] gap-2">
+          <div className="flex flex-col mt-5 gap-2">
             <label htmlFor="address" className="text-[15px] text-gray">
               Address <sup className="text-red">*</sup>
             </label>

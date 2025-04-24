@@ -1,6 +1,6 @@
 const EmpLeaveCounts: React.FC = () => {
   return (
-    <section className="center  gap-24 bg-white rounded-md w-full h-[126px] text-gray text-base border border-[#DBDBDBCC]">
+    <section className="center  gap-24 bg-white rounded-md w-full h-[126px] text-gray text-base border border-[#DBDBDBCC] px-2">
       <div className="center gap-10">
         <p className="text-2xl font-bold text-[#1C40AE]">16</p>
         <p>Available leaves</p>
