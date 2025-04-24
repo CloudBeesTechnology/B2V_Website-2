@@ -71,8 +71,8 @@ export const signUpSchema = Yup.object().shape({
     mother: Yup.string().required("Mother's name is required"),
     siblings: Yup.string().required("Siblings info is required"),
     fatherOcc: Yup.string().required("Father's occupation is required"),
-    motherocc: Yup.string().required("Mother's occupation is required"),
-    homeNumber: Yup
+    motherOcc: Yup.string().required("Mother's occupation is required"),
+    familyPNo: Yup
       .string()
       .matches(/^[0-9]{10}$/, "Contact number must be 10 digits")
       .required("Contact number is required"),

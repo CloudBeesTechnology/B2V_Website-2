@@ -111,7 +111,22 @@ export const PersonalInfoForm = () => {
 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="contact" className="text-[15px] text-gray">
-                Contact<sup className="text-red">*</sup>
+                Contact Number<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="contact"
+                  className="outline-none py-1 w-full"
+                  {...register('contact')}
+                />
+              </div>
+              {errors.contact && (
+                <span className="text-red text-sm">{errors.contact.message}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="contact" className="text-[15px] text-gray">
+              Alternate Contact Number<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -125,7 +140,11 @@ export const PersonalInfoForm = () => {
               )}
             </div>
 
-            <div className="flex flex-col gap-2 w-[30%]">
+            
+          </div>
+
+          <div className="flex justify-between mt-5">
+          <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="email" className="text-[15px] text-gray">
                 Email ID<sup className="text-red">*</sup>
               </label>
@@ -140,10 +159,7 @@ export const PersonalInfoForm = () => {
               {errors.email && (
                 <span className="text-red text-sm">{errors.email.message}</span>
               )}
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-5">
+            </div> 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="department" className="text-[15px] text-gray">
               Department<sup className="text-red">*</sup>
