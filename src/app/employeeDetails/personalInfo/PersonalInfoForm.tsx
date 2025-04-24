@@ -77,7 +77,7 @@ export const PersonalInfoForm = () => {
   const onSubmit = (data: PersonalInfoFormData) => {
     const dataToStore = {
       ...data,
-      profilePhotoUrl: previewImage,
+      profilePhoto: previewImage,
     };
     // console.log(dataToStore,"dataToStore");
     
