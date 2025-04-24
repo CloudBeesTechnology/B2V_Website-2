@@ -6,8 +6,6 @@ import {
   getDocs,
   updateDoc,
   doc,
-  query,
-  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";

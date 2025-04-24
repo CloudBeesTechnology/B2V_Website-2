@@ -8,6 +8,7 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
+import { TableFormate } from "@/components/TableFormate";
 
 type LeaveStatus = {
   empID: string;
@@ -36,8 +37,8 @@ const LeaveHistory = () => {
   ];
 
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
-  // const [filterStatus, setFilterStatus] = useState<"All" | "Approved" | "Rejected">("All");
   const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">("Approved");
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -80,10 +81,10 @@ const LeaveHistory = () => {
   }, []);
 
   const filteredData = leaveApproval.filter((item) =>
-filterStatus==="Approved"?
-    item.leaveStatus === "Approved":item.leaveStatus === "Rejected" 
-
-).map((val)=>val)
+    filterStatus === "Approved"
+      ? item.leaveStatus === "Approved"
+      : item.leaveStatus === "Rejected"
+  );
 
   return (
     <section>
@@ -114,33 +115,15 @@ filterStatus==="Approved"?
       </div>
 
       <div className="bg-white px-10 py-5 rounded-lg overflow-x-auto">
-        <table className="min-w-full border border-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              {Heading.map((title, idx) => (
-                <th key={idx} className="px-4 py-2 text-left">
-                  {title}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((item, index) => (
-              <tr key={index}>
-                <td className="px-4 py-2">{item.empID}</td>
-                <td className="px-4 py-2">{item.name}</td>
-                <td className="px-4 py-2">{item.duration}</td>
-                <td className="px-4 py-2">{item.startDate}</td>
-                <td className="px-4 py-2">{item.endDate}</td>
-                <td className="px-4 py-2">{item.leaveType}</td>
-                <td className="px-4 py-2">{item.leaveStatus}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TableFormate
+          heading={Heading}
+          list="LeaveApproval"
+          leaveApproval={filteredData}
+        />
       </div>
     </section>
   );
 };
 
 export default LeaveHistory;
+

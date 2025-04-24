@@ -1,8 +1,6 @@
 import Image from "next/image";
 import { FaEdit } from "react-icons/fa";
 import avatar from "../assets/employee/avatar.webp";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebaseConfig";
 
 interface Ovla {
   date: string;
@@ -17,6 +15,7 @@ interface LA {
   duration?: string;
   startDate?: string;
   endDate?: string;
+  takenDay?:string;
   leaveType?: string;
   leaveStatus?: string;
 }
@@ -27,11 +26,12 @@ interface EmpLeave {
   startDate: string;
   endDate: string;
   leaveType: string;
+  takenDay?:string;
   leaveStatus: string;
 }
 
 interface allEmployee {
-  profile: string;
+  profile?: string;
   empID: string;
   name: string;
   position: string;
@@ -43,7 +43,7 @@ interface allEmployee {
 interface TableProps {
   heading?: string[];
   ovla?: Ovla[];
-  list?: string;
+  list?: "OVLA" | "AllEmp" | "LeaveApproval" | "empLeave";
   allEmp?: allEmployee[];
   leaveApproval?: LA[];
   empLeave?: EmpLeave[];
@@ -51,37 +51,30 @@ interface TableProps {
 
 export const TableFormate = ({
   heading,
-  ovla,
+  ovla = [],
   list,
   allEmp,
   leaveApproval,
   empLeave,
 
 }: TableProps) => {
-  const handleStatusChange = async (empID: string, status: string) => {
-    try {
-      const docRef = doc(db, "leaveStatus", empID);
-      await updateDoc(docRef, { leaveStatus: status });
-      alert(`Leave status for ${empID} updated to ${status}`);
-    } catch (error) {
-      console.error("Failed to update leave status:", error);
-    }
-  };
-
   return (
     <table className="w-full border-collapse">
-      <thead className="text-mediumlite_grey text-sm font-bold text-start w-full">
-        <tr>
-          {heading?.map((val, index) => (
-            <th key={index} className="text-start py-2 px-4">
-              {val}
-            </th>
-          ))}
-        </tr>
-      </thead>
+      {heading && (
+        <thead className="text-mediumlite_grey text-sm font-bold text-start w-full">
+          <tr>
+            {heading.map((val, index) => (
+              <th key={index} className="text-start py-2 px-4">
+                {val}
+              </th>
+            ))}
+          </tr>
+        </thead>
+      )}
       <tbody>
+        {/* OVLA list */}
         {list === "OVLA" &&
-          ovla?.slice(0, 4).map((val, index) => (
+          ovla.slice(0, 4).map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
               <td className="text-start py-2 px-4">{val.date || "N/A"}</td>
               <td className="text-start py-2 px-4">{val.appType || "N/A"}</td>
@@ -90,15 +83,17 @@ export const TableFormate = ({
             </tr>
           ))}
 
+        {/* All Employee list */}
         {list === "AllEmp" &&
           allEmp?.map((val, index) => (
             <tr key={index} className="text-sm text-medium_gray">
-              <td className="text-start py-2 px-4 flex gap-1 items-center">
+              <td className="text-start py-2 px-4 flex items-center gap-2">
                 <Image
                   src={val.profile || avatar}
                   width={25}
                   height={25}
                   alt={`${val.name} profile`}
+                  className="rounded-full"
                 />
                 {val.empID || "N/A"}
               </td>
@@ -115,15 +110,16 @@ export const TableFormate = ({
             </tr>
           ))}
 
+        {/* Leave Approval list */}
         {list === "LeaveApproval" &&
           leaveApproval?.map((val, index) => {
-            let durationInDays = "-"; // default value if dates are missing
+            let takenDay = "-"; // default value if dates are missing
 
             if (val?.startDate && val?.endDate) {
               const startDate = new Date(val.startDate);
               const endDate = new Date(val.endDate);
               const durationInMs = endDate.getTime() - startDate.getTime();
-              durationInDays = Math.ceil(
+              takenDay = Math.ceil(
                 durationInMs / (1000 * 60 * 60 * 24)
               ).toString();
             }
@@ -137,7 +133,7 @@ export const TableFormate = ({
                   {val?.name || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  {durationInDays || "N/A"}
+                  {takenDay || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
                   {val?.startDate || "N/A"}
@@ -149,39 +145,23 @@ export const TableFormate = ({
                   {val?.leaveType || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  <select
-                    className="bg-white border border-gray-300 rounded px-2 py-1"
-                    defaultValue={val?.leaveStatus}
-                    onChange={(e) => handleStatusChange?.(val.empID,e.target.value)}
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
+                  {val?.leaveStatus || "N/A"}
                 </td>
               </tr>
             );
           })}
 
+        {/* Employee Leave list */}
         {list === "empLeave" &&
           empLeave?.map((val, index) => {
-            let durationInDays = "-"; // default value if dates are missing
-
-            if (val?.startDate && val?.endDate) {
-              const startDate = new Date(val.startDate);
-              const endDate = new Date(val.endDate);
-              const durationInMs = endDate.getTime() - startDate.getTime();
-              durationInDays = Math.ceil(
-                durationInMs / (1000 * 60 * 60 * 24)
-              ).toString();
-            }
+            
             return (
               <tr key={index} className="text-sm text-medium_gray">
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
                   {val.empID || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  {durationInDays || "N/A"}
+                  {val.takenDay || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
                   {val.startDate || "N/A"}
@@ -202,3 +182,4 @@ export const TableFormate = ({
     </table>
   );
 };
+

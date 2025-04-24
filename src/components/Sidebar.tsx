@@ -122,7 +122,7 @@ const Sidebar = () => {
       icons: overview,
       icons2: whiteoverview,
       name: "Overview",
-      path: "/empOverview",
+      path: "/",
     },
     {
       icons: employee,
