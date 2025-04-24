@@ -10,6 +10,7 @@ import profileIcon from '../../../assets/employee/profileIcon.png';
 interface PersonalInfoFormData {
   name: string;
   contact: string;
+  alternateNo?: string;
   email: string;
   department: string;
   position: string;
@@ -125,19 +126,16 @@ export const PersonalInfoForm = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="contact" className="text-[15px] text-gray">
-              Alternate Contact Number<sup className="text-red">*</sup>
+              <label htmlFor="alternateNo" className="text-[15px] text-gray">
+              Alternate Contact Number
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="contact"
+                  id="alternateNo"
                   className="outline-none py-1 w-full"
-                  {...register('contact')}
+                  {...register('alternateNo')}
                 />
               </div>
-              {errors.contact && (
-                <span className="text-red text-sm">{errors.contact.message}</span>
-              )}
             </div>
 
             
@@ -193,7 +191,10 @@ export const PersonalInfoForm = () => {
               )}
             </div>
 
-            <div className="flex flex-col gap-2 w-[30%]">
+          
+          </div>
+          <div className="flex  gap-10 mt-5">
+          <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="proof" className="text-[15px] text-gray">
                 Proof<sup className="text-red">*</sup>
               </label>
@@ -208,8 +209,6 @@ export const PersonalInfoForm = () => {
                 <span className="text-red text-sm">{errors.proof.message}</span>
               )}
             </div>
-          </div>
-          <div className="flex  gap-10 mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="leave" className="text-[15px] text-gray">
              Total Leave

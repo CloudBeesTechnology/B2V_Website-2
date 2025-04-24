@@ -39,7 +39,13 @@ export const signUpSchema = Yup.object().shape({
   export const personalInfoSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     contact: z.string().min(1, 'Contact is required'),
-    email: z.string().email('Invalid email address'),
+    alternateNo: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 10, {
+      message: "Alternate number must be at least 10 characters if provided",
+    }),
+      email: z.string().email('Invalid email address'),
     department: z.string().min(1, 'Department is required'),
     position: z.string().min(1, 'Position is required'),
     proof: z.string().min(1, 'Proof is required'),

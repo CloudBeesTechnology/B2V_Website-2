@@ -57,6 +57,7 @@ const EmpApplyLeaveTable = () => {
       status: "Pending",
       empID: empID,
       halfDay: halfDayValue,
+      remarks:"",
       takenDay: takenDay.toString(),
       createdAt: createdAt,  
   })
