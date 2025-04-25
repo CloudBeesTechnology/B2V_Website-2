@@ -177,7 +177,7 @@ export const EducHome = () => {
             {/* High School */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="highSchool" className="text-[15px] text-gray-600">
-                High School<sup className="text-red-500">*</sup>
+                School<sup className="text-red-500">*</sup>
               </label>
               <input
                 id="highSchool"

@@ -75,8 +75,8 @@ const EmpApplyLeaveTable = () => {
     <section className="mt-10">
       <form onSubmit={handleSubmit(onSubmit)}>
         <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3>
-        <div className="bg-white border-[#D7D5D5] rounded-md ">
-        <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5">
+        <div className="bg-white border-[#D7D5D5] rounded-md py-5">
+        <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
   {/* Leave Type */}
   <div className="flex flex-col">
     <label className="text_size_5 text-gray mb-1">Leave Type</label>
@@ -148,7 +148,7 @@ const EmpApplyLeaveTable = () => {
     />
   </div>
 </div>
-<div className="center pt-4">
+<div className="center pt-2 py-2">
     <button
       type="submit"
       className="rounded-xl border-2 px-4 py-2 border-[#1C40AE] text-[#1C40AE] cursor-pointer"
