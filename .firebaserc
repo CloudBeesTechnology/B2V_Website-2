@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "b2vtech-3519c",
+    "hosting": "b2vtech-3519c"
+  },
+  "targets": {
+    "b2vtech-3519c": {
+      "hosting": {
+        "portal-b2v": [
+          "portal-b2v"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

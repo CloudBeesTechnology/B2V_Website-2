@@ -25,7 +25,7 @@ const LeaveData: React.FC = () => {
           </div>
         </div>
         <div className="mt-auto">
-          <Searchbox />
+          {/* <Searchbox /> */}
         </div>
       </section>
       <section className="bg-white rounded-xl p-5 my-7  ">

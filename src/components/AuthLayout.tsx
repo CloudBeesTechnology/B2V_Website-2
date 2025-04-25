@@ -5,6 +5,17 @@ import { ReactNode } from "react";
 import logo from "../assets/logo/logo.png";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 
+interface AuthLayoutProps {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  linkText?: string;
+  linkHref?: string;
+  backHref?: string;
+  linkName?: string;
+  image: StaticImageData;
+}
+
 export default function AuthLayout({
   title,
   subtitle,
@@ -13,29 +24,20 @@ export default function AuthLayout({
   linkHref,
   image,
   backHref,
-  linkName
-}: {
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-  linkText?: string;
-  linkHref?: string;
-  backHref?: string;
-  linkName?:  string;
-  image: StaticImageData; 
-}) {
+  linkName,
+}: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen w-full">
       {/* Left Side Image & Text */}
       <div className="hidden lg:flex w-1/2 bg-blue-50 justify-center items-center">
         <div className="text-center">
-          <Image 
+          <Image
             src={image}
-            priority 
-            alt="Sign illustration" 
-            className="mx-auto w-2/3" 
-            />
-          {linkText && linkHref && (
+            priority
+            alt="Sign illustration"
+            className="mx-auto w-2/3"
+          />
+          {linkText && linkHref && linkName && (
             <p className="mt-4 text_size_10 flex justify-evenly text-medium_gray">
               {linkText}{" "}
               <Link href={linkHref} className="text-primary font-semibold ml-1">
@@ -43,11 +45,14 @@ export default function AuthLayout({
               </Link>
             </p>
           )}
-          
-            { backHref && linkHref && (
+
+          {backHref && linkHref && (
             <p className="mt-4 text_size_10 flex items-center justify-start gap-3 px-20">
-            <MdOutlineKeyboardArrowLeft className="text-[24px] text-medium_gray font-extralight"/>
-              <Link href={linkHref} className="text-medium_gray font-semibold ml-1">
+              <MdOutlineKeyboardArrowLeft className="text-[24px] text-medium_gray font-extralight" />
+              <Link
+                href={linkHref}
+                className="text-medium_gray font-semibold ml-1"
+              >
                 {backHref}
               </Link>
             </p>
