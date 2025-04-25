@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignInSchema } from "@/validation/Schema";
 import { useRouter } from "next/navigation";
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import Link from "next/link";
 import AuthLayout from "@/components/AuthLayout";
 import signImg from "../../assets/sign/signInImg.png";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseConfig";
+import { useState } from "react";
 
 type SignInFormValues = {
   email: string;
@@ -18,6 +19,7 @@ type SignInFormValues = {
 
 export default function SignIn() {
   const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -93,7 +95,9 @@ export default function SignIn() {
     }
   };
   
-  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <AuthLayout
@@ -126,11 +130,18 @@ export default function SignIn() {
           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaLock className="text-primary mr-2" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               {...register("password")}
               className="w-full focus:outline-none text-lg"
             />
+             <button
+                          type="button"
+                          onClick={togglePasswordVisibility}
+                          className="text-primary focus:outline-none"
+                        >
+                          {showPassword ? <FaEye /> : <FaEyeSlash/>}
+                        </button>
           </div>
           {errors.password && (
             <p className="text-red-500 text-[14px] mt-1">{errors.password.message}</p>
