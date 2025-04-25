@@ -33,6 +33,8 @@ interface EmpLeave {
   leaveStatus: string;
   remarks?: string;
   leaveReason?:string;
+  createdAt?:string;
+
 }
 
 interface allEmployee {
@@ -43,6 +45,7 @@ interface allEmployee {
   department: string;
   contact: string;
   email: string;
+  createdAt?:string;
 }
 
 interface TableProps {
@@ -211,6 +214,16 @@ export const TableFormate = ({
     {val?.leaveStatus || "N/A"}
   </span>
 </td>
+{/* <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
+  {val.createdAt ? (
+    <>
+      <div>{new Date(val.createdAt).toLocaleDateString()}</div>
+      <div className="text-sm text-gray-500">
+        {new Date(val.createdAt).toLocaleTimeString()}
+      </div>
+    </>
+  ) : "N/A"}
+</td> */}
               </tr>
             ))}
         </tbody>
