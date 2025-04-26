@@ -17,8 +17,8 @@ interface FamilyDetails {
   mother: string;
   siblings: string;
   fatherOcc: string;
-  motherocc: string;
-  homeNumber: string;
+  motherOcc: string;
+  familyPNo: string;
   address: string;
 }
 
@@ -181,37 +181,37 @@ export const FamilyHome = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="motherocc" className="text-[15px] text-gray">
+              <label htmlFor="motherOcc" className="text-[15px] text-gray">
                 Mother Occupation <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
                   id="motherocc"
-                  {...register("motherocc")}
+                  {...register("motherOcc")}
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.motherocc && (
+              {errors.motherOcc && (
                 <p className="text-red-500 text-[14px] mt-1">
-                  {errors.motherocc.message}
+                  {errors.motherOcc.message}
                 </p>
               )}
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="homeNumber" className="text-[15px] text-gray">
-                Contact Number <sup className="text-red">*</sup>
+              <label htmlFor="familyPNo" className="text-[15px] text-gray">
+                Family Contact Number <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="homeNumber"
-                  {...register("homeNumber")}
+                  id="familyPNo"
+                  {...register("familyPNo")}
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.homeNumber && (
+              {errors.familyPNo && (
                 <p className="text-red-500 text-[14px] mt-1">
-                  {errors.homeNumber.message}
+                  {errors.familyPNo.message}
                 </p>
               )}
             </div>

@@ -15,7 +15,7 @@ interface LA {
   duration?: string;
   startDate?: string;
   endDate?: string;
-  takenDay?:string;
+  takenDay?: string;
   leaveType?: string;
   leaveStatus?: string;
 }
@@ -26,7 +26,7 @@ interface EmpLeave {
   startDate: string;
   endDate: string;
   leaveType: string;
-  takenDay?:string;
+  takenDay?: string;
   leaveStatus: string;
 }
 
@@ -56,7 +56,6 @@ export const TableFormate = ({
   allEmp,
   leaveApproval,
   empLeave,
-
 }: TableProps) => {
   return (
     <table className="w-full border-collapse">
@@ -64,7 +63,7 @@ export const TableFormate = ({
         <thead className="text-mediumlite_grey text-sm font-bold text-start w-full">
           <tr>
             {heading.map((val, index) => (
-              <th key={index} className="text-start py-2 px-4">
+              <th key={index} className="text-start  py-2 px-4">
                 {val}
               </th>
             ))}
@@ -75,7 +74,7 @@ export const TableFormate = ({
         {/* OVLA list */}
         {list === "OVLA" &&
           ovla.slice(0, 4).map((val, index) => (
-            <tr key={index} className="text-sm text-medium_gray">
+            <tr key={index} className="text-sm  text-medium_gray">
               <td className="text-start py-2 px-4">{val.date || "N/A"}</td>
               <td className="text-start py-2 px-4">{val.appType || "N/A"}</td>
               <td className="text-start py-2 px-4">{val.duration || "N/A"}</td>
@@ -154,7 +153,6 @@ export const TableFormate = ({
         {/* Employee Leave list */}
         {list === "empLeave" &&
           empLeave?.map((val, index) => {
-            
             return (
               <tr key={index} className="text-sm text-medium_gray">
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
@@ -182,4 +180,3 @@ export const TableFormate = ({
     </table>
   );
 };
-

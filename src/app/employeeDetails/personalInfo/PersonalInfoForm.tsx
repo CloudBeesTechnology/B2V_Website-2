@@ -10,6 +10,7 @@ import profileIcon from '../../../assets/employee/profileIcon.png';
 interface PersonalInfoFormData {
   name: string;
   contact: string;
+  alternateNo?: string;
   email: string;
   department: string;
   position: string;
@@ -31,21 +32,38 @@ export const PersonalInfoForm = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('personalInfo');
       if (savedData) {
         const parsedData = JSON.parse(savedData);
-        if (parsedData.profilePhotoUrl) {
-          setPreviewImage(parsedData.profilePhotoUrl);
+        
+        // Set all form values from localStorage
+        reset({
+          name: parsedData.name,
+          contact: parsedData.contact,
+          alternateNo: parsedData.alternateNo,
+          email: parsedData.email,
+          department: parsedData.department,
+          position: parsedData.position,
+          proof: parsedData.proof,
+          totalLeave: parsedData.totalLeave,
+          manager: parsedData.manager,
+          profilePhoto: parsedData.profilePhoto || null,
+        });
+
+        // Set the preview image if it exists
+        if (parsedData.profilePhoto) {
+          setPreviewImage(parsedData.profilePhoto);
         }
       }
     }
-  }, []);
+  }, [reset]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,7 +95,7 @@ export const PersonalInfoForm = () => {
   const onSubmit = (data: PersonalInfoFormData) => {
     const dataToStore = {
       ...data,
-      profilePhotoUrl: previewImage,
+      profilePhoto: previewImage,
     };
     // console.log(dataToStore,"dataToStore");
     
@@ -111,7 +129,7 @@ export const PersonalInfoForm = () => {
 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="contact" className="text-[15px] text-gray">
-                Contact<sup className="text-red">*</sup>
+                Contact Number<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -124,8 +142,24 @@ export const PersonalInfoForm = () => {
                 <span className="text-red text-sm">{errors.contact.message}</span>
               )}
             </div>
-
             <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="alternateNo" className="text-[15px] text-gray">
+              Alternate Contact Number
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="alternateNo"
+                  className="outline-none py-1 w-full"
+                  {...register('alternateNo')}
+                />
+              </div>
+            </div>
+
+            
+          </div>
+
+          <div className="flex justify-between mt-5">
+          <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="email" className="text-[15px] text-gray">
                 Email ID<sup className="text-red">*</sup>
               </label>
@@ -140,10 +174,7 @@ export const PersonalInfoForm = () => {
               {errors.email && (
                 <span className="text-red text-sm">{errors.email.message}</span>
               )}
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-5">
+            </div> 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="department" className="text-[15px] text-gray">
               Department<sup className="text-red">*</sup>
@@ -177,7 +208,10 @@ export const PersonalInfoForm = () => {
               )}
             </div>
 
-            <div className="flex flex-col gap-2 w-[30%]">
+          
+          </div>
+          <div className="flex  gap-10 mt-5">
+          <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="proof" className="text-[15px] text-gray">
                 Proof<sup className="text-red">*</sup>
               </label>
@@ -192,8 +226,6 @@ export const PersonalInfoForm = () => {
                 <span className="text-red text-sm">{errors.proof.message}</span>
               )}
             </div>
-          </div>
-          <div className="flex  gap-10 mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="leave" className="text-[15px] text-gray">
              Total Leave

@@ -245,6 +245,12 @@ const Sidebar = () => {
     }
   }, []);
 
+  const RemoveLocalValues = () => {
+    localStorage.removeItem("experienceData");
+    localStorage.removeItem("personalInfo");
+    localStorage.removeItem("educationData");
+  };
+
   return (
     <section className="p-5 h-full overflow-y-auto">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
@@ -254,70 +260,40 @@ const Sidebar = () => {
         <div className=" space-y-5 mt-3">
           {filteredNavList.map((link, index) => {
             return (
-              <div key={index}>
-                {userRole === "ADMIN" ? (
-                  <div>
-                    {storedPermissions?.includes(link.name) && (
-                      <div
-                        className={clsx(
-                          pathname === link.path
-                            ? "bg-primary px-2 py-2 rounded-sm text-white"
-                            : "px-2 py-2"
-                        )}
-                      >
-                        <Link
-                          href={link.path}
-                          className="flex items-center gap-3"
-                        >
-                          {pathname === link.path ? (
-                            <Image
-                              src={link.icons2}
-                              alt={`${link.name} not found`}
-                              width={24}
-                              height={24}
-                            />
-                          ) : (
-                            <Image
-                              src={link.icons}
-                              alt={`${link.name} not found`}
-                              width={24}
-                              height={24}
-                            />
-                          )}
-                          <p className="text_size_4">{link.name}</p>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    className={clsx(
-                      pathname === link.path
-                        ? "bg-primary px-2 py-2 rounded-sm text-white"
-                        : "px-2 py-2"
-                    )}
+              <section key={index}>
+                {/* {storedPermissions?.includes(link.name) && ( */}
+                <div
+                  className={clsx(
+                    pathname === link.path
+                      ? "bg-primary px-2 py-2 rounded-sm text-white"
+                      : "px-2 py-2"
+                  )}
+                >
+                  <Link
+                    href={link.path}
+                    onClick={RemoveLocalValues}
+                    className="flex items-center gap-3"
                   >
-                    <Link href={link.path} className="flex items-center gap-3">
-                      {pathname === link.path ? (
-                        <Image
-                          src={link.icons2}
-                          alt={`${link.name} not found`}
-                          width={24}
-                          height={24}
-                        />
-                      ) : (
-                        <Image
-                          src={link.icons}
-                          alt={`${link.name} not found`}
-                          width={24}
-                          height={24}
-                        />
-                      )}
-                      <p className="text_size_4">{link.name}</p>
-                    </Link>
-                  </div>
-                )}
-              </div>
+                    {pathname === link.path ? (
+                      <Image
+                        src={link.icons2}
+                        alt={`${link.name} not found`}
+                        width={24}
+                        height={24}
+                      />
+                    ) : (
+                      <Image
+                        src={link.icons}
+                        alt={`${link.name} not found`}
+                        width={24}
+                        height={24}
+                      />
+                    )}
+                    <p className="text_size_4">{link.name}</p>
+                  </Link>
+                </div>
+                {/* )} */}
+              </section>
             );
           })}
         </div>

@@ -1,13 +1,35 @@
+"use client";
 import { ActiveEmployee } from "./ActiveEmployee";
-import { TotalEmployee } from "./TotalEmployee";
+import TotalEmployee from "./TotalEmployee";
 import { OverviewNotice } from "./OverviewNotice";
 import { OverviewLeaveApproval } from "./OverviewLeaveApproval";
-import { OverviewHolidays } from "./OverviewHolidays";
-import { Birthday } from "./Birthday";
-import { Weather } from "./Weather";
+// import { OverviewHolidays } from "./OverviewHolidays";
+import  Birthday  from "./Birthday";
+import Weather from "./Weather";
 import PersonalCal from "./PersonalCal";
+import OverviewHolidays from "./OverviewHolidays";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+type Employee = {
+  id: string;
+  [key: string]: any;
+};
 
-export const OverviewHome = () => {
+const OverviewHome: React.FC = () => {
+  const [allEmployee, setAllEmployee] = useState<Employee[]>([]);
+
+  useEffect(() => {
+    const getAllEmployee = async () => {
+      const querySnapshot = await getDocs(collection(db, "employeeDetails"));
+      const empData: Employee[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Employee, "id">),
+      }));
+      setAllEmployee(empData);
+    };
+    getAllEmployee();
+  }, []);
   return (
     <section className="grid grid-cols-3 gap-4 py-5">
       {/* Left Column */}
@@ -17,7 +39,7 @@ export const OverviewHome = () => {
 
         {/* Employee Statistics */}
         <div className="grid grid-cols-2 gap-4">
-          <TotalEmployee />
+          <TotalEmployee allEmployee={allEmployee} />
           <ActiveEmployee />
         </div>
 
@@ -41,7 +63,7 @@ export const OverviewHome = () => {
 
         {/* Birthdays */}
         <div className=" flex-[0.3] min-h-[25%]">
-          <Birthday />
+          <Birthday allEmployee={allEmployee} />
         </div>
 
         {/* Holidays */}
@@ -72,3 +94,4 @@ export const OverviewHome = () => {
     // </section>
   );
 };
+export default OverviewHome;
