@@ -4,15 +4,14 @@ import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAm5_-lhMcYE-4v9_CtqpV86zu0BRJIWnQ",
-    authDomain: "b2vtech-3519c.firebaseapp.com",
-    projectId: "b2vtech-3519c",
-    storageBucket: "b2vtech-3519c.appspot.com",
-    messagingSenderId: "32812401326",
-    appId: "1:32812401326:web:9465d56e92e1e738bfa33f",
-    measurementId: "G-2JMXJM8TRF"
-  };
-
+  apiKey: "AIzaSyDIsPp1bKVw33CevWV_79q35xCtcY8kGws",
+  authDomain: "b2vtechnew.firebaseapp.com",
+  projectId: "b2vtechnew",
+  storageBucket: "b2vtechnew.firebasestorage.app",
+  messagingSenderId: "749876274717",
+  appId: "1:749876274717:web:1e98b988bf9e99881d88f4",
+  measurementId: "G-6FPTWW0W0M"
+};
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);

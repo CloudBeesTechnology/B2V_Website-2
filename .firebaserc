@@ -1,13 +1,13 @@
 {
   "projects": {
-    "default": "b2vtech-3519c",
-    "hosting": "b2vtech-3519c"
+    "default": "b2vtechnew",
+    "hosting": "b2vtechnew"
   },
   "targets": {
-    "b2vtech-3519c": {
+    "b2vtechnew": {
       "hosting": {
-        "portal-b2v": [
-          "portal-b2v"
+        "b2vportal": [
+          "b2vportal"
         ]
       }
     }

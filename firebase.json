@@ -1,14 +1,16 @@
 {
-  "hosting": {
-    "source": ".",
-    "target": "portal-b2v",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "frameworksBackend": {
-      "region": "asia-east1"
-    }
+    "projects": {
+      "default": "b2vtechnew",
+      "hosting": "b2vtechnew"
+    },
+    "targets": {
+      "b2vtechnew": {
+        "hosting": {
+          "b2vportal": [
+            "b2vportal"
+          ]
+        }
+      }
+    },
+    "etags": {}
   }
-}
