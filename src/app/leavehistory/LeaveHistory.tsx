@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
@@ -18,6 +15,7 @@ type LeaveStatus = {
   startDate: string;
   endDate: string;
   createdDate: string;
+  remarks?: string;
 };
 
 type EnrichedLeaveStatus = LeaveStatus & {
@@ -26,6 +24,9 @@ type EnrichedLeaveStatus = LeaveStatus & {
 };
 
 const LeaveHistory = () => {
+  const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
+  const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">("Approved");
+
   const Heading = [
     "EmpID",
     "Name",
@@ -34,10 +35,8 @@ const LeaveHistory = () => {
     "End Date",
     "Leave Type",
     "Status",
+    ...(filterStatus === "Rejected" ? ["Remarks"] : []),
   ];
-
-  const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
-  const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">("Approved");
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -52,6 +51,7 @@ const LeaveHistory = () => {
           startDate: doc.data().startDate,
           endDate: doc.data().endDate,
           createdDate: doc.data().createdDate,
+          remarks: doc.data().remarks || "",
           name: "",
         }));
 
@@ -80,10 +80,8 @@ const LeaveHistory = () => {
     fetchEmployees();
   }, []);
 
-  const filteredData = leaveApproval.filter((item) =>
-    filterStatus === "Approved"
-      ? item.leaveStatus === "Approved"
-      : item.leaveStatus === "Rejected"
+  const filteredData = leaveApproval.filter(
+    (item) => item.leaveStatus === filterStatus
   );
 
   return (
@@ -119,6 +117,7 @@ const LeaveHistory = () => {
           heading={Heading}
           list="LeaveApproval"
           leaveApproval={filteredData}
+          filterStatus={filterStatus}
         />
       </div>
     </section>

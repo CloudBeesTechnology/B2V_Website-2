@@ -1,4 +1,7 @@
-const TaskPage: React.FC = () => {
-  return <>Task page</>;
-};
-export default TaskPage;
+
+
+export default function TaskPage () {
+  return (
+    <div>TaskPage</div>
+  )
+}

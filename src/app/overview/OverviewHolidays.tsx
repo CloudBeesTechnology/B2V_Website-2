@@ -83,7 +83,6 @@ const OverviewHolidays: React.FC = () => {
             }
           }).filter((item): item is HolidayType => item !== null); // remove null values
 
-          console.log("finalHolidayList : ", finalHolidayList);
           setHolidays(finalHolidayList);
         } else {
           throw new Error("No holidays data found");

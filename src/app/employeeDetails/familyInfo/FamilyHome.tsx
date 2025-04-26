@@ -11,6 +11,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+import { useRouter } from "next/router";
 
 interface FamilyDetails {
   father: string;
@@ -24,6 +25,7 @@ interface FamilyDetails {
 
 export const FamilyHome = () => {
 
+  const router = useRouter();
 
   const {
     register,
@@ -90,7 +92,7 @@ export const FamilyHome = () => {
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("educationData");
 
-      // router.push("/employee"); // Uncomment if you want to redirect
+      router.push("/employee"); 
     } catch (error) {
       console.error("Error writing document to Firestore:", error);
     }
@@ -217,7 +219,7 @@ export const FamilyHome = () => {
             </div>
           </div>
 
-          <div className="flex flex-col mt-5 w-[73%] gap-2">
+          <div className="flex flex-col mt-5 gap-2">
             <label htmlFor="address" className="text-[15px] text-gray">
               Address <sup className="text-red">*</sup>
             </label>
