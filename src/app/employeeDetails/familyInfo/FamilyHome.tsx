@@ -11,7 +11,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface FamilyDetails {
   father: string;
