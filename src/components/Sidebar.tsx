@@ -236,6 +236,7 @@ const Sidebar = () => {
 
   return (
     <section className="p-5 h-full overflow-y-auto">
+ 
       <div className="max-w-[100px] w-full h-20 mx-auto center">
         <Image src={logo} alt="logo not found" />
       </div>

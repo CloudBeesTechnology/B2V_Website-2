@@ -28,9 +28,9 @@ const Navbar = () => {
   };
 
   return (
-    <section className="bg-morelite_grey px-5 py-3 flex w-full sticky top-0 z-50">
-      <div className="flex justify-end items-center w-full gap-4">
-        <div className=" rounded-full gap-1 bg-white flex items-center px-3 py-1">
+    <section className="bg-morelite_grey px-5 py-3 flex w-full sticky top-0 z-[100]">
+      <div className="flex justify-end items-center w-full gap-4 ">
+        <div className="rounded-full gap-1 bg-white flex items-center px-3 py-1">
           <span className="text-gray">
             <IoSearchSharp />
           </span>

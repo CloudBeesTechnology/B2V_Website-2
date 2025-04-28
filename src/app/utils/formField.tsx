@@ -5,6 +5,7 @@ interface FormFieldProps {
   label: string;
   name: string;
   type?: string;
+  module?: string;
   register: ReturnType<typeof useForm>["register"] | any;
   errors?: string | any;
   placeholder?: string;
@@ -14,6 +15,7 @@ const FormField: React.FC<FormFieldProps> = ({
   label,
   name,
   type,
+  module,
   register,
   errors,
 }) => {
@@ -24,7 +26,7 @@ const FormField: React.FC<FormFieldProps> = ({
         type={type}
         {...register(name)}
         className="border border-[#E2E2E2] text-[#202020] bg-[#f5f7fb] text_size_4 p-2 rounded outline-none "
-        readOnly
+        readOnly={module === "user"}
         // placeholder={`Enter ${label.toLowerCase()}`}
       />
       {errors && <span className="text-dark_red text-sm pt-1">{errors}</span>}
