@@ -79,24 +79,7 @@ const Sidebar = () => {
       name: "Leave Management",
       path: "/leavemanagement",
     },
-    // {
-    //   icons: employee,
-    //   icons2: whiteemployee,
-    //   name: "Upcoming Holidays",
-    //   path: "/empUpcomingHolidays",
-    // },
-    // {
-    //   icons: attendance,
-    //   icons2: whiteattendance,
-    //   name: "Apply Leave",
-    //   path: "/empApplyLeave",
-    // },
-    // {
-    //   icons: employee,
-    //   icons2: whiteemployee,
-    //   name: "Task",
-    //   path: "/internTask",
-    // },
+
     {
       icons: timesheet,
       icons2: whitetimesheet,
@@ -260,48 +243,77 @@ const Sidebar = () => {
         <div className=" space-y-5 mt-3">
           {filteredNavList.map((link, index) => {
             return (
-              <section key={index}>
-                {/* {storedPermissions?.includes(link.name) && ( */}
-                <div
-                  className={clsx(
-                    pathname === link.path
-                      ? "bg-primary px-2 py-2 rounded-sm text-white"
-                      : "px-2 py-2"
-                  )}
-                >
-                  <Link
-                    href={link.path}
-                    onClick={RemoveLocalValues}
-                    className="flex items-center gap-3"
-                  >
-                    {pathname === link.path ? (
-                      <Image
-                        src={link.icons2}
-                        alt={`${link.name} not found`}
-                        width={24}
-                        height={24}
-                      />
-                    ) : (
-                      <Image
-                        src={link.icons}
-                        alt={`${link.name} not found`}
-                        width={24}
-                        height={24}
-                      />
+              <div key={index}>
+                {userRole === "ADMIN" ? (
+                  <div>
+                    {storedPermissions?.includes(link.name) && (
+                      <div
+                        className={clsx(
+                          pathname === link.path
+                            ? "bg-primary px-2 py-2 rounded-sm text-white"
+                            : "px-2 py-2"
+                        )}
+                      >
+                        <Link
+                          href={link.path}
+                          onClick={RemoveLocalValues}
+                          className="flex items-center gap-3"
+                        >
+                          {pathname === link.path ? (
+                            <Image
+                              src={link.icons2}
+                              alt={`${link.name} not found`}
+                              width={24}
+                              height={24}
+                            />
+                          ) : (
+                            <Image
+                              src={link.icons}
+                              alt={`${link.name} not found`}
+                              width={24}
+                              height={24}
+                            />
+                          )}
+                          <p className="text_size_4">{link.name}</p>
+                        </Link>
+                      </div>
                     )}
-                    <p className="text_size_4">{link.name}</p>
-                  </Link>
-                </div>
-                {/* )} */}
-              </section>
+                  </div>
+                ) : (
+                  <div
+                    className={clsx(
+                      pathname === link.path
+                        ? "bg-primary px-2 py-2 rounded-sm text-white"
+                        : "px-2 py-2"
+                    )}
+                  >
+                    <Link
+                      href={link.path}
+                      className="flex items-center gap-3"
+                      onClick={RemoveLocalValues}
+                    >
+                      {pathname === link.path ? (
+                        <Image
+                          src={link.icons2}
+                          alt={`${link.name} not found`}
+                          width={24}
+                          height={24}
+                        />
+                      ) : (
+                        <Image
+                          src={link.icons}
+                          alt={`${link.name} not found`}
+                          width={24}
+                          height={24}
+                        />
+                      )}
+                      <p className="text_size_4">{link.name}</p>
+                    </Link>
+                  </div>
+                )}
+              </div>
             );
           })}
-        </div>
-        <div>
-          <Link href="/logout" className="flex items-center gap-3">
-            <Image src={logout} alt="Logout not found" width={24} height={24} />
-            <p className="text_size_5">Logout</p>
-          </Link>
         </div>
       </div>
     </section>

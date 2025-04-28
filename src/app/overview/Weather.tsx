@@ -19,6 +19,7 @@ import {
 } from "react-icons/wi";
 
 import opencage from "opencage-api-client";
+
 interface OpenCageResult {
   components: {
     state_district?: string;
@@ -44,6 +45,7 @@ interface DateTimeState {
   date: string;
   time: string;
 }
+
 const Weather: React.FC = () => {
   const [currentDateTime, setCurrentDateTime] = useState<DateTimeState>({
     date: "",

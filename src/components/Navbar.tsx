@@ -19,16 +19,16 @@ const Navbar = () => {
     signOut(auth)
       .then(() => {
         console.log("User signed out");
-        localStorage.clear()
+        localStorage.clear();
         router.push("/signIn");
       })
       .catch((error) => {
         console.error("Error signing out:", error);
-      }); 
-    }
+      });
+  };
 
   return (
-    <section className="bg-morelite_grey px-5 py-3 flex">
+    <section className="bg-morelite_grey px-5 py-3 flex w-full sticky top-0 z-50">
       <div className="flex justify-end items-center w-full gap-4">
         <div className=" rounded-full gap-1 bg-white flex items-center px-3 py-1">
           <span className="text-gray">
@@ -60,7 +60,10 @@ const Navbar = () => {
               className="bg-cover w-full"
             />
           </div>
-          <p className="text-gray text-xl cursor-pointer" onClick={handleLogout}> 
+          <p
+            className="text-gray text-xl cursor-pointer"
+            onClick={handleLogout}
+          >
             <FaSortDown />
             Logout
           </p>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FaEdit } from "react-icons/fa";
 import { useState } from "react";
 import avatar from "../../public/assets/employee/avatar.webp";
+import { DateFormat } from "./DateFormate";
 
 interface Ovla {
   date: string;
@@ -153,10 +154,10 @@ export const TableFormate = ({
                   <td className="text-start py-3 px-4">{val?.name || "N/A"}</td>
                   <td className="text-start py-3 px-4">{takenDay}</td>
                   <td className="text-start py-3 px-4">
-                    {val?.startDate || "N/A"}
+                  {val?.startDate ? DateFormat(val.startDate) : "N/A"}
                   </td>
                   <td className="text-start py-3 px-4">
-                    {val?.endDate || "N/A"}
+                    {val?.endDate ? DateFormat(val.endDate) : "N/A"}
                   </td>
                   <td className="text-start py-3 px-4">
                     {val?.leaveType || "N/A"}
@@ -195,10 +196,10 @@ export const TableFormate = ({
                   {val.takenDay || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.startDate || "N/A"}
+                  {val.startDate ? DateFormat(val.startDate) : "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.endDate || "N/A"}
+                  {val.endDate ? DateFormat(val.endDate): "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
                   {val.leaveType || "N/A"}
@@ -254,11 +255,11 @@ export const TableFormate = ({
             </tr>
             <tr>
               <td className="font-semibold text-gray-700">Start Date</td>
-              <td>{selectedLeave.startDate}</td>
+              <td>{DateFormat(selectedLeave.startDate)}</td>
             </tr>
             <tr>
               <td className="font-semibold text-gray-700">End Date</td>
-              <td>{selectedLeave.endDate}</td>
+              <td>{DateFormat(selectedLeave.endDate)}</td>
             </tr>
             <tr>
               <td className="font-semibold text-gray-700">Reason</td>

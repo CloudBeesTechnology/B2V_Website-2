@@ -7,7 +7,6 @@ import Link from "next/link";
 import { db } from "@/lib/firebaseConfig"; // your firestore instance
 import { collection, getDocs } from "firebase/firestore";
 export const EmployeeHome = () => {
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -27,11 +26,15 @@ export const EmployeeHome = () => {
     localStorage.removeItem("experienceData");
     localStorage.removeItem("personalInfo");
     localStorage.removeItem("educationData");
-  }
+  };
 
   return (
     <section className="flex gap-10 items-center my-10">
-      <Link href="/allEmployee" onClick={RemoveLocalValues} className="border border-primary center flex-col py-5 rounded-md w-[25%] h-[150px]">
+      <Link
+        href="/allEmployee"
+        onClick={RemoveLocalValues}
+        className="border border-primary center flex-col py-5 rounded-md w-[25%] h-[150px]"
+      >
         <Image
           src={handperson}
           alt="hand person not found"
