@@ -5,6 +5,7 @@ import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
+import {DateFormat} from "@/components/DateFormate"
 
 type LeaveStatus = {
   empID: string;
@@ -151,8 +152,15 @@ const LeaveApproval = () => {
           </thead>
           <tbody>
             {leaveApproval.map((item, index) => {
-              let takenDayInDays = "-";
-       
+              let durationInDays = "-";
+              if (item?.startDate && item?.endDate) {
+                const startDate = new Date(item.startDate);
+                const endDate = new Date(item.endDate);
+                const durationInMs = endDate.getTime() - startDate.getTime();
+                durationInDays = Math.ceil(
+                  durationInMs / (1000 * 60 * 60 * 24)
+                ).toString();
+              }
 
               return (
                 <tr key={index}>
@@ -164,12 +172,13 @@ const LeaveApproval = () => {
                       ? new Date(item.createdAt).toLocaleDateString()
                       : "-"}
                   </td>
-                  <td className="px-4 py-2">{item.startDate}</td>
-                  <td className="px-4 py-2">{item.endDate}</td>
-                  <td className="px-4 py-2">{item.takenDay}</td>
-                  <td className="px-4 py-2 w-[250px] h-[80px] overflow-y-auto text-wrap overflow-wrap-break-word flex">{item.leaveReason}</td>
                   
+                  <td className="px-4 py-2">{DateFormat(item.startDate)}</td>
+                  <td className="px-4 py-2">{DateFormat(item.endDate)}</td>
+                  <td className="px-4 py-2">{item.takenDay}</td>
                 
+                  <td className="px-4 py-2 w-[250px] h-[80px] overflow-y-auto text-wrap overflow-wrap-break-word flex">{item.leaveReason}</td>
+
                   <td className="px-4 py-2">
                     <select
                       value={item.leaveStatus}

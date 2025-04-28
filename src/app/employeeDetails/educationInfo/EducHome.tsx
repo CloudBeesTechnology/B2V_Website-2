@@ -8,17 +8,17 @@ import { educationSchema } from "@/validation/Schema";
 import { useRouter } from "next/navigation";
 
 interface Course {
-  course: string;
-  academic: string;
+  course?: string;
+  academic?: string;
 }
 
 interface EducationDetails {
   degree: string;
   study: string;
   school: string;
-  master: string;
-  field: string;
-  highSchool: string;
+  master?: string;
+  field?: string;
+  highSchool?: string;
   courses: Course[];
 }
 
@@ -123,7 +123,7 @@ export const EducHome = () => {
             {/* School */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="school" className="text-[15px] text-gray-600">
-                School<sup className="text-red-500">*</sup>
+              University<sup className="text-red-500">*</sup>
               </label>
               <input
                 id="school"
@@ -143,52 +143,40 @@ export const EducHome = () => {
             {/* Master’s Degree */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="master" className="text-[15px] text-gray-600">
-                Master’s degree<sup className="text-red-500">*</sup>
+                Master’s degree
               </label>
               <input
                 id="master"
                 {...register("master")}
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
-              {errors.master && (
-                <p className="text-red-500 text-[14px]">
-                  {errors.master.message}
-                </p>
-              )}
+         
             </div>
 
             {/* Master's Field */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="field" className="text-[15px] text-gray-600">
-                Field of study<sup className="text-red-500">*</sup>
+                Field of study
               </label>
               <input
                 id="field"
                 {...register("field")}
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
-              {errors.field && (
-                <p className="text-red-500 text-[14px]">
-                  {errors.field.message}
-                </p>
-              )}
+          
             </div>
 
             {/* High School */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="highSchool" className="text-[15px] text-gray-600">
-                School<sup className="text-red-500">*</sup>
+              University
               </label>
               <input
                 id="highSchool"
                 {...register("highSchool")}
                 className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
               />
-              {errors.highSchool && (
-                <p className="text-red-500 text-[14px]">
-                  {errors.highSchool.message}
-                </p>
-              )}
+          
             </div>
           </div>
         </section>
@@ -212,33 +200,25 @@ export const EducHome = () => {
               {/* Course Name */}
               <div className="flex flex-col gap-2 w-[30%]">
                 <label className="text-[15px] text-gray-600">
-                  Course certificate<sup className="text-red-500">*</sup>
+                  Course certificate
                 </label>
                 <input
                   {...register(`courses.${index}.course` as const)}
                   className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
                 />
-                {errors.courses?.[index]?.course && (
-                  <p className="text-red-500 text-[14px]">
-                    {errors.courses[index]?.course?.message}
-                  </p>
-                )}
+             
               </div>
 
               {/* Academic Name */}
               <div className="flex flex-col gap-2 w-[40%]">
                 <label className="text-[15px] text-gray-600">
-                  Academic name<sup className="text-red-500">*</sup>
+                  Academic name
                 </label>
                 <input
                   {...register(`courses.${index}.academic` as const)}
                   className="border border-[#D9D9D9] px-4 py-1 rounded-sm outline-none"
                 />
-                {errors.courses?.[index]?.academic && (
-                  <p className="text-red-500 text-[14px]">
-                    {errors.courses[index]?.academic?.message}
-                  </p>
-                )}
+             
               </div>
 
               {/* Remove Button */}

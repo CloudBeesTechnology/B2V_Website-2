@@ -2,7 +2,7 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
-import logo from "../assets/logo/logo.png";
+import logo from "../../public/assets/logo/logo.png";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 
 interface AuthLayoutProps {

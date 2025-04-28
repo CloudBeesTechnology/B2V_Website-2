@@ -1,7 +1,7 @@
 "use client";
 import { FaLock } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
-import passwordImg from "../../assets/sign/passwordImg.png";
+import passwordImg from "../../../public/assets/sign/passwordImg.png";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";

@@ -1,6 +1,6 @@
 "use client";
 
-import manrun from "../../assets/home/manRun.png";
+import manrun from "../../../public/assets/home/manRun.png";
 import Image from "next/image";
 import { JSX, useEffect, useState } from "react";
 import {
@@ -70,22 +70,22 @@ const Weather: React.FC = () => {
           const geocodeKey = "2a33da9c22c641dd8f6e0cf5e1490f6c";
 
           opencage
-            .geocode({ q: `${lat},${lng}`, language: "en", key: geocodeKey })
+            .geocode({ q: `${lat},${lng}`, language: "en", key: geocodeKey, no_annotations:0 })
             .then((data: OpenCageResponse) => {
               if (data.status.code === 200 && data.results.length > 0) {
                 const place = data.results[0];
-                setCity(place.components.suburb || "Unknown City");
-                setVuur(place.components.state_district || "Unknown City");
+                setCity(place?.components?.suburb || "Unknown City");
+
+                setVuur(place?.components?.state_district || "Unknown City");
 
                 fetch(
                   `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`
                 )
                   .then((res) => res.json())
                   .then((weatherData: WeatherData) => {
-                    const weather = weatherData.current_weather;
-                    
-                    setTemperature(weather.temperature);
-               
+                    const weather = weatherData?.current_weather;
+
+                    setTemperature(weather?.temperature);
 
                     const weatherDescriptions: Record<number, string> = {
                       0: "Very sunny",
@@ -191,7 +191,8 @@ const Weather: React.FC = () => {
           <span className="text-sm">{temperature}°C</span>
         </p>
         <p className="text-sm">
-          {city}, {vuur}
+          {/* {city}, */}
+          {vuur}
         </p>
         <p className="text-[13px] font-medium w-24">{description}</p>
       </div>

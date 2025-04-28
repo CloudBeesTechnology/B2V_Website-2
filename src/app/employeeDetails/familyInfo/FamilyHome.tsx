@@ -1,6 +1,5 @@
-"use client"
+"use client";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { familySchema } from "@/validation/Schema"; // Make sure this schema is defined
 import { db } from "@/lib/firebaseConfig";
 import {
@@ -12,19 +11,20 @@ import {
   limit,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 
 interface FamilyDetails {
-  father: string;
-  mother: string;
-  siblings: string;
-  fatherOcc: string;
-  motherOcc: string;
-  familyPNo: string;
-  address: string;
+  father?: string;
+  mother?: string;
+  siblings?: string;
+  fatherOcc?: string;
+  motherOcc?: string;
+  familyPNo?: string;
+  address?: string;
 }
 
 export const FamilyHome = () => {
-
   const router = useRouter();
 
   const {
@@ -32,7 +32,7 @@ export const FamilyHome = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FamilyDetails>({
-    resolver: yupResolver(familySchema),
+    resolver:  zodResolver(familySchema),
   });
 
   const onSubmit = async (data: FamilyDetails) => {
@@ -86,13 +86,13 @@ export const FamilyHome = () => {
         collection(db, "employeeDetails"),
         combinedData
       );
-      console.log("Data successfully written with ID:", docRef.id);
+      // console.log("Data successfully written with ID:", docRef.id);
 
       localStorage.removeItem("experienceData");
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("educationData");
 
-      router.push("/employee"); 
+      router.push("/employee");
     } catch (error) {
       console.error("Error writing document to Firestore:", error);
     }
@@ -110,7 +110,7 @@ export const FamilyHome = () => {
           <div className=" grid grid-cols-3 gap-10">
             <div className="flex flex-col gap-2">
               <label htmlFor="father" className="text-[15px] text-gray">
-                Father Name <sup className="text-red">*</sup>
+                Father Name 
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -119,16 +119,12 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.father && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.father.message}
-                </p>
-              )}
+       
             </div>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="mother" className="text-[15px] text-gray">
-                Mother Name <sup className="text-red">*</sup>
+                Mother Name 
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -137,16 +133,12 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.mother && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.mother.message}
-                </p>
-              )}
+       
             </div>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="siblings" className="text-[15px] text-gray">
-                Siblings <sup className="text-red">*</sup>
+                Siblings 
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -155,18 +147,14 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.siblings && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.siblings.message}
-                </p>
-              )}
+              
             </div>
           </div>
 
           <div className=" grid grid-cols-3 gap-10 mt-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="fatherOcc" className="text-[15px] text-gray">
-                Father Occupation <sup className="text-red">*</sup>
+                Father Occupation 
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -175,16 +163,12 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.fatherOcc && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.fatherOcc.message}
-                </p>
-              )}
+            
             </div>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="motherOcc" className="text-[15px] text-gray">
-                Mother Occupation <sup className="text-red">*</sup>
+                Mother Occupation 
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -193,16 +177,12 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.motherOcc && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.motherOcc.message}
-                </p>
-              )}
+        
             </div>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="familyPNo" className="text-[15px] text-gray">
-                Family Contact Number <sup className="text-red">*</sup>
+                Family Contact Number
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -211,17 +191,13 @@ export const FamilyHome = () => {
                   className="outline-none py-1 w-full"
                 />
               </div>
-              {errors.familyPNo && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.familyPNo.message}
-                </p>
-              )}
+           
             </div>
           </div>
 
           <div className="flex flex-col mt-5 gap-2">
             <label htmlFor="address" className="text-[15px] text-gray">
-              Address <sup className="text-red">*</sup>
+              Address 
             </label>
             <textarea
               id="address"
@@ -229,11 +205,7 @@ export const FamilyHome = () => {
               rows={4}
               className="border p-2 border-[#D9D9D9] outline-none rounded-sm resize-none"
             ></textarea>
-            {errors.address && (
-              <p className="text-red-500 text-[14px] mt-1">
-                {errors.address.message}
-              </p>
-            )}
+      
           </div>
 
           <div className="mb-20 pt-10 center">

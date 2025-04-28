@@ -1,8 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import Image from "next/image";
-import handperson from "../../assets/employee/handPerson.png";
-import notepen from "../../assets/employee/notePen.png";
+import handperson from "../../../public/assets/employee/handPerson.png";
+import notepen from "../../../public/assets/employee/notePen.png";
 import Link from "next/link";
 import { db } from "@/lib/firebaseConfig"; // your firestore instance
 import { collection, getDocs } from "firebase/firestore";
@@ -44,7 +44,7 @@ export const EmployeeHome = () => {
       <Link href="/employeeDetails" onClick={RemoveLocalValues} className="border border-primary center flex-col gap-3 py-5 rounded-md w-[25%] h-[150px]">
         <Image src={notepen} alt="note with pen not found" width={50}
           height={50} />
-        <p className="text_size_8 text-gray">Add employee info</p>
+        <p className="text_size_8 text-gray">Add Employee Info</p>
       </Link>
     </section>
   );

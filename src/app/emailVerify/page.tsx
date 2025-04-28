@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { FaEnvelope } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
-import emailImg from "../../assets/sign/emailImg.png";
+import emailImg from "../../../public/assets/sign/emailImg.png";
 import { useRouter } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db, RecaptchaVerifier } from "@/lib/firebaseConfig";

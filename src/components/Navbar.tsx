@@ -7,7 +7,7 @@ import {
   IoMicOutline,
 } from "react-icons/io5";
 import { FaSortDown } from "react-icons/fa";
-import avatar from "../assets/navbar/Missing_avatar.svg.png";
+import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
 import { auth } from "@/lib/firebaseConfig";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ const Navbar = () => {
     signOut(auth)
       .then(() => {
         console.log("User signed out");
+        localStorage.clear()
         router.push("/signIn");
       })
       .catch((error) => {
