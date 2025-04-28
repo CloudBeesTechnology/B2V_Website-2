@@ -42,7 +42,7 @@ const Sidebar = () => {
       ? localStorage.getItem("empID")?.toString()?.toUpperCase()
       : null;
 
-  const navList = [
+  const adminPortal = [
     {
       icons: overview,
       icons2: whiteoverview,
@@ -65,7 +65,7 @@ const Sidebar = () => {
       icons: internship,
       icons2: whiteinternship,
       name: "Internship",
-      path: "/internship/request",
+      path: "/internship",
     },
     {
       icons: user,
@@ -79,24 +79,24 @@ const Sidebar = () => {
       name: "Leave Management",
       path: "/leavemanagement",
     },
-    {
-      icons: employee,
-      icons2: whiteemployee,
-      name: "Upcoming Holidays",
-      path: "/empUpcomingHolidays",
-    },
-    {
-      icons: attendance,
-      icons2: whiteattendance,
-      name: "Apply Leave",
-      path: "/empApplyLeave",
-    },
-    {
-      icons: employee,
-      icons2: whiteemployee,
-      name: "Task",
-      path: "/internTask",
-    },
+    // {
+    //   icons: employee,
+    //   icons2: whiteemployee,
+    //   name: "Upcoming Holidays",
+    //   path: "/empUpcomingHolidays",
+    // },
+    // {
+    //   icons: attendance,
+    //   icons2: whiteattendance,
+    //   name: "Apply Leave",
+    //   path: "/empApplyLeave",
+    // },
+    // {
+    //   icons: employee,
+    //   icons2: whiteemployee,
+    //   name: "Task",
+    //   path: "/internTask",
+    // },
     {
       icons: timesheet,
       icons2: whitetimesheet,
@@ -116,6 +116,67 @@ const Sidebar = () => {
       path: "/report",
     },
   ];
+
+  const employeePortal = [
+    {
+      icons: overview,
+      icons2: whiteoverview,
+      name: "Overview",
+      path: "/",
+    },
+    {
+      icons: employee,
+      icons2: whiteemployee,
+      name: "Upcoming Holidays",
+      path: "/empUpcomingHolidays",
+    },
+    {
+      icons: attendance,
+      icons2: whiteattendance,
+      name: "Apply Leave",
+      path: "/empApplyLeave",
+    },
+    {
+      icons: timesheet,
+      icons2: whitetimesheet,
+      name: "Timesheet",
+      path: "/empTimeSheet",
+    },
+    {
+      icons: setting,
+      icons2: whitesetting,
+      name: "Settings",
+      path: "/settings",
+    },
+  ];
+
+  const internPortal = [
+    {
+      icons: overview,
+      icons2: whiteoverview,
+      name: "Overview",
+      path: "/",
+    },
+    {
+      icons: employee,
+      icons2: whiteemployee,
+      name: "Task",
+      path: "/internTask",
+    },
+    {
+      icons: timesheet,
+      icons2: whitetimesheet,
+      name: "Timesheet",
+      path: "/empTimeSheet",
+    },
+    {
+      icons: setting,
+      icons2: whitesetting,
+      name: "Settings",
+      path: "/settings",
+    },
+  ];
+
   const roleAccessMap = {
     EMPLOYEE: [
       "Overview",
@@ -138,17 +199,25 @@ const Sidebar = () => {
     ],
   };
 
+  const portalMap: Record<string, typeof adminPortal> = {
+    ADMIN: adminPortal,
+    EMPLOYEE: employeePortal,
+    INTERN: internPortal,
+  };
+
   const filteredNavList =
-    typeof userRole === "string" && roleAccessMap[userRole]
-      ? navList.filter((item) => roleAccessMap[userRole].includes(item.name))
+    userRole && roleAccessMap[userRole]
+      ? portalMap[userRole].filter((item) =>
+          roleAccessMap[userRole].includes(item.name)
+        )
       : [];
 
   useEffect(() => {
-    const getUserAndPermissions = async (empID: string, role: string) => {
+    const getUserAndPermissions = async (empID: string) => {
       const empQuery = query(
         collection(db, "users"),
         where("empID", "==", empID),
-        where("role", "==", role)
+        where("role", "==", "Admin")
       );
       const userQuery = query(
         collection(db, "userDetails"),
@@ -166,11 +235,11 @@ const Sidebar = () => {
       return { ...empData, ...userData };
     };
 
-    let userRole =
-      typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+    // let userRole =
+    //   typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
 
-    if (userID && userRole) {
-      getUserAndPermissions(userID, userRole).then((data) => {
+    if (userID) {
+      getUserAndPermissions(userID).then((data) => {
         setStoredPermissions(data.permission);
       });
     }
@@ -180,7 +249,7 @@ const Sidebar = () => {
     localStorage.removeItem("experienceData");
     localStorage.removeItem("personalInfo");
     localStorage.removeItem("educationData");
-  }
+  };
 
   return (
     <section className="p-5 h-full overflow-y-auto">
@@ -194,14 +263,17 @@ const Sidebar = () => {
               <section key={index}>
                 {/* {storedPermissions?.includes(link.name) && ( */}
                 <div
-
                   className={clsx(
                     pathname === link.path
                       ? "bg-primary px-2 py-2 rounded-sm text-white"
                       : "px-2 py-2"
                   )}
                 >
-                  <Link href={link.path} onClick={RemoveLocalValues} className="flex items-center gap-3">
+                  <Link
+                    href={link.path}
+                    onClick={RemoveLocalValues}
+                    className="flex items-center gap-3"
+                  >
                     {pathname === link.path ? (
                       <Image
                         src={link.icons2}

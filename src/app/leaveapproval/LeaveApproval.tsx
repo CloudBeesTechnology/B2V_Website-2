@@ -10,9 +10,10 @@ type LeaveStatus = {
   empID: string;
   leaveStatus: string;
   leaveType: string;
-  duration: string;
+  takenDay: string;
   startDate: string;
   endDate: string;
+  leaveReason: string;
   createdAt: string;
 };
 
@@ -26,11 +27,12 @@ const LeaveApproval = () => {
   const Heading = [
     "EmpID",
     "Name",
-    "Applay Date",
-    "Duration",
+    "Leave Type",
+    "Apply Date",
     "Start Date",
     "End Date",
-    "Leave Type",
+    "takenDay",
+    "Leave Reason",
     "Status",
   ];
 
@@ -50,9 +52,10 @@ const LeaveApproval = () => {
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
             leaveType: doc.data().leaveType,
-            duration: doc.data().duration,
+            takenDay: doc.data().takenDay,
             startDate: doc.data().startDate,
             endDate: doc.data().endDate,
+            leaveReason: doc.data().leaveReason,
             createdAt: doc.data().createdAt,
             name: "",
             remarks: doc.data().remarks || "",
@@ -148,29 +151,25 @@ const LeaveApproval = () => {
           </thead>
           <tbody>
             {leaveApproval.map((item, index) => {
-              let durationInDays = "-";
-              if (item?.startDate && item?.endDate) {
-                const startDate = new Date(item.startDate);
-                const endDate = new Date(item.endDate);
-                const durationInMs = endDate.getTime() - startDate.getTime();
-                durationInDays = Math.ceil(
-                  durationInMs / (1000 * 60 * 60 * 24)
-                ).toString();
-              }
+              let takenDayInDays = "-";
+       
 
               return (
                 <tr key={index}>
                   <td className="px-4 py-2">{item.empID}</td>
                   <td className="px-4 py-2">{item.name}</td>
+                  <td className="px-4 py-2">{item.leaveType}</td>
                   <td className="px-4 py-2">
                     {item.createdAt
                       ? new Date(item.createdAt).toLocaleDateString()
                       : "-"}
                   </td>
-                  <td className="px-4 py-2">{durationInDays}</td>
                   <td className="px-4 py-2">{item.startDate}</td>
                   <td className="px-4 py-2">{item.endDate}</td>
-                  <td className="px-4 py-2">{item.leaveType}</td>
+                  <td className="px-4 py-2">{item.takenDay}</td>
+                  <td className="px-4 py-2 w-[250px] h-[80px] overflow-y-auto text-wrap overflow-wrap-break-word flex">{item.leaveReason}</td>
+                  
+                
                   <td className="px-4 py-2">
                     <select
                       value={item.leaveStatus}
@@ -190,6 +189,7 @@ const LeaveApproval = () => {
           </tbody>
         </table>
       </div>
+
 
       {/* POPUP Modal */}
       {showPopup && (

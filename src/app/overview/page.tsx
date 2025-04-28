@@ -1,4 +1,4 @@
-import { OverviewHome } from "./OverviewHome";
+import  OverviewHome  from "./OverviewHome";
 
 export default function Overview() {
     return (

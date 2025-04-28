@@ -127,13 +127,13 @@ interface LeaveData {
         />
       </div>
       <div className="text-mediumlite_grey text-[13px] font-medium flex gap-10 my-5">
-        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-approved_blue before:content-[''] before:inline-block ">
+        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-approved_blue before:content-[''] before:inline-block">
           Approved
         </p>
-        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-medium_red before:content-[''] before:inline-block ">
+        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-medium_red before:content-[''] before:inline-block">
           Rejected
         </p>
-        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-medium_orange before:content-[''] before:inline-block ">
+        <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-medium_orange before:content-[''] before:inline-block">
           Pending
         </p>
       </div>
