@@ -7,7 +7,7 @@ import {
   IoMicOutline,
 } from "react-icons/io5";
 import { FaSortDown } from "react-icons/fa";
-import avatar from "../assets/navbar/Missing_avatar.svg.png";
+import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
 import { auth } from "@/lib/firebaseConfig";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -19,15 +19,16 @@ const Navbar = () => {
     signOut(auth)
       .then(() => {
         console.log("User signed out");
+        localStorage.clear();
         router.push("/signIn");
       })
       .catch((error) => {
         console.error("Error signing out:", error);
-      }); 
-    }
+      });
+  };
 
   return (
-    <section className="bg-morelite_grey px-5 py-3 flex">
+    <section className="bg-morelite_grey px-5 py-3 flex ">
       <div className="flex justify-end items-center w-full gap-4">
         <div className=" rounded-full gap-1 bg-white flex items-center px-3 py-1">
           <span className="text-gray">
@@ -59,7 +60,10 @@ const Navbar = () => {
               className="bg-cover w-full"
             />
           </div>
-          <p className="text-gray text-xl cursor-pointer" onClick={handleLogout}> 
+          <p
+            className="text-gray text-xl cursor-pointer"
+            onClick={handleLogout}
+          >
             <FaSortDown />
             Logout
           </p>

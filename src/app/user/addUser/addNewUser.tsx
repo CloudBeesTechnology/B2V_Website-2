@@ -195,7 +195,7 @@ const AddNewUser: React.FC = () => {
 
   return (
     <main ref={parentRef}>
-      <section className="flex justify-between items-center my-10 ">
+      <section className="flex justify-between items-center my-10">
         <IoArrowBack
           onClick={() => router.back()}
           className="text-[22px] text-gray cursor-pointer"

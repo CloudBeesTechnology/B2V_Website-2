@@ -1,6 +1,6 @@
 "use client";
 
-import manrun from "../../assets/home/manRun.png";
+import manrun from "../../../public/assets/home/manRun.png";
 import Image from "next/image";
 import { JSX, useEffect, useState } from "react";
 import {

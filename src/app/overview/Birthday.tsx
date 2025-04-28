@@ -1,5 +1,5 @@
 import Image from "next/image";
-import birth from "../../assets/home/image 7.svg";
+import birth from "../../../public/assets/home/image 7.svg";
 import { RxCross1 } from "react-icons/rx";
 import { useEffect, useState } from "react";
 

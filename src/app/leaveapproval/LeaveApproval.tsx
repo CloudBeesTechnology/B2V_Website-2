@@ -146,48 +146,56 @@ const LeaveApproval = () => {
               ))}
             </tr>
           </thead>
-          <tbody>
-            {leaveApproval.map((item, index) => {
-              let durationInDays = "-";
-              if (item?.startDate && item?.endDate) {
-                const startDate = new Date(item.startDate);
-                const endDate = new Date(item.endDate);
-                const durationInMs = endDate.getTime() - startDate.getTime();
-                durationInDays = Math.ceil(
-                  durationInMs / (1000 * 60 * 60 * 24)
-                ).toString();
-              }
+          <tbody>    
+  {leaveApproval&&leaveApproval.length > 0 ? (
+    leaveApproval.map((item, index) => {
+      let durationInDays = "-";
+      if (item?.startDate && item?.endDate) {
+        const startDate = new Date(item.startDate);
+        const endDate = new Date(item.endDate);
+        const durationInMs = endDate.getTime() - startDate.getTime();
+        durationInDays = Math.ceil(
+          durationInMs / (1000 * 60 * 60 * 24)
+        ).toString();
+      }
 
-              return (
-                <tr key={index}>
-                  <td className="px-4 py-2">{item.empID}</td>
-                  <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">
-                    {item.createdAt
-                      ? new Date(item.createdAt).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="px-4 py-2">{durationInDays}</td>
-                  <td className="px-4 py-2">{item.startDate}</td>
-                  <td className="px-4 py-2">{item.endDate}</td>
-                  <td className="px-4 py-2">{item.leaveType}</td>
-                  <td className="px-4 py-2">
-                    <select
-                      value={item.leaveStatus}
-                      onChange={(e) =>
-                        handleStatusChange(item.docId, e.target.value)
-                      }
-                      className="border border-gray-300 rounded px-2 py-1 outline-none"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+      return (
+        <tr key={index}>
+          <td className="px-4 py-2">{item.empID}</td>
+          <td className="px-4 py-2">{item.name}</td>
+          <td className="px-4 py-2">
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
+              : "-"}
+          </td>
+          <td className="px-4 py-2">{durationInDays}</td>
+          <td className="px-4 py-2">{item.startDate}</td>
+          <td className="px-4 py-2">{item.endDate}</td>
+          <td className="px-4 py-2">{item.leaveType}</td>
+          <td className="px-4 py-2">
+            <select
+              value={item.leaveStatus}
+              onChange={(e) =>
+                handleStatusChange(item.docId, e.target.value)
+              }
+              className="border border-gray-300 rounded px-2 py-1 outline-none"
+            >
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </td>
+        </tr>
+      );
+    })
+  ) : (
+    <tr>
+      <td colSpan={8} className="text-center py-4">
+        No data found
+      </td>
+    </tr>
+  )}
+</tbody>
         </table>
       </div>
 

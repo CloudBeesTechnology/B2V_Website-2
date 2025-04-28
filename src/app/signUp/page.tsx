@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { signUpSchema } from "@/validation/Schema"; // Update path if needed
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import AuthLayout from "@/components/AuthLayout";
-import signUpImg from "../../assets/sign/signUpImg.png";
+import signUpImg from "../../../public/assets/sign/signUpImg.png";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getDocs, collection, query, where } from "firebase/firestore";

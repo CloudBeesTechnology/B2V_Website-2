@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import Link from "next/link";
 import AuthLayout from "@/components/AuthLayout";
-import signImg from "../../assets/sign/signInImg.png";
+import signImg from "../../../public/assets/sign/signInImg.png";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseConfig";

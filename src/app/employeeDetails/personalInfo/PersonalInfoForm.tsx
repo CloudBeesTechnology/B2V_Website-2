@@ -1,30 +1,34 @@
-'use client';
-import { useForm } from 'react-hook-form';
+"use client";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import Image from 'next/image';
-import { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { personalInfoSchema } from "@/validation/Schema"
-import profileIcon from '../../../assets/employee/profileIcon.png';
+import Image from "next/image";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
+import { personalInfoSchema } from "@/validation/Schema";
+import profileIcon from "../../../../public/assets/employee/profileIcon.png";
+import { LiaUploadSolid } from "react-icons/lia";
 
 interface PersonalInfoFormData {
   name: string;
+  dob: string;
+  gender: string;
+  nationality: string;
+  address: string;
   contact: string;
+  doj: string;
   alternateNo?: string;
   email: string;
-  department: string;
-  position: string;
+  lang: string;
+  religion?: string;
   proof: string;
-  totalLeave: string;
-  manager: string;
-  nationality:string;
-  dob:string;
-  doj:string;
+  department?: string;
+  position: string;
+  totalLeave?: string;
+  manager?: string;
   profilePhoto?: File | string | null;
 }
 
 export const PersonalInfoForm = () => {
-  
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -35,28 +39,35 @@ export const PersonalInfoForm = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-    reset
+    reset,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
   });
 
-useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedData = localStorage.getItem('personalInfo');
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("personalInfo");
       if (savedData) {
         const parsedData = JSON.parse(savedData);
-        
+
         // Set all form values from localStorage
         reset({
           name: parsedData.name,
+          dob: parsedData.dob,
+          gender: parsedData.gender,
+          nationality: parsedData.nationality,
+          address: parsedData.address,
           contact: parsedData.contact,
+          doj: parsedData.doj,
           alternateNo: parsedData.alternateNo,
           email: parsedData.email,
-          department: parsedData.department,
-          position: parsedData.position,
+          lang: parsedData.lang,
+          religion: parsedData.religion,
           proof: parsedData.proof,
+          department: parsedData.department,
           totalLeave: parsedData.totalLeave,
           manager: parsedData.manager,
+          position: parsedData.position,
           profilePhoto: parsedData.profilePhoto || null,
         });
 
@@ -71,17 +82,17 @@ useEffect(() => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file');
+      if (!file.type.match("image.*")) {
+        alert("Please select an image file");
         return;
       }
       if (file.size > 2 * 1024 * 1024) {
-        alert('File size should be less than 2MB');
+        alert("File size should be less than 2MB");
         return;
       }
 
       setSelectedFile(file);
-      setValue('profilePhoto', file);
+      setValue("profilePhoto", file);
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -101,9 +112,9 @@ useEffect(() => {
       profilePhoto: previewImage,
     };
     // console.log(dataToStore,"dataToStore");
-    
-    localStorage.setItem('personalInfo', JSON.stringify(dataToStore));
-    router.push('/employeeDetails?tab=educationInfo');
+
+    localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
+    router.push("/employeeDetails?tab=educationInfo");
   };
 
   return (
@@ -111,9 +122,12 @@ useEffect(() => {
       <div>
         <h3 className="text-mediumlite_grey text-[22px]">Personal Info</h3>
       </div>
-      <form className="flex justify-between my-5" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex justify-between my-5"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <section className="flex flex-col gap-4 w-[70%]">
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="name" className="text-[15px] text-gray">
                 Name<sup className="text-red">*</sup>
@@ -122,54 +136,23 @@ useEffect(() => {
                 <input
                   id="name"
                   className="outline-none py-1 w-full"
-                  {...register('name')}
+                  {...register("name")}
                 />
               </div>
               {errors.name && (
                 <span className="text-red text-sm">{errors.name.message}</span>
               )}
             </div>
-
-            <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="contact" className="text-[15px] text-gray">
-                Contact Number<sup className="text-red">*</sup>
-              </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input
-                  id="contact"
-                  className="outline-none py-1 w-full"
-                  {...register('contact')}
-                />
-              </div>
-              {errors.contact && (
-                <span className="text-red text-sm">{errors.contact.message}</span>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="alternateNo" className="text-[15px] text-gray">
-              Alternate Contact Number
-              </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input
-                  id="alternateNo"
-                  className="outline-none py-1 w-full"
-                  {...register('alternateNo')}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="dob" className="text-[15px] text-gray">
-                Date of Birth<sup className="text-red">*</sup>
+                DOB<sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
                   id="dob"
                   type="date"
                   className="outline-none py-1 w-full"
-                  {...register('dob')}
+                  {...register("dob")}
                 />
               </div>
               {errors.dob && (
@@ -178,40 +161,104 @@ useEffect(() => {
             </div>
 
             <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="alternateNo" className="text-[15px] text-gray">
+                Gender
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <select className=" outline-none w-full text-gray-400">
+                  <option>Select</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-5">
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="nationality" className="text-[15px] text-gray">
+                Nationality<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="nationality"
+                  className="outline-none py-1 w-full"
+                  {...register("nationality")}
+                />
+              </div>
+              {errors.nationality && (
+                <span className="text-red text-sm">
+                  {errors.nationality.message}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="address" className="text-[15px] text-gray">
+                Address<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="address"
+                  className="outline-none py-1 w-full"
+                  {...register("address")}
+                />
+              </div>
+              {errors.address && (
+                <span className="text-red text-sm">
+                  {errors.address.message}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="contact" className="text-[15px] text-gray">
+                Contact<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="contact"
+                  className="outline-none py-1 w-full"
+                  {...register("contact")}
+                />
+              </div>
+              {errors.contact && (
+                <span className="text-red text-sm">
+                  {errors.contact.message}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between mt-5">
+            <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="doj" className="text-[15px] text-gray">
-                Date of Join<sup className="text-red">*</sup>
+                Date of Join <sup className="text-red">*</sup>
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
                   id="doj"
                   type="date"
                   className="outline-none py-1 w-full"
-                  {...register('doj')}
+                  {...register("doj")}
                 />
               </div>
               {errors.doj && (
                 <span className="text-red text-sm">{errors.doj.message}</span>
               )}
             </div>
+
             <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="nationality" className="text-[15px] text-gray">
-              Nationality<sup className="text-red">*</sup>
+              <label htmlFor="alternateNo" className="text-[15px] text-gray">
+                Alternate Phone No
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="nationality"
+                  id="alternateNo"
                   className="outline-none py-1 w-full"
-                  {...register('nationality')}
+                  {...register("alternateNo")}
                 />
               </div>
-              {errors.nationality && (
-                <span className="text-red text-sm">{errors.nationality.message}</span>
-              )}
             </div>
-          </div>
-
-          <div className="flex justify-between mt-5">
-          <div className="flex flex-col gap-2 w-[30%]">
+            <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="email" className="text-[15px] text-gray">
                 Email ID<sup className="text-red">*</sup>
               </label>
@@ -220,30 +267,109 @@ useEffect(() => {
                   id="email"
                   type="email"
                   className="outline-none py-1 w-full"
-                  {...register('email')}
+                  {...register("email")}
                 />
               </div>
               {errors.email && (
                 <span className="text-red text-sm">{errors.email.message}</span>
               )}
-            </div> 
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-5">
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="lang" className="text-[15px] text-gray">
+                Language <sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="lang"
+                  type="lang"
+                  className="outline-none py-1 w-full"
+                  {...register("lang")}
+                />
+              </div>
+              {errors.lang && (
+                <span className="text-red text-sm">{errors.lang.message}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="religion" className="text-[15px] text-gray">
+                Religion
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="religion"
+                  className="outline-none py-1 w-full"
+                  {...register("religion")}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="proof" className="text-[15px] text-gray">
+                Proof<sup className="text-red">*</sup>
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="proof"
+                  className="outline-none py-1 w-full"
+                  {...register("proof")}
+                />
+                <span>
+                  <LiaUploadSolid />
+                </span>
+              </div>
+              {errors.proof && (
+                <span className="text-red text-sm">{errors.proof.message}</span>
+              )}
+            </div>
+       
+          </div>
+
+          <div className="flex  gap-10 mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="department" className="text-[15px] text-gray">
-              Department<sup className="text-red">*</sup>
+                Department
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
                   id="department"
                   className="outline-none py-1 w-full"
-                  {...register('department')}
+                  {...register("department")}
                 />
               </div>
-              {errors.department && (
-                <span className="text-red text-sm">{errors.department.message}</span>
-              )}
+        
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="leave" className="text-[15px] text-gray">
+                Total Leave
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="leave"
+                  className="outline-none py-1 w-full"
+                  {...register("totalLeave")}
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="manager" className="text-[15px] text-gray">
+                Assign Manager
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="manager"
+                  type="tel"
+                  className="outline-none py-1 w-full"
+                  {...register("manager")}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex  gap-10 mt-5">
+               <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="position" className="text-[15px] text-gray">
                 Position<sup className="text-red">*</sup>
               </label>
@@ -259,56 +385,6 @@ useEffect(() => {
                 <span className="text-red text-sm">{errors.position.message}</span>
               )}
             </div>
-
-          
-          </div>
-
-          <div className="flex  gap-10 mt-5">
-          <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="proof" className="text-[15px] text-gray">
-                Proof<sup className="text-red">*</sup>
-              </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input
-                  id="proof"
-                  className="outline-none py-1 w-full"
-                  {...register('proof')}
-                />
-              </div>
-              {errors.proof && (
-                <span className="text-red text-sm">{errors.proof.message}</span>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="leave" className="text-[15px] text-gray">
-             Total Leave
-              </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input
-                  id="leave"
-                  className="outline-none py-1 w-full"
-                  {...register('totalLeave')}
-                />
-              </div>
-
-            </div>
-
-            <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="manager" className="text-[15px] text-gray">
-               Assign Manager
-              </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <input
-                  id="manager"
-                  type="tel"
-                  className="outline-none py-1 w-full"
-                  {...register('manager')}
-                />
-              </div>
-           
-            </div>
-
-           
           </div>
 
           <div className="mb-20 pt-10 center">
@@ -360,8 +436,7 @@ useEffect(() => {
           {selectedFile && (
             <p className="text-sm text-gray-500 text-center">
               Selected: {selectedFile.name}
-              <br />
-              ({(selectedFile.size / 1024).toFixed(1)} KB)
+              <br />({(selectedFile.size / 1024).toFixed(1)} KB)
             </p>
           )}
         </section>

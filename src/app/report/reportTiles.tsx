@@ -1,9 +1,9 @@
 "use client"; // if you're using app directory (Next.js 13+)
 
 import Image from "next/image";
-import employeeDetails from "../../assets/report/reportTailIcons/employeeDetails.svg";
-import Certificate from "../../assets/report/reportTailIcons/Cerificate.svg";
-import leaveData from "../../assets/report/reportTailIcons/LeaveData.svg";
+import employeeDetails from "../../../public/assets/report/reportTailIcons/employeeDetails.svg";
+import Certificate from "../../../public/assets/report/reportTailIcons/Cerificate.svg";
+import leaveData from "../../../public/assets/report/reportTailIcons/LeaveData.svg";
 import { useRouter } from "next/navigation";
 
 type CardType = {

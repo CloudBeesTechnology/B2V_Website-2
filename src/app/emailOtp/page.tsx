@@ -1,6 +1,6 @@
 'use client';
 import AuthLayout from "@/components/AuthLayout";
-import emailImg from "../../assets/sign/emailImg.png";
+import emailImg from "../../../public/assets/sign/emailImg.png";
 import { useState } from 'react';
 import { useRouter } from "next/navigation"; 
 
