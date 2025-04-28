@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { FaEdit } from "react-icons/fa";
 import { useState } from "react";
-import avatar from "../assets/employee/avatar.webp";
+import avatar from "../../public/assets/employee/avatar.webp";
 
 interface Ovla {
   date: string;

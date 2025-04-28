@@ -107,7 +107,7 @@ interface LeaveData {
     fetchLeaves();
   }, []);
 
-  if (loading) return <div>Loading leave history...</div>;
+  if (loading) return <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (

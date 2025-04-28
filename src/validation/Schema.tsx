@@ -38,7 +38,12 @@ export const signUpSchema = Yup.object().shape({
 
   export const personalInfoSchema = z.object({
     name: z.string().min(1, 'Name is required'),
+    dob: z.string().min(1, 'Date of Birth is required'),
+    gender: z.string().nonempty( 'Gender is required'),
+    nationality: z.string().min(1, 'Nationality is required'),
+    address: z.string().nonempty( 'Address is required'),
     contact: z.string().min(1, 'Contact is required'),
+    doj: z.string().nonempty( 'Date of Join is required'),
     alternateNo: z
     .string()
     .optional()
@@ -46,58 +51,54 @@ export const signUpSchema = Yup.object().shape({
       message: "Alternate number must be at least 10 characters if provided",
     }),
       email: z.string().email('Invalid email address'),
-    department: z.string().min(1, 'Department is required'),
-    nationality: z.string().min(1, 'Nationality is required'),
-    dob: z.string().min(1, 'Date of Birth is required'),
-    doj: z.string().min(1, 'Date of Join is required'),
+      lang: z.string().min(1, 'Language is required'),
+      religion: z.string().optional(),
+      proof: z.string().min(1, 'Proof is required'),
+    department: z.string().optional(),
     position: z.string().min(1, 'Position is required'),
-    proof: z.string().min(1, 'Proof is required'),
+    totalLeave:z.string().optional(),
+    manager:z.string().optional(),
     profilePhoto: z.any().optional(),
-    totalLeave:z.string(),
-    manager:z.string()
   });
 
   export const educationSchema = z.object({
-    degree: z.string().nonempty("Bachelor’s degree is required"),
-    study: z.string().nonempty("Field of study is required"),
-    school: z.string().nonempty("School is required"),
-    master: z.string().nonempty("Master’s degree is required"),
-    field: z.string().nonempty("Field of study is required"),
-    highSchool: z.string().nonempty("High school is required"),
+    degree: z.string().nonempty("It is required"),
+    study: z.string().nonempty("It is required"),
+    school: z.string().nonempty("It is required"),
+    master: z.string().optional(),
+    field: z.string().optional(),
+    highSchool: z.string().optional(),
     courses: z
       .array(
         z.object({
-          course: z.string().nonempty("Course certificate is required"),
-          academic: z.string().nonempty("Academic name is required"),
+          course: z.string().optional(),
+          academic: z.string().optional(),
         })
       )
       .min(1, "At least one course is required"),
   });
 
 
-  export const familySchema = Yup.object().shape({
-    father: Yup.string().required("Father's name is required"),
-    mother: Yup.string().required("Mother's name is required"),
-    siblings: Yup.string().required("Siblings info is required"),
-    fatherOcc: Yup.string().required("Father's occupation is required"),
-    motherOcc: Yup.string().required("Mother's occupation is required"),
-    familyPNo: Yup
-      .string()
-      .matches(/^[0-9]{10}$/, "Contact number must be 10 digits")
-      .required("Contact number is required"),
-    address: Yup.string().required("Address is required"),
+  export const familySchema = z.object({
+    father:z.string().optional(),
+    mother:z.string().optional(),
+    siblings:z.string().optional(),
+    fatherOcc:z.string().optional(),
+    motherOcc:z.string().optional(),
+    familyPNo:z.string() .regex(/^[0-9]{10}$/, { message: "Contact number must be 10 digits" }).optional(),
+    address:z.string().optional(),
   });
 
 
   export const experienceSchema = z.object({
     experiences: z.array(
       z.object({
-        year: z.string().nonempty("Year of experience is required"),
-        company: z.string().nonempty("Company name is required"),
-        work: z.string().nonempty("Work type is required"),
-        manager: z.string().nonempty("Manager name is required"),
-        dept: z.string().nonempty("Department is required"),
-        location: z.string().nonempty("Location is required"),
+        year: z.string().optional(),
+        company: z.string().optional(),
+        work: z.string().optional(),
+        manager: z.string().optional(),
+        dept: z.string().optional(),
+        location: z.string().optional(),
       })
     ),
   });

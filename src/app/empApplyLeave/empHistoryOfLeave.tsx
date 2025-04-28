@@ -6,12 +6,21 @@ import { db } from "@/lib/firebaseConfig";
 import { TableFormate } from "@/components/TableFormate";
 
 const EmpHistoryOfLeave = () => {
-  const Heading = ["EmpID", "Duration", "Start Date", "End Date", "leaveType", "Status"];
+  const Heading = [
+    "EmpID",
+    "Duration",
+    "Start Date",
+    "End Date",
+    "leaveType",
+    "Status",
+  ];
   const [empLeave, setEmpLeave] = useState<Array<any>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
+        setLoading(true);
         const empID = localStorage.getItem("empID"); // Example: "CBT0002"
         if (!empID) return;
 
@@ -24,11 +33,17 @@ const EmpHistoryOfLeave = () => {
         setEmpLeave(leaveList);
       } catch (error) {
         console.error("Error fetching leave data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchLeaves();
   }, []);
+  if (loading)
+    return (
+      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+    );
 
   return (
     <section>
@@ -38,7 +53,10 @@ const EmpHistoryOfLeave = () => {
         </h4>
         <div className="flex justify-center items-center gap-12 ">
           <div>
-            <label htmlFor="start-date" className="block text-[16px] font-medium ">
+            <label
+              htmlFor="start-date"
+              className="block text-[16px] font-medium "
+            >
               Start Date
             </label>
             <input
@@ -48,7 +66,10 @@ const EmpHistoryOfLeave = () => {
             />
           </div>
           <div>
-            <label htmlFor="end-date" className="block text-[16px] font-medium ">
+            <label
+              htmlFor="end-date"
+              className="block text-[16px] font-medium "
+            >
               End Date
             </label>
             <input
@@ -60,14 +81,18 @@ const EmpHistoryOfLeave = () => {
         </div>
       </div>
       <div className="bg-white  py-5 rounded-lg">
-        <TableFormate
-          heading={Heading}
-          list="empLeave"
-          empLeave={empLeave}
-          ovla={[]}
-          allEmp={[]}
-          leaveApproval={[]}
-        />
+        {empLeave && empLeave.length > 0 ? (
+          <TableFormate
+            heading={Heading}
+            list="empLeave"
+            empLeave={empLeave}
+            ovla={[]}
+            allEmp={[]}
+            leaveApproval={[]}
+          />
+        ) : (
+          <p className="text-center py-4 text-gray-400">Data not found</p>
+        )}
       </div>
     </section>
   );
