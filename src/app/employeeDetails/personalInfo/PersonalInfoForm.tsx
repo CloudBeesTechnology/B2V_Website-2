@@ -7,6 +7,7 @@ import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { personalInfoSchema } from "@/validation/Schema";
 import profileIcon from "../../../../public/assets/employee/profileIcon.png";
 import { LiaUploadSolid } from "react-icons/lia";
+import { profile } from "console";
 
 interface PersonalInfoFormData {
   name: string;
@@ -20,7 +21,7 @@ interface PersonalInfoFormData {
   email: string;
   lang: string;
   religion?: string;
-  proof: string;
+  proof?: File | string | null;
   department?: string;
   position: string;
   totalLeave?: string;
@@ -32,7 +33,18 @@ export const PersonalInfoForm = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImageProof, setPreviewImageProof] = useState<string | null>(
+    null
+  );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [proofFile, setproofFile] = useState<File | null>(null);
+  const profileFileInputRef = useRef<HTMLInputElement>(null);
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+  const triggerProfileFileInput = () => {
+    profileFileInputRef.current?.click();
+  };
 
   const {
     register,
@@ -63,7 +75,7 @@ export const PersonalInfoForm = () => {
           email: parsedData.email,
           lang: parsedData.lang,
           religion: parsedData.religion,
-          proof: parsedData.proof,
+          proof: parsedData.proof || null,
           department: parsedData.department,
           totalLeave: parsedData.totalLeave,
           manager: parsedData.manager,
@@ -75,11 +87,14 @@ export const PersonalInfoForm = () => {
         if (parsedData.profilePhoto) {
           setPreviewImage(parsedData.profilePhoto);
         }
+        if (parsedData.proof) {
+          setPreviewImageProof(parsedData.proof);
+        }
       }
     }
   }, [reset]);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, type: string) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.match("image.*")) {
@@ -90,31 +105,43 @@ export const PersonalInfoForm = () => {
         alert("File size should be less than 2MB");
         return;
       }
+      if (type === "profilePhoto") {
+        // console.log("profile");
 
-      setSelectedFile(file);
-      setValue("profilePhoto", file);
+        setSelectedFile(file);
+        setValue("profilePhoto", file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setPreviewImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else if (type === "proof") {
+        // console.log("proof");
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+        setproofFile(file);
+        setValue("proof", file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setPreviewImageProof(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+  console.log(proofFile,"proofFile");
+  
 
   const onSubmit = (data: PersonalInfoFormData) => {
     const dataToStore = {
       ...data,
       profilePhoto: previewImage,
+      proof:proofFile
     };
-    // console.log(dataToStore,"dataToStore");
+    console.log(dataToStore, "dataToStore");
 
-    localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
-    router.push("/employeeDetails?tab=educationInfo");
+    // localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
+    // router.push("/employeeDetails?tab=educationInfo");
   };
 
   return (
@@ -310,21 +337,25 @@ export const PersonalInfoForm = () => {
               <label htmlFor="proof" className="text-[15px] text-gray">
                 Proof<sup className="text-red">*</sup>
               </label>
-              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+              <div className="border border-[#D9D9D9] px-4 py-3 rounded-sm flex items-center">
                 <input
                   id="proof"
-                  className="outline-none py-1 w-full"
-                  {...register("proof")}
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => handleFileChange(e, "proof")}
+                  accept="image/*"
+                  className="outline-none py-1 w-full hidden"
+                  // {...register("proof")}
                 />
-                <span>
-                  <LiaUploadSolid />
+                <span onClick={triggerFileInput} className="w-full flex justify-end">
+                 <LiaUploadSolid  className="text-medium_gray" />
                 </span>
               </div>
+              <span className="text-xs text-medium_gray"> {proofFile?.name || ""}</span>
               {errors.proof && (
                 <span className="text-red text-sm">{errors.proof.message}</span>
               )}
             </div>
-       
           </div>
 
           <div className="flex  gap-10 mt-5">
@@ -339,7 +370,6 @@ export const PersonalInfoForm = () => {
                   {...register("department")}
                 />
               </div>
-        
             </div>
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="leave" className="text-[15px] text-gray">
@@ -369,7 +399,7 @@ export const PersonalInfoForm = () => {
             </div>
           </div>
           <div className="flex  gap-10 mt-5">
-               <div className="flex flex-col gap-2 w-[30%]">
+            <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="position" className="text-[15px] text-gray">
                 Position<sup className="text-red">*</sup>
               </label>
@@ -378,11 +408,13 @@ export const PersonalInfoForm = () => {
                   id="position"
                   type="tel"
                   className="outline-none py-1 w-full"
-                  {...register('position')}
+                  {...register("position")}
                 />
               </div>
               {errors.position && (
-                <span className="text-red text-sm">{errors.position.message}</span>
+                <span className="text-red text-sm">
+                  {errors.position.message}
+                </span>
               )}
             </div>
           </div>
@@ -400,7 +432,7 @@ export const PersonalInfoForm = () => {
         <section className="w-[30%] flex items-center flex-col gap-4">
           <div
             className="max-w-[150px] w-full h-[150px] rounded-full overflow-hidden cursor-pointer relative border border-gray-200"
-            onClick={triggerFileInput}
+            onClick={triggerProfileFileInput}
           >
             {previewImage ? (
               <Image
@@ -426,8 +458,8 @@ export const PersonalInfoForm = () => {
 
           <input
             type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
+            ref={profileFileInputRef}
+            onChange={(e) => handleFileChange(e, "profilePhoto")}
             accept="image/*"
             className="hidden"
           />

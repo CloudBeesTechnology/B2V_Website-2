@@ -45,7 +45,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <Sidebar />
       </div>
       <div className="fixed top-0 h-screen ml-64 w-[calc(100%-16rem)] bg-[#F5F5F5] overflow-auto">
-        <div className="w-full h-20 sticky top-0">
+        <div className="w-full h-20 sticky top-0 z-[9999]">
           <Navbar />
         </div>
         <main className="px-10">{children}</main>
