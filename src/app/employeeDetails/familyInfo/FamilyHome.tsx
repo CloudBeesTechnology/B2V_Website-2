@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useForm } from "react-hook-form";
 import { familySchema } from "@/validation/Schema"; // Make sure this schema is defined
 import { db } from "@/lib/firebaseConfig";
@@ -25,7 +25,6 @@ interface FamilyDetails {
 }
 
 export const FamilyHome = () => {
-
   const router = useRouter();
 
   const {
@@ -93,7 +92,7 @@ export const FamilyHome = () => {
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("educationData");
 
-      router.push("/employee"); 
+      router.push("/employee");
     } catch (error) {
       console.error("Error writing document to Firestore:", error);
     }

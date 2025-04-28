@@ -53,8 +53,10 @@ const OverviewHolidays: React.FC = () => {
     };
 
     const fetchHolidays = async () => {
+      let getCurrentYear = new Date().getFullYear();
+
       let India = "IN";
-      let Year = "2025";
+      let Year = `${getCurrentYear}`;
       try {
         const response = await fetch(
           `https://calendarific.com/api/v2/holidays?api_key=KaX8Jjn8nBTUDWalYku3aMvqgJ7A8sz3&country=${India}&year=${Year}`
@@ -109,18 +111,20 @@ const OverviewHolidays: React.FC = () => {
     })
     .slice(0, 7);
   return (
-    <section className="rounded-xl px-5 py-8 shadow-xl mb-10 h-full overflow-hidden">
-      <div className=" pb-1">
-        <p className="text-gray text_size_3">Holidays</p>
-      </div>
-      <div>
+    <section className="rounded-xl p-5 shadow-xl mb-10 h-full overflow-hidden">
+      <p className="text-gray text_size_3 ">Holidays</p>
+
+      <div className="py-3">
         {filteredHolidays.map((holiday, index) => (
           <article
             key={index}
-            className="text_size_5 flex items-center space-y-2 gap-10"
+            className="text_size_5 flex items-center space-y-4 "
           >
-            <p className="text-gray">{holiday.date}</p>
-            <p className=" text-mediumlite_grey text-start">{holiday.name}</p>
+            <p className="text-gray w-1/4">{holiday.date}</p>
+
+            <p className="text-mediumlite_grey text-start w-3/4">
+              {holiday.name}
+            </p>
           </article>
         ))}
       </div>
