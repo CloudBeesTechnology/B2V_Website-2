@@ -5,9 +5,12 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { doc, setDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 const EmpApplyLeaveTable = () => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -17,26 +20,31 @@ const EmpApplyLeaveTable = () => {
     resolver: zodResolver(leaveSchema),
   });
 
-  const isHalfDay = watch("halfDay");
+  const isHalfDay = watch('halfDay');
 
   const onSubmit = async (data: LeaveFormData) => {
-    const empID = localStorage.getItem("empID");
+    const empID = localStorage.getItem('empID');
+    if (!empID) {
+      alert('Employee ID not found.');
+      return;
+    }
+
     const createdAt = new Date().toISOString();
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
-  
+
     if (end < start) {
-      alert("End Date cannot be before Start Date");
+      alert('End Date cannot be before Start Date');
       return;
     }
-  
+
     const isSameDate =
       start.getFullYear() === end.getFullYear() &&
       start.getMonth() === end.getMonth() &&
       start.getDate() === end.getDate();
-  
+
     let takenDay = 0;
-  
+
     if (isSameDate) {
       // Same day leave
       takenDay = isHalfDay ? 0.5 : 1;
@@ -45,30 +53,29 @@ const EmpApplyLeaveTable = () => {
       const days = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1;
       takenDay = isHalfDay ? days + 0.5 : days;
     }
-  
-    const halfDayValue = isHalfDay ? "0.5" : "0";
-  
-          await setDoc(doc(db, "leaveStatus", createdAt), {
 
-      endDate: data.endDate,
-      leaveReason: data.leaveReason,
-      leaveType: data.leaveType,
-      startDate: data.startDate,
-      leaveStatus: "Pending",
-      empID: empID,
-      halfDay: halfDayValue,
-      remarks:"",
-      takenDay: takenDay.toString(),
-      createdAt: createdAt,  
-  })
-      .then((res) => {
-        console.log(res, "res");
-      })
-      .catch((error) => {
-        console.log(error);
+    const halfDayValue = isHalfDay ? '0.5' : '0';
+
+    try {
+      await setDoc(doc(db, 'leaveStatus', createdAt), {
+        endDate: data.endDate,
+        leaveReason: data.leaveReason,
+        leaveType: data.leaveType,
+        startDate: data.startDate,
+        leaveStatus: 'Pending',
+        empID: empID,
+        halfDay: halfDayValue,
+        remarks: '',
+        takenDay: takenDay.toString(),
+        createdAt: createdAt,
       });
+
+      window.location.reload();
+        } catch (error) {
+      console.error('Error applying for leave:', error);
+      alert('There was an error submitting your leave request.');
+    }
   };
-  
   
   
   return (
