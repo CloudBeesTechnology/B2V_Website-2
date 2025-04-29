@@ -96,7 +96,7 @@ const Searchbox: React.FC<SearchboxProps> = ({
       </div>
 
       {showDropdown && filteredUsers.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white p-1 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto">
+        <ul className="absolute z-10 w-72 bg-white p-1 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto">
         
           {filteredUsers?.map((user, idx) => (
             <li
