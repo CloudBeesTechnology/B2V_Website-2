@@ -3,22 +3,18 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+
+import EmpLeaveDateFilter from "../empLeaveDateFilter";
 import { TableFormate } from "@/components/TableFormate";
-import EmpLeaveDateFilter from "./empLeaveDateFilter";
 
-const EmpHistoryOfLeave = () => {
-  const Heading = [
-    "EmpID",
-    "Duration",
-    "Start Date",
-    "End Date",
-    "leaveType",
-    "Status",
-  ];
-  const [empLeave, setEmpLeave] = useState<Array<any>>([]);
-  const [secondaryEmpLeave, setSecondaryEmpLeave] = useState<Array<any>>([]);
+const EmpHistoryOfPermission = () => {
+  const [empPermission, setEmpPermission] = useState<Array<any>>([]);
+  const [secondaryEmpPermission, setSecondaryEmpPermission] = useState<
+    Array<any>
+  >([]);
+
   const [loading, setLoading] = useState(true);
-
+  const Heading = ["EmpID", "Duration", "Applied Date", "Reason", "Status"];
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
@@ -26,14 +22,14 @@ const EmpHistoryOfLeave = () => {
         const empID = localStorage.getItem("empID"); // Example: "CBT0002"
         if (!empID) return;
 
-        const querySnapshot = await getDocs(collection(db, "leaveStatus"));
+        const querySnapshot = await getDocs(collection(db, "applyPermission"));
 
-        const leaveList = querySnapshot.docs
+        const permissionData = querySnapshot.docs
           .map((doc) => doc.data())
           .filter((item) => item.empID === empID); // Only that person's data
 
-        setSecondaryEmpLeave(leaveList);
-        setEmpLeave(leaveList);
+        setEmpPermission(permissionData);
+        setSecondaryEmpPermission(permissionData);
       } catch (error) {
         console.error("Error fetching leave data:", error);
       } finally {
@@ -52,18 +48,19 @@ const EmpHistoryOfLeave = () => {
   return (
     <section>
       <EmpLeaveDateFilter
-        empLeave={empLeave}
+        empPermission={empPermission}
         handleFilteredData={(filteredData) =>
-          setSecondaryEmpLeave(filteredData)
+          setSecondaryEmpPermission(filteredData)
         }
-        titleName="History of Leave"
+        titleName="History of Permission"
       />
+
       <div className="bg-white mb-10 py-5 rounded-lg">
-        {secondaryEmpLeave && secondaryEmpLeave.length > 0 ? (
+        {secondaryEmpPermission && secondaryEmpPermission.length > 0 ? (
           <TableFormate
             heading={Heading}
-            list="empLeave"
-            secondaryEmpLeave={secondaryEmpLeave}
+            list="empPermission"
+            secondaryEmpPermission={secondaryEmpPermission}
             ovla={[]}
             allEmp={[]}
             leaveApproval={[]}
@@ -76,4 +73,4 @@ const EmpHistoryOfLeave = () => {
   );
 };
 
-export default EmpHistoryOfLeave;
+export default EmpHistoryOfPermission;
