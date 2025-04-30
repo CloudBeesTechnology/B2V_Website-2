@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
-
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
+import { EmployeeContextProvider } from "@/app/utils/EmpContext";
 
 const pathList = [
   "/signIn",
@@ -14,7 +14,11 @@ const pathList = [
   "/passwordSet",
 ];
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
+export default function LayoutWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const isAuthPage = pathList.includes(pathname);
@@ -48,7 +52,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <div className="w-full h-20 sticky top-0 z-[9999]">
           <Navbar />
         </div>
-        <main className="px-10">{children}</main>
+        <main className="px-10">
+          <EmployeeContextProvider>{children}</EmployeeContextProvider>
+        </main>
       </div>
     </section>
   ) : null;

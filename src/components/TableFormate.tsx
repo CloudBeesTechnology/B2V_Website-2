@@ -4,6 +4,8 @@ import { FaEdit } from "react-icons/fa";
 import { useState } from "react";
 import avatar from "../../public/assets/employee/avatar.webp";
 import { DateFormat } from "./DateFormate";
+import { UseEmployeeList } from "@/app/utils/EmpContext";
+import { useRouter } from "next/navigation";
 
 interface Ovla {
   date: string;
@@ -22,6 +24,7 @@ interface LA {
   leaveType?: string;
   leaveStatus?: string;
   remarks?: string;
+  reason?: string;
 }
 
 interface EmpLeave {
@@ -33,9 +36,8 @@ interface EmpLeave {
   takenDay?: string;
   leaveStatus: string;
   remarks?: string;
-  leaveReason?:string;
-  createdAt?:string;
-
+  leaveReason?: string;
+  createdAt?: string;
 }
 
 interface allEmployee {
@@ -46,7 +48,7 @@ interface allEmployee {
   department: string;
   contact: string;
   email: string;
-  createdAt?:string;
+  createdAt?: string;
 }
 
 interface TableProps {
@@ -57,6 +59,7 @@ interface TableProps {
   leaveApproval?: LA[];
   empLeave?: EmpLeave[];
   filterStatus?: "Approved" | "Rejected";
+  viewData?: (data: allEmployee) => void;
 }
 
 export const TableFormate = ({
@@ -67,10 +70,12 @@ export const TableFormate = ({
   leaveApproval,
   empLeave,
   filterStatus,
+  viewData,
 }: TableProps) => {
   const [selectedLeave, setSelectedLeave] = useState<EmpLeave | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const router = useRouter();
+  const { handleStoredData } = UseEmployeeList();
   const handleRowClick = (data: EmpLeave) => {
     setSelectedLeave(data);
     setIsPopupOpen(true);
@@ -86,7 +91,7 @@ export const TableFormate = ({
       <table className="w-full border-collapse">
         {heading && (
           <thead className="text-mediumlite_grey text-sm font-bold text-start w-full">
-            <tr>
+            <tr className="border-b border-morelite_grey">
               {heading.map((val, index) => (
                 <th key={index} className="text-start py-2 px-4">
                   {val}
@@ -98,7 +103,10 @@ export const TableFormate = ({
         <tbody>
           {list === "OVLA" &&
             ovla.slice(0, 4).map((val, index) => (
-              <tr key={index} className="text-sm text-medium_gray">
+              <tr
+                key={index}
+                className="text-sm text-medium_gray border-b border-morelite_grey"
+              >
                 <td className="text-start py-2 px-4">{val.date || "N/A"}</td>
                 <td className="text-start py-2 px-4">{val.appType || "N/A"}</td>
                 <td className="text-start py-2 px-4">
@@ -109,75 +117,104 @@ export const TableFormate = ({
             ))}
 
           {list === "AllEmp" &&
-            allEmp?.map((val, index) => (
-              <tr key={index} className="text-sm text-medium_gray">
-                <td className="text-start py-2 px-4 flex items-center gap-2">
-                  <Image
-                    src={val.profile || avatar}
-                    width={25}
-                    height={25}
-                    alt={`${val.name} profile`}
-                    className="rounded-full"
-                  />
-                  {val.empID || "N/A"}
-                </td>
-                <td className="text-start py-2 px-4">{val.name || "N/A"}</td>
-                <td className="text-start py-2 px-4">
-                  {val.position || "N/A"}
-                </td>
-                <td className="text-start py-2 px-4">
-                  {val.department || "N/A"}
-                </td>
-                <td className="text-start py-2 px-4">{val.contact || "N/A"}</td>
-                <td className="text-start py-2 px-4">{val.email || "N/A"}</td>
-                <td className="text-start py-2 px-4">
-                  <FaEdit />
-                </td>
-              </tr>
-            ))}
+            allEmp
+              ?.sort((a, b) => {
+                const numA = parseInt(a.empID?.replace(/\D/g, "") || "0");
+                const numB = parseInt(b.empID?.replace(/\D/g, "") || "0");
+                return numA - numB; // For ascending order. Use b - a for descending.
+              })
+              .map((val, index) => (
+                <tr
+                  key={index}
+                  className="text-sm text-medium_gray border-b border-morelite_grey"
+                >
+                  <td className="text-start py-2 px-4 flex items-center gap-2">
+                    <Image
+                      src={val.profile || avatar}
+                      width={25}
+                      height={25}
+                      alt={`${val.name} profile`}
+                      className="rounded-full"
+                    />
+                    {val.empID || "N/A"}
+                  </td>
+                  <td className="text-start py-2 px-4">{val.name || "N/A"}</td>
+                  <td className="text-start py-2 px-4">
+                    {val.position || "N/A"}
+                  </td>
+                  <td className="text-start py-2 px-4">
+                    {val.department || "N/A"}
+                  </td>
+                  <td className="text-start py-2 px-4">
+                    {val.contact || "N/A"}
+                  </td>
+                  <td className="text-start py-2 px-4">{val.email || "N/A"}</td>
+                  <td
+                    className=" py-2 px-4 text-primary text-center"
+                    onClick={() => viewData?.(val)}
+                  >
+                    View
+                  </td>
+                  <td
+                    className="center  py-2 px-4"
+                    onClick={() => {
+                      handleStoredData(val);
+                      router.push("/employeeDetails");
+                    }}
+                  >
+                    <FaEdit />
+                  </td>
+                </tr>
+              ))}
 
           {list === "LeaveApproval" &&
             leaveApproval?.map((val, index) => {
-              let takenDay = "-";
-              if (val?.startDate && val?.endDate) {
-                const startDate = new Date(val.startDate);
-                const endDate = new Date(val.endDate);
-                const durationInMs = endDate.getTime() - startDate.getTime();
-                takenDay = Math.ceil(
-                  durationInMs / (1000 * 60 * 60 * 24)
-                ).toString();
-              }
-
               return (
-                <tr key={index} className="text-sm text-medium_gray">
+                <tr
+                  key={index}
+                  className="text-sm text-medium_gray border-b border-morelite_grey"
+                >
                   <td className="text-start py-3 px-4">{val.empID || "N/A"}</td>
                   <td className="text-start py-3 px-4">{val?.name || "N/A"}</td>
-                  <td className="text-start py-3 px-4">{takenDay}</td>
                   <td className="text-start py-3 px-4">
-                  {val?.startDate ? DateFormat(val.startDate) : "N/A"}
+                    {val?.leaveType
+                      ? val.leaveType.charAt(0).toUpperCase() +
+                        val.leaveType.slice(1).toLowerCase()
+                      : "N/A"}
                   </td>
-                  <td className="text-start py-3 px-4">
+                  <td className="text-center py-3 px-4">
+                    {val?.startDate ? DateFormat(val.startDate) : "N/A"}
+                  </td>
+                  <td className="text-center py-3 px-4">
                     {val?.endDate ? DateFormat(val.endDate) : "N/A"}
                   </td>
-                  <td className="text-start py-3 px-4">
-                    {val?.leaveType || "N/A"}
+                  <td className="text-center py-3 px-4">{val?.duration}</td>
+                  <td className="px-4 py-3 w-[250px] pt-3 overflow-y-auto text-wrap overflow-wrap-break-word flex">
+                    {val?.reason}
                   </td>
-                  <td className="text-start py-3 px-4">
-  <span
-    className={`
-      ${val?.leaveStatus === "Pending" ? "bg-lite_orange text-medium_orange" : ""}
-      ${val?.leaveStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
-      ${val?.leaveStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
-    `}
-  >
-    {val?.leaveStatus || "N/A"}
-  </span>
-</td>
                   {filterStatus === "Rejected" && (
                     <td className="text-start py-3 px-4 text-wrap overflow-wrap-break-word w-[250px]">
                       {val?.remarks || "No remarks"}
                     </td>
                   )}
+
+                  <td className="text-start py-3 px-4">
+                    <span
+                      className={`px-3 py-1 rounded-md
+      ${
+        val?.leaveStatus === "Pending"
+          ? "bg-lite_orange text-medium_orange"
+          : val?.leaveStatus === "Rejected"
+          ? "bg-lite_red text-medium_red"
+          : val?.leaveStatus === "Approved"
+          ? "bg-lite_blue text-medium_blue"
+          : ""
+      }
+    `}
+                    >
+                      {val?.leaveStatus || "N/A"}
+                    </span>
+                  </td>
                 </tr>
               );
             })}
@@ -186,7 +223,7 @@ export const TableFormate = ({
             empLeave?.map((val, index) => (
               <tr
                 key={index}
-                className="text-sm text-medium_gray cursor-pointer hover:bg-gray-100"
+                className="text-sm text-medium_gray cursor-pointer hover:bg-gray-100 border-b border-morelite_grey"
                 onClick={() => handleRowClick(val)}
               >
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
@@ -199,23 +236,27 @@ export const TableFormate = ({
                   {val.startDate ? DateFormat(val.startDate) : "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.endDate ? DateFormat(val.endDate): "N/A"}
+                  {val.endDate ? DateFormat(val.endDate) : "N/A"}
                 </td>
                 <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
                   {val.leaveType || "N/A"}
                 </td>
                 <td className="text-start py-3 px-4">
-  <span
-    className={`
-      ${val?.leaveStatus === "Pending" ? "bg-lite_orange text-medium_orange" : ""}
+                  <span
+                    className={`
+      ${
+        val?.leaveStatus === "Pending"
+          ? "bg-lite_orange text-medium_orange"
+          : ""
+      }
       ${val?.leaveStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
       ${val?.leaveStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
     `}
-  >
-    {val?.leaveStatus || "N/A"}
-  </span>
-</td>
-{/* <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
+                  >
+                    {val?.leaveStatus || "N/A"}
+                  </span>
+                </td>
+                {/* <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
   {val.createdAt ? (
     <>
       <div>{new Date(val.createdAt).toLocaleDateString()}</div>
@@ -231,53 +272,52 @@ export const TableFormate = ({
       </table>
 
       {isPopupOpen && selectedLeave && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000004d] bg-opacity-50">
-    <div className="bg-white rounded-lg max-w-md w-full relative">
-      <button
-        onClick={closePopup}
-        className="absolute top-3 right-5 text-white"
-      >
-        ✖
-      </button>
-      <h2 className="text-lg text-center text-white py-2 font-semibold mb-4 bg-[#319CE5] w-full">
-        Details
-      </h2>
-      <div className="p-6">
-        <table className="w-full text-sm text-left border-separate border-spacing-y-2">
-          <tbody>
-            <tr>
-              <td className="font-semibold text-gray-700">Employee ID</td>
-              <td>{selectedLeave.empID}</td>
-            </tr>
-            <tr>
-              <td className="font-semibold text-gray-700">Leave Type</td>
-              <td>{selectedLeave.leaveType}</td>
-            </tr>
-            <tr>
-              <td className="font-semibold text-gray-700">Start Date</td>
-              <td>{DateFormat(selectedLeave.startDate)}</td>
-            </tr>
-            <tr>
-              <td className="font-semibold text-gray-700">End Date</td>
-              <td>{DateFormat(selectedLeave.endDate)}</td>
-            </tr>
-            <tr>
-              <td className="font-semibold text-gray-700">Reason</td>
-              <td>{selectedLeave.leaveReason}</td>
-            </tr> 
-            <tr>
-              <td className="font-semibold text-gray-700 w-[200px] text-wrap overflow-wrap-break-word">Remarks</td>
-              <td>{selectedLeave.remarks || "No Remarks"}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-)}
-
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0000004d] bg-opacity-50">
+          <div className="bg-white rounded-lg max-w-md w-full relative">
+            <button
+              onClick={closePopup}
+              className="absolute top-3 right-5 text-white"
+            >
+              ✖
+            </button>
+            <h2 className="text-lg text-center text-white py-2 font-semibold mb-4 bg-[#319CE5] w-full">
+              Details
+            </h2>
+            <div className="p-6">
+              <table className="w-full text-sm text-left border-separate border-spacing-y-2">
+                <tbody>
+                  <tr>
+                    <td className="font-semibold text-gray-700">Employee ID</td>
+                    <td>{selectedLeave.empID}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold text-gray-700">Leave Type</td>
+                    <td>{selectedLeave.leaveType}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold text-gray-700">Start Date</td>
+                    <td>{DateFormat(selectedLeave.startDate)}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold text-gray-700">End Date</td>
+                    <td>{DateFormat(selectedLeave.endDate)}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold text-gray-700">Reason</td>
+                    <td>{selectedLeave.leaveReason}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold text-gray-700 w-[200px] text-wrap overflow-wrap-break-word">
+                      Remarks
+                    </td>
+                    <td>{selectedLeave.remarks || "No Remarks"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

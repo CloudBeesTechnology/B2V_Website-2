@@ -11,9 +11,9 @@ export const EmployeeHome = () => {
     const fetchUsers = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "users")); // use your actual collection name
-        querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
-        });
+        // querySnapshot.forEach((doc) => {
+        //   console.log(doc.id, " => ", doc.data());
+        // });
       } catch (error) {
         console.error("Error fetching user data: ", error);
       }

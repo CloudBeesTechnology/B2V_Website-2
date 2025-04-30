@@ -60,7 +60,7 @@ export const personalInfoSchema = z.object({
   religion: z.string().optional(),
   proof:z.any().optional(),
   department: z.string().optional(),
-  position: z.string().min(1, "Position is required"),
+  position: z.string().optional(),
   totalLeave: z.string().optional(),
   manager: z.string().optional(),
   profilePhoto: z.any().optional(),
@@ -87,13 +87,12 @@ export const familySchema = z.object({
   father: z.string().optional(),
   mother: z.string().optional(),
   siblings: z.string().optional(),
-  fatherOcc: z.string().optional(),
-  motherOcc: z.string().optional(),
-  familyPNo: z
-    .string()
-    .regex(/^[0-9]{10}$/, { message: "Contact number must be 10 digits" })
-    .optional(),
-  address: z.string().optional(),
+  personalStatus: z.string().optional(),
+  husbandName: z.string().optional(),
+  wifeName: z.string().optional(),
+  child: z.string().optional(),
+  familyPNo:  z.string().optional(),
+  familyAddress: z.string().optional(),
 });
 
 export const experienceSchema = z.object({

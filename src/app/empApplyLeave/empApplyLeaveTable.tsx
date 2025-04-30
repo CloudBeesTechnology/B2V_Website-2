@@ -92,9 +92,9 @@ const EmpApplyLeaveTable = () => {
       className="rounded-md px-2 py-2 border border-lite_gray shadow-md text_size_5 outline-none"
     >
       <option value="">Select Leave</option>
-      <option value="casual">Casual Leave</option>
-      <option value="sick">Sick Leave</option>
-      <option value="maternity">Maternity Leave</option>
+      <option value="Casual">Casual Leave</option>
+      <option value="Sick">Sick Leave</option>
+      <option value="Maternity">Maternity Leave</option>
       <option value="other">Other</option>
     </select>
     {errors.leaveType && (

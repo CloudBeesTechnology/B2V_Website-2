@@ -73,3 +73,9 @@
 // };
 
 // export default Internship;
+    import React from 'react'
+
+    export default function Tabpage() {
+        return <div>page</div>;
+      }
+      

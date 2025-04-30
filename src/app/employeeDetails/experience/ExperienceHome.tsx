@@ -6,6 +6,7 @@ import { experienceSchema } from "@/validation/Schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { UseEmployeeList } from "@/app/utils/EmpContext";
 
 interface Experience {
   year?: string;
@@ -21,7 +22,7 @@ interface ExperienceDetails {
 
 export const ExperienceHome = () => {
   const router = useRouter();
-
+const {storedEmpData}=UseEmployeeList()
   const {
     register,
     handleSubmit,
@@ -56,6 +57,25 @@ export const ExperienceHome = () => {
     }
   }, [reset]);
 
+  useEffect(() => {
+    if (storedEmpData) {
+      reset({
+        experiences: storedEmpData.experiences?.length > 0
+        ? storedEmpData.experiences
+        : [
+            {
+              year: "",
+              company: "",
+              work: "",
+              manager: "",
+              dept: "",
+              location: "",
+            },
+          ],
+      });
+    }
+  }, [storedEmpData, reset]);
+  
   const { fields, append, remove } = useFieldArray({
     control,
     name: "experiences",

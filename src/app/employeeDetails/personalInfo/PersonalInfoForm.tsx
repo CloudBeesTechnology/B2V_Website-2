@@ -8,6 +8,8 @@ import { personalInfoSchema } from "@/validation/Schema";
 import profileIcon from "../../../../public/assets/employee/profileIcon.png";
 import { LiaUploadSolid } from "react-icons/lia";
 import { profile } from "console";
+import { UseEmployeeList } from "@/app/utils/EmpContext";
+import { DateFormat } from "@/components/DateFormate";
 
 interface PersonalInfoFormData {
   name: string;
@@ -23,7 +25,7 @@ interface PersonalInfoFormData {
   religion?: string;
   proof?: File | string | null;
   department?: string;
-  position: string;
+  position?: string;
   totalLeave?: string;
   manager?: string;
   profilePhoto?: File | string | null;
@@ -31,6 +33,7 @@ interface PersonalInfoFormData {
 
 export const PersonalInfoForm = () => {
   const router = useRouter();
+  const { storedEmpData } = UseEmployeeList();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [previewImageProof, setPreviewImageProof] = useState<string | null>(
@@ -129,21 +132,46 @@ export const PersonalInfoForm = () => {
     }
   };
 
-  console.log(proofFile,"proofFile");
-  
+  // console.log(proofFile,"proofFile");
 
   const onSubmit = (data: PersonalInfoFormData) => {
+    // console.log("ftghj");
+
     const dataToStore = {
       ...data,
       profilePhoto: previewImage,
-      proof:proofFile
+      proof: proofFile,
     };
-    console.log(dataToStore, "dataToStore");
+    // console.log(dataToStore, "dataToStore");
 
-    // localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
-    // router.push("/employeeDetails?tab=educationInfo");
+    localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
+    router.push("/employeeDetails?tab=educationInfo");
   };
+  // console.log(storedEmpData, "84512");
 
+  useEffect(() => {
+    if (storedEmpData) {
+      reset({
+        name: storedEmpData.name || "",
+        dob: storedEmpData.dob || "",
+        address: storedEmpData.address || "",
+        gender: storedEmpData.gender || "",
+        nationality: storedEmpData.nationality || "",
+        contact: storedEmpData.contact || "",
+        doj: storedEmpData.doj || "",
+        alternateNo: storedEmpData.alternateNo || "",
+        email: storedEmpData.email || "",
+        lang: storedEmpData.lang || "",
+        religion: storedEmpData.religion || "",
+        proof: storedEmpData.proof || null,
+        department: storedEmpData.department || "",
+        totalLeave: storedEmpData.totalLeave || "",
+        manager: storedEmpData.manager || "",
+        position: storedEmpData.position || "",
+        profilePhoto: storedEmpData.profilePhoto || null,
+      });
+    }
+  }, [storedEmpData, reset]);
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
       <div>
@@ -192,7 +220,10 @@ export const PersonalInfoForm = () => {
                 Gender
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
-                <select className=" outline-none w-full text-gray-400">
+                <select
+                  className=" outline-none w-full"
+                  {...register("gender")}
+                >
                   <option>Select</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -335,7 +366,8 @@ export const PersonalInfoForm = () => {
 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="proof" className="text-[15px] text-gray">
-                Proof<sup className="text-red">*</sup>
+                Proof
+                {/* <sup className="text-red">*</sup> */}
               </label>
               <div className="border border-[#D9D9D9] px-4 py-3 rounded-sm flex items-center">
                 <input
@@ -347,11 +379,17 @@ export const PersonalInfoForm = () => {
                   className="outline-none py-1 w-full hidden"
                   // {...register("proof")}
                 />
-                <span onClick={triggerFileInput} className="w-full flex justify-end">
-                 <LiaUploadSolid  className="text-medium_gray" />
+                <span
+                  onClick={triggerFileInput}
+                  className="w-full flex justify-end"
+                >
+                  <LiaUploadSolid className="text-medium_gray" />
                 </span>
               </div>
-              <span className="text-xs text-medium_gray"> {proofFile?.name || ""}</span>
+              <span className="text-xs text-medium_gray">
+                {" "}
+                {proofFile?.name || ""}
+              </span>
               {errors.proof && (
                 <span className="text-red text-sm">{errors.proof.message}</span>
               )}
@@ -401,7 +439,7 @@ export const PersonalInfoForm = () => {
           <div className="flex  gap-10 mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="position" className="text-[15px] text-gray">
-                Position<sup className="text-red">*</sup>
+                Position
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
@@ -411,11 +449,6 @@ export const PersonalInfoForm = () => {
                   {...register("position")}
                 />
               </div>
-              {errors.position && (
-                <span className="text-red text-sm">
-                  {errors.position.message}
-                </span>
-              )}
             </div>
           </div>
 
