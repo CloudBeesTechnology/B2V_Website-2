@@ -27,6 +27,7 @@ const EmpPermissionTable: React.FC = () => {
     }
   };
 
+  
   const onSubmit = async (data: PermissionFormSchema) => {
     const empID = localStorage.getItem("empID");
     if (data) {
