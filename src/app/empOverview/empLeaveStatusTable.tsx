@@ -143,7 +143,7 @@ const EmpHistoryOfLeave = () => {
           <TableFormate
             heading={Heading}
             list="empLeave"
-            empLeave={empLeave}
+            secondaryEmpLeave={empLeave}
             ovla={[]}
             allEmp={[]}
             leaveApproval={[]}

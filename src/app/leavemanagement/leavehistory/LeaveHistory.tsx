@@ -38,9 +38,9 @@ const LeaveHistory: React.FC = () => {
         </div>
       </section>
       <section className="py-7 bg-white rounded-xl px-10 space-y-7 my-10">
-        <div className="flex justify-start items-center ">
-          <h1 className="text-xl font-semibold text-gray">Leave History</h1>
-        </div>
+          <div className="flex justify-start items-center ">
+            <h1 className="text-xl font-semibold text-gray">Leave History</h1>
+          </div>
 
         <LeaveTable />
       </section>

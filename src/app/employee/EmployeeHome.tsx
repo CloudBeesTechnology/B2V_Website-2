@@ -11,9 +11,9 @@ export const EmployeeHome = () => {
     const fetchUsers = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "users")); // use your actual collection name
-        querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
-        });
+        // querySnapshot.forEach((doc) => {
+        //   console.log(doc.id, " => ", doc.data());
+        // });
       } catch (error) {
         console.error("Error fetching user data: ", error);
       }
@@ -33,7 +33,7 @@ export const EmployeeHome = () => {
       <Link
         href="/allEmployee"
         onClick={RemoveLocalValues}
-        className="border border-primary center flex-col py-5 rounded-md w-[25%] h-[150px]"
+        className="border border-primary center flex-col py-5 rounded-md w-[20%] h-[150px]"
       >
         <Image
           src={handperson}
@@ -44,7 +44,7 @@ export const EmployeeHome = () => {
 
         <p className="text_size_8 text-gray">All Employee</p>
       </Link>
-      <Link href="/employeeDetails" onClick={RemoveLocalValues} className="border border-primary center flex-col gap-3 py-5 rounded-md w-[25%] h-[150px]">
+      <Link href="/employeeDetails" onClick={RemoveLocalValues} className="border border-primary center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px]">
         <Image src={notepen} alt="note with pen not found" width={50}
           height={50} />
         <p className="text_size_8 text-gray">Add Employee Info</p>

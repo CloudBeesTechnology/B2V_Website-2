@@ -4,6 +4,8 @@ import { FaEdit } from "react-icons/fa";
 import { useState } from "react";
 import avatar from "../../public/assets/employee/avatar.webp";
 import { DateFormat } from "./DateFormate";
+import { UseEmployeeList } from "@/app/utils/EmpContext";
+import { useRouter } from "next/navigation";
 
 interface Ovla {
   date: string;
@@ -22,6 +24,7 @@ interface LA {
   leaveType?: string;
   leaveStatus?: string;
   remarks?: string;
+  reason?: string;
 }
 
 interface EmpLeave {
@@ -65,6 +68,7 @@ interface TableProps {
   secondaryEmpPermission?: empPermission[];
   secondaryEmpLeave?: EmpLeave[];
   filterStatus?: "Approved" | "Rejected";
+  viewData?: (data: allEmployee) => void;
 }
 
 export const TableFormate = ({
@@ -76,10 +80,12 @@ export const TableFormate = ({
   secondaryEmpPermission,
   secondaryEmpLeave,
   filterStatus,
+  viewData,
 }: TableProps) => {
   const [selectedLeave, setSelectedLeave] = useState<EmpLeave | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const router = useRouter();
+  const { handleStoredData } = UseEmployeeList();
   const handleRowClick = (data: EmpLeave) => {
     setSelectedLeave(data);
     setIsPopupOpen(true);
@@ -95,7 +101,7 @@ export const TableFormate = ({
       <table className="w-full border-collapse table-fixed">
         {heading && (
           <thead className="text-mediumlite_grey text-sm font-bold w-full">
-            <tr className="text-center">
+            <tr className="text-center border-b border-morelite_grey">
               {heading.map((val, index) => (
                 <th key={index} className="py-2 px-4">
                   {val}
@@ -107,7 +113,7 @@ export const TableFormate = ({
         <tbody>
           {list === "OVLA" &&
             ovla.slice(0, 4).map((val, index) => (
-              <tr key={index} className="text-center text-sm text-medium_gray">
+              <tr key={index} className="text-center text-sm text-medium_gray border-b border-morelite_grey">
                 <td className=" py-2 px-4">{val.date || "N/A"}</td>
                 <td className=" py-2 px-4">{val.appType || "N/A"}</td>
                 <td className=" py-2 px-4">{val.duration || "N/A"}</td>
@@ -116,8 +122,14 @@ export const TableFormate = ({
             ))}
 
           {list === "AllEmp" &&
-            allEmp?.map((val, index) => (
-              <tr key={index} className="text-center text-sm text-medium_gray">
+            allEmp?.sort((a, b) => {
+              const numA = parseInt(a.empID?.replace(/\D/g, "") || "0");
+              const numB = parseInt(b.empID?.replace(/\D/g, "") || "0");
+              return numA - numB; // For ascending order. Use b - a for descending.
+            })
+            
+            .map((val, index) => (
+              <tr key={index} className="text-center text-sm text-medium_gray border-b border-morelite_grey">
                 <td className=" py-2 px-4 flex items-center gap-2">
                   <Image
                     src={val.profile || avatar}
@@ -132,8 +144,16 @@ export const TableFormate = ({
                 <td className=" py-2 px-4">{val.position || "N/A"}</td>
                 <td className=" py-2 px-4">{val.department || "N/A"}</td>
                 <td className=" py-2 px-4">{val.contact || "N/A"}</td>
-                <td className=" py-2 px-4">{val.email || "N/A"}</td>
-                <td className=" py-2 px-4">
+                <td className=" py-2 px-4 break-words overflow-hidden">{val.email || "N/A"}</td>
+                <td className="text-center text-primary py-2 px-4" onClick={()=>viewData?.(val)}>
+                 View
+                </td>
+                <td className="center py-2 px-4" onClick={()=>{
+                  handleStoredData(val)
+                  router.push("/employeeDetails")
+                  console.log("784512qawesdrtfgyhujk");
+                  
+                }}>
                   <FaEdit />
                 </td>
               </tr>
@@ -141,24 +161,14 @@ export const TableFormate = ({
 
           {list === "LeaveApproval" &&
             leaveApproval?.map((val, index) => {
-              let takenDay = "-";
-              if (val?.startDate && val?.endDate) {
-                const startDate = new Date(val.startDate);
-                const endDate = new Date(val.endDate);
-                const durationInMs = endDate.getTime() - startDate.getTime();
-                takenDay = Math.ceil(
-                  durationInMs / (1000 * 60 * 60 * 24)
-                ).toString();
-              }
-
               return (
                 <tr
                   key={index}
-                  className="text-center text-sm text-medium_gray"
+                  className="text-center text-sm text-medium_gray border-b border-morelite_grey"
                 >
                   <td className=" py-3 px-4">{val.empID || "N/A"}</td>
                   <td className=" py-3 px-4">{val?.name || "N/A"}</td>
-                  <td className=" py-3 px-4">{takenDay}</td>
+                  <td className=" py-3 px-4">{val?.duration}</td>
                   <td className=" py-3 px-4">
                     {val?.startDate ? DateFormat(val.startDate) : "N/A"}
                   </td>
@@ -195,7 +205,7 @@ export const TableFormate = ({
               return (
                 <tr
                   key={index}
-                  className="text-center text-sm text-medium_gray"
+                  className="text-center text-sm text-medium_gray border-b border-morelite_grey"
                 >
                   <td className=" py-3 px-4">{val.empID || "N/A"}</td>
                   <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
@@ -233,7 +243,7 @@ export const TableFormate = ({
             secondaryEmpLeave?.map((val, index) => (
               <tr
                 key={index}
-                className="text-center text-sm text-medium_gray cursor-pointer hover:bg-gray-100"
+                className="text-center text-sm text-medium_gray cursor-pointer border-b border-morelite_grey hover:bg-gray-100"
                 onClick={() => handleRowClick(val)}
               >
                 <td className=" py-3 px-4 border-b border-t border-morelite_grey">
