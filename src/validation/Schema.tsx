@@ -51,10 +51,7 @@ export const personalInfoSchema = z.object({
   doj: z.string().nonempty("Date of Join is required"),
   alternateNo: z
     .string()
-    .optional()
-    .refine((val) => !val || val.length >= 10, {
-      message: "Alternate number must be at least 10 characters if provided",
-    }),
+    .optional(),
   email: z.string().email("Invalid email address"),
   lang: z.string().min(1, "Language is required"),
   religion: z.string().optional(),
