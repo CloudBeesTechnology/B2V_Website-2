@@ -63,6 +63,7 @@ export const personalInfoSchema = z.object({
   position: z.string().optional(),
   totalLeave: z.string().optional(),
   manager: z.string().optional(),
+  leadEmpID: z.string().optional(),
   profilePhoto: z.any().optional(),
 });
 
