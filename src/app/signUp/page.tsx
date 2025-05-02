@@ -303,6 +303,3 @@ export default function SignUp() {
 //     </AuthLayout>
 //   );
 // }
-
-
-

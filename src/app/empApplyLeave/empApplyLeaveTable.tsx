@@ -5,11 +5,12 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { doc, setDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
+import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 
 const EmpApplyLeaveTable = () => {
-  const router = useRouter();
+  const { publicHolidays } = useFetchHolidayList();
 
   const {
     register,
@@ -46,7 +47,6 @@ const EmpApplyLeaveTable = () => {
     let takenDay = 0;
 
     if (isSameDate) {
-      // Same day leave
       takenDay = isHalfDay ? 0.5 : 1;
     } else {
       const timeDiff = end.getTime() - start.getTime();
@@ -56,20 +56,46 @@ const EmpApplyLeaveTable = () => {
 
     const halfDayValue = isHalfDay ? "0.5" : "0";
 
+    const leaveDetails: any = {
+      endDate: data.endDate,
+      leaveReason: data.leaveReason,
+      leaveType: data.leaveType,
+      startDate: data.startDate,
+      leaveStatus: "Pending",
+      empID: empID,
+      leadEmpID:"",
+      managerEmpID:"",
+      halfDay: halfDayValue,
+      remarks: "",
+      managerRemarks: "",
+      leadRemarks: "",
+      leadDate:"",
+      managerDate:"",
+      managerStatus:"Pending",
+      leadStatus:"Pending",
+      takenDay: takenDay,
+      createdAt: createdAt,
+    };
+
+    const validLeaveDates = await checkNonWorkingDays(
+      leaveDetails,
+      publicHolidays
+    );
+
+    if (validLeaveDates.length > 0) {
+      if (takenDay === 0.5) {
+        leaveDetails.takenDay = "0.5";
+      } else if (leaveDetails.takenDay >= 1) {
+        leaveDetails.takenDay = validLeaveDates.length.toString();
+      }
+    } else {
+      leaveDetails.takenDay = "0";
+    }
+
     try {
       await setDoc(doc(db, "leaveStatus", createdAt), {
-        endDate: data.endDate,
-        leaveReason: data.leaveReason,
-        leaveType: data.leaveType,
-        startDate: data.startDate,
-        leaveStatus: "Pending",
-        empID: empID,
-        halfDay: halfDayValue,
-        remarks: "",
-        takenDay: takenDay.toString(),
-        createdAt: createdAt,
+        ...leaveDetails,
       });
-
       window.location.reload();
     } catch (error) {
       console.error("Error applying for leave:", error);
@@ -83,24 +109,7 @@ const EmpApplyLeaveTable = () => {
         {/* <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3> */}
         <div className="bg-white border-[#D7D5D5] rounded-md py-5">
         <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
-  {/* Leave Type */}
-  <div className="flex flex-col">
-    <label className="text_size_5 text-gray mb-1">Leave Type</label>
-    <select
-      {...register("leaveType")}
-      className="rounded-md px-2 py-2 border border-lite_gray shadow-md text_size_5 outline-none"
-    >
-      <option value="">Select Leave</option>
-      <option value="Casual">Casual Leave</option>
-      <option value="Sick">Sick Leave</option>
-      <option value="Maternity">Maternity Leave</option>
-      <option value="other">Other</option>
-    </select>
-    {errors.leaveType && (
-      <p className="text-dark_red text-sm py-1">{errors.leaveType.message}</p>
-    )}
-  </div>
-          <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
+
             {/* Leave Type */}
             <div className="flex flex-col">
               <label className="text_size_5 text-gray mb-1">Leave Type</label>
@@ -187,7 +196,7 @@ const EmpApplyLeaveTable = () => {
             </button>
           </div>
         </div>
-        </div>
+       
       </form>
     </section>
   );
