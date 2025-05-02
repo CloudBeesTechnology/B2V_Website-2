@@ -104,24 +104,6 @@ const EmpApplyLeaveTable = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* <h3 className="text-gray text-xl font-bold py-5">Apply Leave</h3> */}
         <div className="bg-white border-[#D7D5D5] rounded-md py-5">
-        <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
-  {/* Leave Type */}
-  <div className="flex flex-col">
-    <label className="text_size_5 text-gray mb-1">Leave Type</label>
-    <select
-      {...register("leaveType")}
-      className="rounded-md px-2 py-2 border border-lite_gray shadow-md text_size_5 outline-none "
-    >
-      <option value="">Select Leave</option>
-      <option value="Casual">Casual Leave</option>
-      <option value="Sick">Sick Leave</option>
-      <option value="Maternity">Maternity Leave</option>
-      <option value="other">Other</option>
-    </select>
-    {errors.leaveType && (
-      <p className="text-dark_red text-sm py-1">{errors.leaveType.message}</p>
-    )}
-  </div>
           <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
             {/* Leave Type */}
             <div className="flex flex-col">
@@ -199,16 +181,16 @@ const EmpApplyLeaveTable = () => {
                 className="accent-blue-600 w-6 h-6"
               />
             </div>
+            {/* </div> */}
+            <div className="center pt-2 py-2">
+              <button
+                type="submit"
+                className="rounded-xl border-2 px-4 py-2 border-[#1C40AE] text-[#1C40AE] cursor-pointer"
+              >
+                Submit
+              </button>
+            </div>
           </div>
-          <div className="center pt-2 py-2">
-            <button
-              type="submit"
-              className="rounded-xl border-2 px-4 py-2 border-[#1C40AE] text-[#1C40AE] cursor-pointer"
-            >
-              Submit
-            </button>
-          </div>
-        </div>
         </div>
       </form>
     </section>
