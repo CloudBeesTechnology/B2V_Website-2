@@ -26,13 +26,20 @@ export const EmployeeContextProvider = ({
   const [storedEmpData, setStoredEmpData] = useState<any | null>(null);
   const pathname = usePathname();
   useEffect(() => {
+    const savedData = localStorage.getItem("storedEmpData");
+    if (savedData) {
+      setStoredEmpData(JSON.parse(savedData));
+    }
+  }, []);
+  useEffect(() => {
     if (pathname === "/employee") {
-      setStoredEmpData("");
+      localStorage.removeItem("storedEmpData");
+      setStoredEmpData(null);
     }
   }, [pathname]);
   const handleStoredData = (items: any) => {
     console.log(items);
-
+    localStorage.setItem("storedEmpData", JSON.stringify(items));
     setStoredEmpData(items);
   };
 
@@ -53,3 +60,4 @@ export const UseEmployeeList = () => {
   }
   return context;
 };
+

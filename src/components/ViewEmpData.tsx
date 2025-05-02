@@ -38,6 +38,7 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
     { label: "Position", key: "position" },
     { label: "Total Leave", key: "totalLeave" },
     { label: "Manager", key: "manager" },
+    { label: "Lead", key: "leadEmpID" },
   ];
   const educMenu = [
     { label: "Degree", key: "degree" },

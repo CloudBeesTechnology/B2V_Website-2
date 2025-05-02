@@ -28,6 +28,7 @@ interface PersonalInfoFormData {
   position?: string;
   totalLeave?: string;
   manager?: string;
+  leadEmpID?: string;
   profilePhoto?: File | string | null;
 }
 
@@ -83,6 +84,7 @@ export const PersonalInfoForm = () => {
           totalLeave: parsedData.totalLeave,
           manager: parsedData.manager,
           position: parsedData.position,
+          leadEmpID: parsedData.leadEmpID,
           profilePhoto: parsedData.profilePhoto || null,
         });
 
@@ -172,6 +174,8 @@ export const PersonalInfoForm = () => {
       });
     }
   }, [storedEmpData, reset]);
+  console.log(storedEmpData, "employeee");
+
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
       <div>
@@ -410,6 +414,19 @@ export const PersonalInfoForm = () => {
               </div>
             </div>
             <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="position" className="text-[15px] text-gray">
+                Position
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="position"
+                  type="tel"
+                  className="outline-none py-1 w-full"
+                  {...register("position")}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="leave" className="text-[15px] text-gray">
                 Total Leave
               </label>
@@ -421,7 +438,8 @@ export const PersonalInfoForm = () => {
                 />
               </div>
             </div>
-
+          </div>
+          <div className="flex  gap-10 mt-5">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="manager" className="text-[15px] text-gray">
                 Assign Manager
@@ -435,18 +453,17 @@ export const PersonalInfoForm = () => {
                 />
               </div>
             </div>
-          </div>
-          <div className="flex  gap-10 mt-5">
+
             <div className="flex flex-col gap-2 w-[30%]">
-              <label htmlFor="position" className="text-[15px] text-gray">
-                Position
+              <label htmlFor="lead" className="text-[15px] text-gray">
+                Assign Lead
               </label>
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
-                  id="position"
+                  id="lead"
                   type="tel"
                   className="outline-none py-1 w-full"
-                  {...register("position")}
+                  {...register("leadEmpID")}
                 />
               </div>
             </div>
