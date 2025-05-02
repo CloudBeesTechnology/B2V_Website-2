@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
-import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
 import Link from "next/link";
-import {DateFormat} from "@/components/DateFormate"
+import { DateFormat } from "@/components/DateFormate";
+import { useRouter } from "next/navigation";
+import { IoArrowBack } from "react-icons/io5";
+import clsx from "clsx";
 
 type LeaveStatus = {
   empID: string;
@@ -27,14 +30,14 @@ type EnrichedLeaveStatus = LeaveStatus & {
 const LeaveApproval = () => {
   const Heading = [
     "EmpID",
-    "Name",
-    "Leave Type",
-    "Apply Date",
+    "Name(s)",
+    "Type",
+    "Applied",
     "Start Date",
     "End Date",
-    "takenDay",
-    "Leave Reason",
-    "Status",
+    "Duration(s)",
+    "Reason(s)",
+    "Actions",
   ];
 
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
@@ -42,6 +45,7 @@ const LeaveApproval = () => {
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("Pending");
   const [remarks, setRemarks] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -132,19 +136,29 @@ const LeaveApproval = () => {
 
   return (
     <section>
-      <h4 className="text-primary pb-2 px-2 mt-3 mb-7 text_size_2 flex items-center gap-10">
-        <Link href="/leavemanagement" className="text-mediumlite_grey">
-          <MdOutlineKeyboardBackspace />
-        </Link>
-        Leave Approval List
-      </h4>
+      <div className="flex justify-start items-center text-[22px] text-gray gap-10 my-10">
+        <IoArrowBack onClick={() => router.back()} className="cursor-pointer" />
+        <h3>Leave Management</h3>
+      </div>
 
-      <div className="bg-white px-10 py-5 rounded-lg overflow-x-auto">
+      <div className="py-7 bg-white rounded-xl px-10 space-y-7">
+        <section className="flex justify-between items-center ">
+          <h1 className="text-xl font-semibold text-gray">
+            Leave Approval List
+          </h1>
+          <div className="center gap-5 py-3 px-4 bg-primary text-white rounded-xl text-lg font-bold ">
+            <p>Export</p>
+            <IoIosArrowDropdownCircle />
+          </div>
+        </section>
         <table className="min-w-full border border-gray-200">
           <thead className="bg-gray-100">
             <tr>
               {Heading.map((title, idx) => (
-                <th key={idx} className="px-4 py-2 text-left">
+                <th
+                  key={idx}
+                  className="px-4 py-2 text-left text-gray text-[16px] font-medium"
+                >
                   {title}
                 </th>
               ))}
@@ -163,33 +177,72 @@ const LeaveApproval = () => {
               }
 
               return (
-                <tr key={index}>
+                <tr className="text-sm text-gray" key={index}>
                   <td className="px-4 py-2">{item.empID}</td>
                   <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">{item.leaveType}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 ">
+                    {" "}
+                    {item?.leaveType
+                      ? item.leaveType.charAt(0).toUpperCase() +
+                        item.leaveType.slice(1).toLowerCase()
+                      : "N/A"}
+                  </td>
+                  <td className="px-4 py-2 text-center">
                     {item.createdAt
                       ? new Date(item.createdAt).toLocaleDateString()
                       : "-"}
                   </td>
-                  
-                  <td className="px-4 py-2">{DateFormat(item.startDate)}</td>
-                  <td className="px-4 py-2">{DateFormat(item.endDate)}</td>
-                  <td className="px-4 py-2">{item.takenDay}</td>
-                
-                  <td className="px-4 py-2 w-[250px] h-[80px] overflow-y-auto text-wrap overflow-wrap-break-word flex">{item.leaveReason}</td>
+
+                  <td className="px-4 py-2 text-center">{DateFormat(item.startDate)}</td>
+                  <td className="px-4 py-2 text-center">{DateFormat(item.endDate)}</td>
+                  <td className="px-4 py-2 text-center">{item.takenDay}</td>
+
+                  <td className="px-4 py-2 w-[250px] pt-3 overflow-y-auto text-wrap overflow-wrap-break-word flex">
+                    {item.leaveReason}
+                  </td>
 
                   <td className="px-4 py-2">
                     <select
                       value={item.leaveStatus}
+                      className={clsx(
+                        "border border-gray-300 rounded px-2 py-1 outline-none",
+                        item.leaveStatus === "Pending"
+                          ? "text-medium_orange bg-lite_orange"
+                          : item.leaveStatus === "Approved"
+                          ? "text-approved_blue bg-lite_blue"
+                          : item.leaveStatus === "Rejected"
+                          ? "text-red bg-lite_red"
+                          : ""
+                      )}
                       onChange={(e) =>
                         handleStatusChange(item.docId, e.target.value)
                       }
-                      className="border border-gray-300 rounded px-2 py-1 outline-none"
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
+                      <option
+                        className={clsx(
+                          item.leaveStatus === "Pending" && "text-red"
+                        )}
+                        value="Pending"
+                      >
+                        Pending
+                      </option>
+                      <option
+                        className={clsx(
+                          item.leaveStatus === "Approved" &&
+                            "text-medium_orange"
+                        )}
+                        value="Approved"
+                      >
+                        Approved
+                      </option>
+                      <option
+                        className={clsx(
+                          item.leaveStatus === "Rejected" && "text-red"
+                        )}
+                        value="Rejected"
+                      >
+                        Rejected
+                      </option>
                     </select>
                   </td>
                 </tr>
@@ -198,7 +251,6 @@ const LeaveApproval = () => {
           </tbody>
         </table>
       </div>
-
 
       {/* POPUP Modal */}
       {showPopup && (

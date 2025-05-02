@@ -1,13 +1,12 @@
-// import { redirect } from "next/navigation";
+import React from "react";
+import Internship from "./tabs/page";
 
-// export default function InternshipPage() {
-//   redirect("/internship/request");
-// }
-import React from 'react'
-
- const Internship = () => {
+const InternshipPage = () => {
   return (
-    <div>page</div>
-  )
-}
-export default Internship;
+    <main>
+      <Internship />
+    </main>
+  );
+};
+export default InternshipPage;
+

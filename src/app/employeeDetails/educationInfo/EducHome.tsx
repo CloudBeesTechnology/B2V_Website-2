@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { MdOutlineAddBox } from "react-icons/md";
 import { educationSchema } from "@/validation/Schema";
 import { useRouter } from "next/navigation";
+import { UseEmployeeList } from "@/app/utils/EmpContext";
 
 interface Course {
   course?: string;
@@ -24,7 +25,7 @@ interface EducationDetails {
 
 export const EducHome = () => {
   const router = useRouter();
-
+const {storedEmpData}=UseEmployeeList()
   const {
     register,
     control,
@@ -55,22 +56,37 @@ export const EducHome = () => {
       }));
     }
   }, [reset]);
-
+  useEffect(() => {
+    if (storedEmpData) {
+      reset({
+        degree: storedEmpData.degree||"",
+        study: storedEmpData.study||"",
+        school: storedEmpData.school||"",
+        master: storedEmpData.master||"",
+        field: storedEmpData.field||"",
+        highSchool: storedEmpData.highSchool||"",
+        courses: storedEmpData.courses?.length > 0
+        ? storedEmpData.courses
+        : [{ course: "", academic: "" }],
+      });
+    }
+  }, [storedEmpData, reset]);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "courses",
   });
 
   const onSubmit = (data: EducationDetails) => {
-    console.log("Education Data:", data);
-
+    
     // const personalInfo = localStorage.getItem("personalInfo");
     // const parsedPersonalInfo = personalInfo ? JSON.parse(personalInfo) : {};
-
+    
     const combinedData = {
       // personalInfo: parsedPersonalInfo,
       ...data,
     };
+    // console.log("Education Data:", combinedData);
+
     localStorage.setItem("educationData", JSON.stringify(combinedData));
     router.push("/employeeDetails?tab=experience");
   };
@@ -90,7 +106,7 @@ export const EducHome = () => {
           <div className="flex gap-10 flex-wrap">
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="degree" className="text-[15px] text-gray-600">
-                Bachelor’s degree<sup className="text-red-500">*</sup>
+                Bachelor’s Degree<sup className="text-red-500">*</sup>
               </label>
               <input
                 id="degree"
@@ -106,7 +122,7 @@ export const EducHome = () => {
 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="study" className="text-[15px] text-gray-600">
-                Field of study<sup className="text-red-500">*</sup>
+                Field Of Study<sup className="text-red-500">*</sup>
               </label>
               <input
                 id="study"
@@ -123,7 +139,7 @@ export const EducHome = () => {
             {/* School */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="school" className="text-[15px] text-gray-600">
-              University<sup className="text-red-500">*</sup>
+             School<sup className="text-red-500">*</sup>
               </label>
               <input
                 id="school"
@@ -143,7 +159,7 @@ export const EducHome = () => {
             {/* Master’s Degree */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="master" className="text-[15px] text-gray-600">
-                Master’s degree
+                Master’s Degree
               </label>
               <input
                 id="master"
@@ -156,7 +172,7 @@ export const EducHome = () => {
             {/* Master's Field */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="field" className="text-[15px] text-gray-600">
-                Field of study
+                Field Of Study
               </label>
               <input
                 id="field"
@@ -169,7 +185,7 @@ export const EducHome = () => {
             {/* High School */}
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="highSchool" className="text-[15px] text-gray-600">
-              University
+              School
               </label>
               <input
                 id="highSchool"
@@ -200,7 +216,7 @@ export const EducHome = () => {
               {/* Course Name */}
               <div className="flex flex-col gap-2 w-[30%]">
                 <label className="text-[15px] text-gray-600">
-                  Course certificate
+                  Course Certificate
                 </label>
                 <input
                   {...register(`courses.${index}.course` as const)}
@@ -212,7 +228,7 @@ export const EducHome = () => {
               {/* Academic Name */}
               <div className="flex flex-col gap-2 w-[40%]">
                 <label className="text-[15px] text-gray-600">
-                  Academic name
+                  Academic Name
                 </label>
                 <input
                   {...register(`courses.${index}.academic` as const)}

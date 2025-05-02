@@ -5,65 +5,104 @@ import EmpHistoryOfLeave from "./empHistoryOfLeave";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import { useRouter, useSearchParams } from "next/navigation";
+import EmpPermission from "./empPermission/page";
+import { DiVim } from "react-icons/di";
 
 const EmpApplyLeave: React.FC = () => {
   const [empLeave, setEmpLeave] = useState<any>(null);
   const [empLeaveStatus, setEmpLeaveStatus] = useState<Array<any>>([]);
-  useEffect(() => {
-      const empID = localStorage.getItem("empID");
-  
-      const fetchData = async () => {
-        if (empID) {
-          try {
-            const docRef = query(collection(db, "employeeDetails"),where("empID","==",empID)); // Firestore path
-            const docSnap = await getDocs(docRef);
-  
-            if (docSnap.empty) {
-              alert("Employee not found")  
-            } 
-            
-            const empData = docSnap.docs[0].data();
-            console.log("Employee Data:", empData);
-            setEmpLeave(empData)
-          
-          } catch (error) {
-            console.error("Error fetching employee data:", error);
-          }
-        }
-      };
-  
-      fetchData();
-    }, []);
-    
 
-    useEffect(() => {
-      const fetchLeaves = async () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const getURLparam = searchParams.get("tab") || "applyLeave";
+  const tabs = [
+    { tabName: "Apply Leave", path: "applyLeave" },
+    { tabName: "Permission", path: "permission" },
+  ];
+
+  const handleTabClick = (tabName: string) => {
+    router.push(`/empApplyLeave?tab=${tabName}`);
+  };
+
+  useEffect(() => {
+    const empID = localStorage.getItem("empID");
+
+    const fetchData = async () => {
+      if (empID) {
         try {
-          const empID = localStorage.getItem("empID"); // Example: "CBT0002"
-          if (!empID) return;
-  
-          const querySnapshot = await getDocs(collection(db, "leaveStatus"));
-  
-          const leaveList = querySnapshot.docs
-            .map((doc) => doc.data())
-            .filter((item) => item.empID === empID); // Only that person's data
-  
-            setEmpLeaveStatus(leaveList);
+          const docRef = query(
+            collection(db, "employeeDetails"),
+            where("empID", "==", empID)
+          ); // Firestore path
+          const docSnap = await getDocs(docRef);
+
+          if (docSnap.empty) {
+            alert("Employee not found");
+          }
+
+          const empData = docSnap.docs[0].data();
+          console.log("Employee Data:", empData);
+          setEmpLeave(empData);
         } catch (error) {
-          console.error("Error fetching leave data:", error);
+          console.error("Error fetching employee data:", error);
         }
-      };
-  
-      fetchLeaves();
-    }, []);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchLeaves = async () => {
+      try {
+        const empID = localStorage.getItem("empID"); // Example: "CBT0002"
+        if (!empID) return;
+
+        const querySnapshot = await getDocs(collection(db, "leaveStatus"));
+
+        const leaveList = querySnapshot.docs
+          .map((doc) => doc.data())
+          .filter((item) => item.empID === empID); // Only that person's data
+
+        setEmpLeaveStatus(leaveList);
+      } catch (error) {
+        console.error("Error fetching leave data:", error);
+      }
+    };
+
+    fetchLeaves();
+  }, []);
   return (
     <main>
-      <header className="center  py-14 px-6">
+      <header className="center gap-10 py-14 px-6">
         <h2 className="text-2xl font-medium text-[#303030]">Apply Leave</h2>
       </header>
       <EmpLeaveCounts data={empLeave} leaveStatus={empLeaveStatus} />
-      <EmpApplyLeaveTable />
-      <EmpHistoryOfLeave />
+
+      <div className="flex justify-start gap-10 pt-15  text-xl font-bold">
+        {tabs.map((tab, index) => {
+          return (
+            <h3
+              key={index}
+              onClick={() => handleTabClick(tab.path)}
+              className={`cursor-pointer pb-1 ${
+                getURLparam === tab.path ? "text-primary" : "text-gray"
+              }`}
+            >
+              {tab.tabName}
+            </h3>
+          );
+        })}
+      </div>
+      {getURLparam === "permission" ? (
+        <EmpPermission />
+      ) : (
+        <section>
+          <EmpApplyLeaveTable />
+          <EmpHistoryOfLeave />
+        </section>
+      )}
     </main>
   );
 };

@@ -201,6 +201,7 @@ const AddNewUser: React.FC = () => {
           className="text-[22px] text-gray cursor-pointer"
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
+
         <Searchbox
           allUser={allUser}
           handleSelect={handleSelect}
@@ -214,6 +215,7 @@ const AddNewUser: React.FC = () => {
               label="Name"
               name="name"
               type="text"
+              module="user"
               register={register}
               errors={errors?.name?.message}
             />
@@ -221,6 +223,7 @@ const AddNewUser: React.FC = () => {
               label="Employee ID"
               name="empID"
               type="text"
+              module="user"
               register={register}
               errors={errors?.empID?.message}
             />
@@ -228,6 +231,7 @@ const AddNewUser: React.FC = () => {
               label="Phone Number"
               name="phone"
               type="text"
+              module="user"
               register={register}
               errors={errors?.phone?.message}
             />
@@ -235,6 +239,7 @@ const AddNewUser: React.FC = () => {
               label="Email ID"
               name="email"
               type="text"
+              module="user"
               register={register}
               errors={errors?.email?.message}
             />
@@ -242,6 +247,7 @@ const AddNewUser: React.FC = () => {
               label="Position"
               name="position"
               type="text"
+              module="user"
               register={register}
               errors={errors?.position?.message}
             />
@@ -249,6 +255,7 @@ const AddNewUser: React.FC = () => {
               label="Department"
               name="department"
               type="text"
+              module="user"
               register={register}
               errors={errors?.department?.message}
             />

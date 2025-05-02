@@ -6,6 +6,8 @@ import { db } from "@/lib/firebaseConfig";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
 import { TableFormate } from "@/components/TableFormate";
+import { IoArrowBack } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 type LeaveStatus = {
   empID: string;
@@ -16,6 +18,7 @@ type LeaveStatus = {
   endDate: string;
   createdDate: string;
   remarks?: string;
+  reason?:string
 };
 
 type EnrichedLeaveStatus = LeaveStatus & {
@@ -24,6 +27,7 @@ type EnrichedLeaveStatus = LeaveStatus & {
 };
 
 const LeaveHistory = () => {
+  const router = useRouter();
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
   const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">(
     "Approved"
@@ -31,13 +35,14 @@ const LeaveHistory = () => {
   const [loading, setLoading] = useState(true);
   const Heading = [
     "EmpID",
-    "Name",
-    "Duration",
+    "Name(s)",
+    "Type",
     "Start Date",
     "End Date",
-    "Leave Type",
-    "Status",
+    "Duration(s)",
+    "Reason(s)",
     ...(filterStatus === "Rejected" ? ["Remarks"] : []),
+    "Actions",
   ];
 
   useEffect(() => {
@@ -51,14 +56,16 @@ const LeaveHistory = () => {
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
             leaveType: doc.data().leaveType,
-            duration: doc.data().duration,
+            duration: doc.data().takenDay,
             startDate: doc.data().startDate,
             endDate: doc.data().endDate,
+            reason: doc.data().leaveReason,
             createdDate: doc.data().createdDate,
             remarks: doc.data().remarks || "",
             name: "",
           })
         );
+        
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")
@@ -92,52 +99,71 @@ const LeaveHistory = () => {
   const filteredData = leaveApproval.filter(
     (item) => item.leaveStatus === filterStatus
   );
-  if (loading) return <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+    );
 
   return (
     <section>
-      <h4 className="text-primary pb-2 px-2 mt-3 mb-7 text_size_2 flex items-center gap-10">
-        <Link href="/leavemanagement" className="text-mediumlite_grey">
-          <MdOutlineKeyboardBackspace />
-        </Link>
-        Leave History
-      </h4>
-
-      <div className="flex gap-4 mb-4 px-10">
-        <button
-          onClick={() => setFilterStatus("Approved")}
-          className={`px-4 py-2 rounded ${
-            filterStatus === "Approved"
-              ? "bg-green-600 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          Approved List
-        </button>
-        <button
-          onClick={() => setFilterStatus("Rejected")}
-          className={`px-4 py-2 rounded ${
-            filterStatus === "Rejected"
-              ? "bg-red-600 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          Rejected List
-        </button>
+      <div className="flex justify-start items-center text-[22px] text-gray gap-10 my-10">
+        <IoArrowBack onClick={() => router.back()} className="cursor-pointer" />
+        <h3>Leave History</h3>
       </div>
-
-      <div className="bg-white px-10 py-5 rounded-lg overflow-x-auto">
-        {filteredData && filteredData?.length > 0 ? (
-          <TableFormate
-            heading={Heading}
-            list="LeaveApproval"
-            leaveApproval={filteredData}
-            filterStatus={filterStatus}
-          />
-        ) : (
-          <p className="text-center py-4 text-gray-400">Data not found</p>
-        )}
-      </div>
+      <section className="flex justify-between items-center my-10">
+        <div className="flex justify-start  items-center gap-7">
+          <div className="flex gap-5 ">
+            <div className="flex flex-col">
+              <label className="text-[#7E7D7D] mb-1">Start Date</label>
+              <input
+                type="date"
+                className="border border-[#9D9393]   text-gray rounded px-3 py-2"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-[#7E7D7D] mb-1">End Date</label>
+              <input
+                type="date"
+                className="border border-[#9D9393] text-gray rounded px-3 py-2"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-auto">{/* <Searchbox /> */}</div>
+      </section>
+      <section className="py-7 bg-white rounded-xl px-10 space-y-7 my-10  overflow-x-auto">
+        {/* <LeaveTable /> */}
+        <div className="flex gap-4 mb-4 text-gray">
+          <button
+            onClick={() => setFilterStatus("Approved")}
+            className={`px-4 py-2 rounded ${
+              filterStatus === "Approved" && "bg-lite_blue "
+            }`}
+          >
+            Approved List
+          </button>
+          <button
+            onClick={() => setFilterStatus("Rejected")}
+            className={`px-4 py-2 rounded ${
+              filterStatus === "Rejected" && "bg-lite_blue "
+            }`}
+          >
+            Rejected List
+          </button>
+        </div>
+        <div className="my-10">
+          {filteredData && filteredData?.length > 0 ? (
+            <TableFormate
+              heading={Heading}
+              list="LeaveApproval"
+              leaveApproval={filteredData}
+              filterStatus={filterStatus}
+            />
+          ) : (
+            <p className="text-center py-4 text-gray-400">Data not found</p>
+          )}
+        </div>
+      </section>
     </section>
   );
 };

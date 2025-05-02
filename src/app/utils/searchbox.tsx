@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 
@@ -78,12 +77,12 @@ const Searchbox: React.FC<SearchboxProps> = ({
   }, [parentRef]);
 
   return (
-    <div className="relative w-72" ref={inputRef}>
+    <div className="w-72" ref={inputRef}>
       <div className="flex">
         <input
           type="text"
-          className="w-full p-2 font-semibold border border-[#DCE0E5] rounded-l-md outline-none"
-          placeholder="Search by EmpID..."
+          className="w-full p-2 font-semibold border border-[#DCE0E5] rounded-l-md outline-none bg-white"
+          placeholder="Search EmpID / Name"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -96,12 +95,12 @@ const Searchbox: React.FC<SearchboxProps> = ({
       </div>
 
       {showDropdown && filteredUsers.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-gray rounded-md shadow-md mt-1 max-h-60 overflow-y-auto">
+        <ul className="absolute z-10 w-72 bg-white p-1 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto">
           {filteredUsers?.map((user, idx) => (
             <li
               key={idx}
               onClick={() => handleDropdownSelect(user)}
-              className="px-4 py-2 cursor-pointer hover:bg-lite_gray"
+              className="px-4 py-2 cursor-pointer hover:bg-[#f3f4f6]"
             >
               {user.name} ({user.empID})
             </li>
