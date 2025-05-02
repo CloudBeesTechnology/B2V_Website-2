@@ -50,7 +50,7 @@ export const AllEmployeeHome = () => {
     setShowingPopUp(!showingPopUp)
   }
 const handleViewData=(data:any)=>{
-  console.log(data);
+  // console.log(data);
   setEmpPopupData(data)
 handleClose()
 }
@@ -76,7 +76,6 @@ handleClose()
             list="AllEmp"
             ovla={[]}
             leaveApproval={[]}
-            empLeave={[]}
             viewData={handleViewData}
           />
         ) : (

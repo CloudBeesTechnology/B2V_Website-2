@@ -18,10 +18,10 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
 }) => {
   return (
     <div className="flex flex-col ">
-      <label className="text-[#7E7D7D] text_size_5">{label}</label>
+      <label className="text-[#303030] text_size_4">{label}</label>
       <select
         {...register(name)}
-        className="border border-[#9D9393] text-[#202020] text_size_5  px-2 py-3 rounded-md outline-none"
+        className="border border-[#E2E2E2] bg-[#f5f7fb] text-[#202020] text_size_5 mt-auto px-2 py-2.5  rounded-md outline-none"
       >
         <option value="">Select {label}</option>
         {options.map((option) => (

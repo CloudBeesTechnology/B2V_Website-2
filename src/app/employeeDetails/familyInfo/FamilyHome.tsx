@@ -141,7 +141,7 @@ export const FamilyHome = () => {
         wifeName: storedEmpData.wifeName || "",
         child: storedEmpData.child || "",
         familyPNo: storedEmpData.familyPNo || "",
-        familyAddress: storedEmpData.FamilAddress || "",
+        familyAddress: storedEmpData.familyAddress || "",
       });
     }
   }, [storedEmpData, reset]);

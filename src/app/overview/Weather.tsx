@@ -70,7 +70,12 @@ const Weather: React.FC = () => {
           const geocodeKey = "2a33da9c22c641dd8f6e0cf5e1490f6c";
 
           opencage
-            .geocode({ q: `${lat},${lng}`, language: "en", key: geocodeKey, no_annotations:0 })
+            .geocode({
+              q: `${lat},${lng}`,
+              language: "en",
+              key: geocodeKey,
+              no_annotations: 0,
+            })
             .then((data: OpenCageResponse) => {
               if (data.status.code === 200 && data.results.length > 0) {
                 const place = data.results[0];
@@ -184,7 +189,7 @@ const Weather: React.FC = () => {
     <section
       className={`bg-gradient-to-r ${backgroundClass} flex gap-2 rounded-xl`}
     >
-      <div className="text-center text-gray border-r h-full center gap-1 flex-col border-dashed px-5 py-3">
+      <div className="text-center text-gray border-r h-full center gap-1 flex-col border-dashed px-5 py-4">
         <p className="flex flex-col text-[#73877B] text-2xl text-center items-center justify-center">
           {/* <BsFillCloudSunFill /> */}
           {weatherIcon}

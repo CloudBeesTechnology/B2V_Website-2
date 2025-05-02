@@ -233,9 +233,21 @@ const Sidebar = () => {
     localStorage.removeItem("personalInfo");
     localStorage.removeItem("educationData");
   };
+const isLinkActive = (linkName:string, linkPath:string) => {
+  const customPaths: Record<string, string[]>  = {
+    "Leave Management": ["/leavemanagement", "/leaveapproval", "/leavehistory"],
+    "Employee": ["/employee", "/employeedetails", "/employeepersonal"],
+    // Add more modules and paths here if needed
+  };
+
+  return customPaths[linkName]
+    ? customPaths[linkName].includes(pathname)
+    : pathname === linkPath;
+};
 
   return (
     <section className="p-5 h-full overflow-y-auto">
+ 
       <div className="max-w-[100px] w-full h-20 mx-auto center">
         <Image src={logo} alt="logo not found" />
       </div>
@@ -249,7 +261,7 @@ const Sidebar = () => {
                     {storedPermissions?.includes(link.name) && (
                       <div
                         className={clsx(
-                          pathname === link.path
+                        isLinkActive(link.name, link.path)
                             ? "bg-primary px-2 py-2 rounded-sm text-white"
                             : "px-2 py-2"
                         )}
@@ -259,7 +271,7 @@ const Sidebar = () => {
                           onClick={RemoveLocalValues}
                           className="flex items-center gap-3"
                         >
-                          {pathname === link.path ? (
+                          {isLinkActive(link.name, link.path)? (
                             <Image
                               src={link.icons2}
                               alt={`${link.name} not found`}
