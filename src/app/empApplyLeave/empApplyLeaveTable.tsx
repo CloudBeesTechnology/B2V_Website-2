@@ -7,8 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
+import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 
 const EmpApplyLeaveTable = () => {
+  const { publicHolidays } = useFetchHolidayList();
   const router = useRouter();
 
   const {
@@ -56,20 +59,39 @@ const EmpApplyLeaveTable = () => {
 
     const halfDayValue = isHalfDay ? "0.5" : "0";
 
+    const leaveDetails: any = {
+      endDate: data.endDate,
+      leaveReason: data.leaveReason,
+      leaveType: data.leaveType,
+      startDate: data.startDate,
+      leaveStatus: "Pending",
+      empID: empID,
+      halfDay: halfDayValue,
+      remarks: "",
+      takenDay: takenDay,
+      createdAt: createdAt,
+    };
+
+    // Removed dates if applied leaves includes a Holidays.
+    const validLeaveDates = await checkNonWorkingDays(
+      leaveDetails,
+      publicHolidays
+    );
+
+    if (validLeaveDates.length > 0) {
+      if (takenDay === 0.5) {
+        leaveDetails.takenDay = "0.5";
+      } else if (leaveDetails.takenDay >= 1) {
+        leaveDetails.takenDay = validLeaveDates.length.toString();
+      }
+    } else {
+      leaveDetails.takenDay = "0";
+    }
+
     try {
       await setDoc(doc(db, "leaveStatus", createdAt), {
-        endDate: data.endDate,
-        leaveReason: data.leaveReason,
-        leaveType: data.leaveType,
-        startDate: data.startDate,
-        leaveStatus: "Pending",
-        empID: empID,
-        halfDay: halfDayValue,
-        remarks: "",
-        takenDay: takenDay.toString(),
-        createdAt: createdAt,
+        ...leaveDetails,
       });
-
       window.location.reload();
     } catch (error) {
       console.error("Error applying for leave:", error);
