@@ -82,9 +82,8 @@ export default function SignIn() {
       localStorage.setItem("employeeName", employeeData.name);
       localStorage.setItem("empID", employeeData.empID);
   
-      // Redirect based on user role
         router.push("/");
-    
+         
     } catch (error: any) {
       console.error("Sign in error:", error.message);
       alert("Sign in failed. Please check your email and password.");

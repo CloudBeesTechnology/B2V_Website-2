@@ -43,7 +43,7 @@ const EmpApplyLeaveTable = () => {
 
       const employeeData = querySnapshot.docs[0].data();
       const leadEmpID = employeeData.leadEmpID || "";
-      const managerEmpID = employeeData.managerEmpID || "";
+      const managerEmpID = employeeData.manager || "";
 
       const createdAt = new Date().toISOString();
       const start = new Date(data.startDate);
@@ -125,10 +125,10 @@ const EmpApplyLeaveTable = () => {
           <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
             {/* Leave Type */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-gray mb-1">Leave Type</label>
+              <label className="text_size_5 text-medium_gray mb-1">Leave Type</label>
               <select
                 {...register("leaveType")}
-                className="rounded-md px-2 py-2 border border-lite_gray shadow-md text_size_5 outline-none"
+                className="rounded-md px-2 py-2 border text-mediumlite_grey border-lite_gray shadow-md text_size_5 outline-none"
               >
                 <option value="">Select Leave</option>
                 <option value="casual">Casual Leave</option>
@@ -145,11 +145,11 @@ const EmpApplyLeaveTable = () => {
 
             {/* Start Date */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-gray mb-1">Start Date</label>
+              <label className="text_size_5 text-medium_gray mb-1">Start Date</label>
               <input
                 type="date"
                 {...register("startDate")}
-                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none"
+                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none text-mediumlite_grey"
               />
               {errors.startDate && (
                 <p className="text-dark_red text-sm py-1">
@@ -160,11 +160,11 @@ const EmpApplyLeaveTable = () => {
 
             {/* End Date */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-gray mb-1">End Date</label>
+              <label className="text_size_5 text-medium_gray mb-1">End Date</label>
               <input
                 type="date"
                 {...register("endDate")}
-                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none"
+                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none text-mediumlite_grey"
               />
               {errors.endDate && (
                 <p className="text-dark_red text-sm py-1">
@@ -175,12 +175,12 @@ const EmpApplyLeaveTable = () => {
 
             {/* Leave Reason */}
             <div className="flex flex-col ">
-              <label className="text_size_5 text-gray mb-1">Leave Reason</label>
+              <label className="text_size_5 text-medium_gray mb-1">Leave Reason</label>
               <input
                 type="text"
                 {...register("leaveReason")}
                 placeholder="Reason"
-                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none"
+                className="border border-lite_gray rounded-md px-2 py-2 shadow-md text_size_5 outline-none text-mediumlite_grey"
               />
               {errors.leaveReason && (
                 <p className="text-medium_red text-sm py-1">
@@ -191,11 +191,11 @@ const EmpApplyLeaveTable = () => {
 
             {/* Half Day Checkbox */}
             <div className="flex flex-col gap-1 mb-3">
-              <label className="text-gray text_size_5">Half Day</label>
+              <label className="text-medium_gray text_size_5">Half Day</label>
               <input
                 type="checkbox"
                 {...register("halfDay")}
-                className="accent-blue-600 w-6 h-6"
+                className="accent-blue-500 w-6 h-6"
               />
             </div>
           </div>

@@ -7,9 +7,10 @@ import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { personalInfoSchema } from "@/validation/Schema";
 import profileIcon from "../../../../public/assets/employee/profileIcon.png";
 import { LiaUploadSolid } from "react-icons/lia";
-import { profile } from "console";
 import { UseEmployeeList } from "@/app/utils/EmpContext";
 import { DateFormat } from "@/components/DateFormate";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { app } from "@/lib/firebaseConfig";
 
 interface PersonalInfoFormData {
   name: string;
@@ -23,13 +24,13 @@ interface PersonalInfoFormData {
   email: string;
   lang: string;
   religion?: string;
-  proof?: File | string | null;
+  proof?: string | null;
   department?: string;
   position?: string;
   totalLeave?: string;
   manager?: string;
   leadEmpID?: string;
-  profilePhoto?: File | string | null;
+  profilePhoto?: string | null;
 }
 
 export const PersonalInfoForm = () => {
@@ -37,15 +38,19 @@ export const PersonalInfoForm = () => {
   const { storedEmpData } = UseEmployeeList();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [previewImageProof, setPreviewImageProof] = useState<string | null>(
-    null
-  );
+  const [previewImageProof, setPreviewImageProof] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [proofFile, setproofFile] = useState<File | null>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const profileFileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Initialize Firebase Storage
+  const storage = getStorage(app);
+
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
+  
   const triggerProfileFileInput = () => {
     profileFileInputRef.current?.click();
   };
@@ -106,25 +111,19 @@ export const PersonalInfoForm = () => {
         alert("Please select an image file");
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 5 * 1024 * 1024) {
         alert("File size should be less than 2MB");
         return;
       }
       if (type === "profilePhoto") {
-        // console.log("profile");
-
         setSelectedFile(file);
-        setValue("profilePhoto", file);
         const reader = new FileReader();
         reader.onload = () => {
           setPreviewImage(reader.result as string);
         };
         reader.readAsDataURL(file);
       } else if (type === "proof") {
-        // console.log("proof");
-
-        setproofFile(file);
-        setValue("proof", file);
+        setProofFile(file);
         const reader = new FileReader();
         reader.onload = () => {
           setPreviewImageProof(reader.result as string);
@@ -134,22 +133,48 @@ export const PersonalInfoForm = () => {
     }
   };
 
-  // console.log(proofFile,"proofFile");
-
-  const onSubmit = (data: PersonalInfoFormData) => {
-    // console.log("ftghj");
-
-    const dataToStore = {
-      ...data,
-      profilePhoto: previewImage,
-      proof: proofFile,
-    };
-    // console.log(dataToStore, "dataToStore");
-
-    localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
-    router.push("/employeeDetails?tab=educationInfo");
+  const uploadFileToFirebase = async (file: File, path: string): Promise<string> => {
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
   };
-  // console.log(storedEmpData, "84512");
+
+  const onSubmit = async (data: PersonalInfoFormData) => {
+    setIsUploading(true);
+    try {
+      let profilePhotoUrl = data.profilePhoto || null;
+      let proofUrl = data.proof || null;
+      const sanitizedName = data.name
+      ? data.name.replace(/[^a-zA-Z0-9]/g, '_') // Replace special chars with underscores
+      : 'unknown';
+
+    // Upload profile photo if a new one was selected
+    if (selectedFile) {
+      const profilePath = `employee-profile/${sanitizedName}/${Date.now()}_${selectedFile.name}`;
+      profilePhotoUrl = await uploadFileToFirebase(selectedFile, profilePath);
+    }
+
+    // Upload proof document if a new one was selected
+    if (proofFile) {
+      const proofPath = `employee-proofs/${sanitizedName}/${Date.now()}_${proofFile.name}`;
+      proofUrl = await uploadFileToFirebase(proofFile, proofPath);
+    }
+
+      const dataToStore = {
+        ...data,
+        profilePhoto: profilePhotoUrl,
+        proof: proofUrl,
+      };
+
+      localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
+      router.push("/employeeDetails?tab=educationInfo");
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      alert("Error uploading files. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (storedEmpData) {
@@ -173,9 +198,15 @@ export const PersonalInfoForm = () => {
         position: storedEmpData.position || "",
         profilePhoto: storedEmpData.profilePhoto || null,
       });
+
+      if (storedEmpData.profilePhoto) {
+        setPreviewImage(storedEmpData.profilePhoto);
+      }
+      if (storedEmpData.proof) {
+        setPreviewImageProof(storedEmpData.proof);
+      }
     }
   }, [storedEmpData, reset]);
-  console.log(storedEmpData, "employeee");
 
   return (
     <section className="bg-white py-5 px-10 rounded-xl">
@@ -372,7 +403,6 @@ export const PersonalInfoForm = () => {
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="proof" className="text-[15px] text-gray">
                 Proof
-                {/* <sup className="text-red">*</sup> */}
               </label>
               <div className="border border-[#D9D9D9] px-4 py-3 rounded-sm flex items-center">
                 <input
@@ -382,7 +412,6 @@ export const PersonalInfoForm = () => {
                   onChange={(e) => handleFileChange(e, "proof")}
                   accept="image/*"
                   className="outline-none py-1 w-full hidden"
-                  // {...register("proof")}
                 />
                 <span
                   onClick={triggerFileInput}
@@ -392,7 +421,6 @@ export const PersonalInfoForm = () => {
                 </span>
               </div>
               <span className="text-xs text-medium_gray">
-                {" "}
                 {proofFile?.name || ""}
               </span>
               {errors.proof && (
@@ -473,9 +501,10 @@ export const PersonalInfoForm = () => {
           <div className="mb-20 pt-10 center">
             <button
               type="submit"
-              className="text-[15px] cursor-pointer text-white bg-primary px-5 py-3 w-[20%] rounded-md"
+              className="text-[15px] cursor-pointer text-white bg-primary px-5 py-3 w-[20%] rounded-md disabled:opacity-50"
+              disabled={isUploading}
             >
-              Next
+              {isUploading ? "Uploading..." : "Next"}
             </button>
           </div>
         </section>
@@ -527,3 +556,534 @@ export const PersonalInfoForm = () => {
     </section>
   );
 };
+
+
+
+// "use client";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { useRouter } from "next/navigation";
+// import Image from "next/image";
+// import { useState, useRef, ChangeEvent, useEffect } from "react";
+// import { personalInfoSchema } from "@/validation/Schema";
+// import profileIcon from "../../../../public/assets/employee/profileIcon.png";
+// import { LiaUploadSolid } from "react-icons/lia";
+// import { profile } from "console";
+// import { UseEmployeeList } from "@/app/utils/EmpContext";
+// import { DateFormat } from "@/components/DateFormate";
+
+// interface PersonalInfoFormData {
+//   name: string;
+//   dob: string;
+//   gender: string;
+//   nationality: string;
+//   address: string;
+//   contact: string;
+//   doj: string;
+//   alternateNo?: string;
+//   email: string;
+//   lang: string;
+//   religion?: string;
+//   proof?: File | string | null;
+//   department?: string;
+//   position?: string;
+//   totalLeave?: string;
+//   manager?: string;
+//   leadEmpID?: string;
+//   profilePhoto?: File | string | null;
+// }
+
+// export const PersonalInfoForm = () => {
+//   const router = useRouter();
+//   const { storedEmpData } = UseEmployeeList();
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+//   const [previewImage, setPreviewImage] = useState<string | null>(null);
+//   const [previewImageProof, setPreviewImageProof] = useState<string | null>(
+//     null
+//   );
+//   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+//   const [proofFile, setproofFile] = useState<File | null>(null);
+//   const profileFileInputRef = useRef<HTMLInputElement>(null);
+//   const triggerFileInput = () => {
+//     fileInputRef.current?.click();
+//   };
+//   const triggerProfileFileInput = () => {
+//     profileFileInputRef.current?.click();
+//   };
+
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors },
+//     setValue,
+//     reset,
+//   } = useForm<PersonalInfoFormData>({
+//     resolver: zodResolver(personalInfoSchema),
+//   });
+
+//   useEffect(() => {
+//     if (typeof window !== "undefined") {
+//       const savedData = localStorage.getItem("personalInfo");
+//       if (savedData) {
+//         const parsedData = JSON.parse(savedData);
+
+//         // Set all form values from localStorage
+//         reset({
+//           name: parsedData.name,
+//           dob: parsedData.dob,
+//           gender: parsedData.gender,
+//           nationality: parsedData.nationality,
+//           address: parsedData.address,
+//           contact: parsedData.contact,
+//           doj: parsedData.doj,
+//           alternateNo: parsedData.alternateNo,
+//           email: parsedData.email,
+//           lang: parsedData.lang,
+//           religion: parsedData.religion,
+//           proof: parsedData.proof || null,
+//           department: parsedData.department,
+//           totalLeave: parsedData.totalLeave,
+//           manager: parsedData.manager,
+//           position: parsedData.position,
+//           leadEmpID: parsedData.leadEmpID,
+//           profilePhoto: parsedData.profilePhoto || null,
+//         });
+
+//         // Set the preview image if it exists
+//         if (parsedData.profilePhoto) {
+//           setPreviewImage(parsedData.profilePhoto);
+//         }
+//         if (parsedData.proof) {
+//           setPreviewImageProof(parsedData.proof);
+//         }
+//       }
+//     }
+//   }, [reset]);
+
+//   const handleFileChange = (e: ChangeEvent<HTMLInputElement>, type: string) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       if (!file.type.match("image.*")) {
+//         alert("Please select an image file");
+//         return;
+//       }
+//       if (file.size > 2 * 1024 * 1024) {
+//         alert("File size should be less than 2MB");
+//         return;
+//       }
+//       if (type === "profilePhoto") {
+//         // console.log("profile");
+
+//         setSelectedFile(file);
+//         setValue("profilePhoto", file);
+//         const reader = new FileReader();
+//         reader.onload = () => {
+//           setPreviewImage(reader.result as string);
+//         };
+//         reader.readAsDataURL(file);
+//       } else if (type === "proof") {
+//         // console.log("proof");
+
+//         setproofFile(file);
+//         setValue("proof", file);
+//         const reader = new FileReader();
+//         reader.onload = () => {
+//           setPreviewImageProof(reader.result as string);
+//         };
+//         reader.readAsDataURL(file);
+//       }
+//     }
+//   };
+
+//   // console.log(proofFile,"proofFile");
+
+//   const onSubmit = (data: PersonalInfoFormData) => {
+//     // console.log("ftghj");
+
+//     const dataToStore = {
+//       ...data,
+//       profilePhoto: previewImage,
+//       proof: proofFile,
+//     };
+//     // console.log(dataToStore, "dataToStore");
+
+//     localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
+//     router.push("/employeeDetails?tab=educationInfo");
+//   };
+//   // console.log(storedEmpData, "84512");
+
+//   useEffect(() => {
+//     if (storedEmpData) {
+//       reset({
+//         name: storedEmpData.name || "",
+//         dob: storedEmpData.dob || "",
+//         address: storedEmpData.address || "",
+//         gender: storedEmpData.gender || "",
+//         nationality: storedEmpData.nationality || "",
+//         contact: storedEmpData.contact || "",
+//         doj: storedEmpData.doj || "",
+//         alternateNo: storedEmpData.alternateNo || "",
+//         email: storedEmpData.email || "",
+//         lang: storedEmpData.lang || "",
+//         religion: storedEmpData.religion || "",
+//         proof: storedEmpData.proof || null,
+//         department: storedEmpData.department || "",
+//         totalLeave: storedEmpData.totalLeave || "",
+//         manager: storedEmpData.manager || "",
+//         position: storedEmpData.position || "",
+//         profilePhoto: storedEmpData.profilePhoto || null,
+//       });
+//     }
+//   }, [storedEmpData, reset]);
+//   console.log(storedEmpData, "employeee");
+
+//   return (
+//     <section className="bg-white py-5 px-10 rounded-xl">
+//       <div>
+//         <h3 className="text-mediumlite_grey text-[22px]">Personal Info</h3>
+//       </div>
+//       <form
+//         className="flex justify-between my-5"
+//         onSubmit={handleSubmit(onSubmit)}
+//       >
+//         <section className="flex flex-col gap-4 w-[70%]">
+//           <div className="flex justify-between mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="name" className="text-[15px] text-gray">
+//                 Name<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="name"
+//                   className="outline-none py-1 w-full"
+//                   {...register("name")}
+//                 />
+//               </div>
+//               {errors.name && (
+//                 <span className="text-red text-sm">{errors.name.message}</span>
+//               )}
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="dob" className="text-[15px] text-gray">
+//                 DOB<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="dob"
+//                   type="date"
+//                   className="outline-none py-1 w-full"
+//                   {...register("dob")}
+//                 />
+//               </div>
+//               {errors.dob && (
+//                 <span className="text-red text-sm">{errors.dob.message}</span>
+//               )}
+//             </div>
+
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="alternateNo" className="text-[15px] text-gray">
+//                 Gender
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <select
+//                   className=" outline-none w-full"
+//                   {...register("gender")}
+//                 >
+//                   <option>Select</option>
+//                   <option value="Male">Male</option>
+//                   <option value="Female">Female</option>
+//                 </select>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex justify-between mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="nationality" className="text-[15px] text-gray">
+//                 Nationality<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="nationality"
+//                   className="outline-none py-1 w-full"
+//                   {...register("nationality")}
+//                 />
+//               </div>
+//               {errors.nationality && (
+//                 <span className="text-red text-sm">
+//                   {errors.nationality.message}
+//                 </span>
+//               )}
+//             </div>
+
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="address" className="text-[15px] text-gray">
+//                 Address<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="address"
+//                   className="outline-none py-1 w-full"
+//                   {...register("address")}
+//                 />
+//               </div>
+//               {errors.address && (
+//                 <span className="text-red text-sm">
+//                   {errors.address.message}
+//                 </span>
+//               )}
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="contact" className="text-[15px] text-gray">
+//                 Contact<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="contact"
+//                   className="outline-none py-1 w-full"
+//                   {...register("contact")}
+//                 />
+//               </div>
+//               {errors.contact && (
+//                 <span className="text-red text-sm">
+//                   {errors.contact.message}
+//                 </span>
+//               )}
+//             </div>
+//           </div>
+//           <div className="flex justify-between mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="doj" className="text-[15px] text-gray">
+//                 Date of Join <sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="doj"
+//                   type="date"
+//                   className="outline-none py-1 w-full"
+//                   {...register("doj")}
+//                 />
+//               </div>
+//               {errors.doj && (
+//                 <span className="text-red text-sm">{errors.doj.message}</span>
+//               )}
+//             </div>
+
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="alternateNo" className="text-[15px] text-gray">
+//                 Alternate Phone No
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="alternateNo"
+//                   className="outline-none py-1 w-full"
+//                   {...register("alternateNo")}
+//                 />
+//               </div>
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="email" className="text-[15px] text-gray">
+//                 Email ID<sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="email"
+//                   type="email"
+//                   className="outline-none py-1 w-full"
+//                   {...register("email")}
+//                 />
+//               </div>
+//               {errors.email && (
+//                 <span className="text-red text-sm">{errors.email.message}</span>
+//               )}
+//             </div>
+//           </div>
+
+//           <div className="flex justify-between mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="lang" className="text-[15px] text-gray">
+//                 Language <sup className="text-red">*</sup>
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="lang"
+//                   type="lang"
+//                   className="outline-none py-1 w-full"
+//                   {...register("lang")}
+//                 />
+//               </div>
+//               {errors.lang && (
+//                 <span className="text-red text-sm">{errors.lang.message}</span>
+//               )}
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="religion" className="text-[15px] text-gray">
+//                 Religion
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="religion"
+//                   className="outline-none py-1 w-full"
+//                   {...register("religion")}
+//                 />
+//               </div>
+//             </div>
+
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="proof" className="text-[15px] text-gray">
+//                 Proof
+//                 {/* <sup className="text-red">*</sup> */}
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-3 rounded-sm flex items-center">
+//                 <input
+//                   id="proof"
+//                   type="file"
+//                   ref={fileInputRef}
+//                   onChange={(e) => handleFileChange(e, "proof")}
+//                   accept="image/*"
+//                   className="outline-none py-1 w-full hidden"
+//                   // {...register("proof")}
+//                 />
+//                 <span
+//                   onClick={triggerFileInput}
+//                   className="w-full flex justify-end"
+//                 >
+//                   <LiaUploadSolid className="text-medium_gray" />
+//                 </span>
+//               </div>
+//               <span className="text-xs text-medium_gray">
+//                 {" "}
+//                 {proofFile?.name || ""}
+//               </span>
+//               {errors.proof && (
+//                 <span className="text-red text-sm">{errors.proof.message}</span>
+//               )}
+//             </div>
+//           </div>
+
+//           <div className="flex  gap-10 mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="department" className="text-[15px] text-gray">
+//                 Department
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="department"
+//                   className="outline-none py-1 w-full"
+//                   {...register("department")}
+//                 />
+//               </div>
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="position" className="text-[15px] text-gray">
+//                 Position
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="position"
+//                   type="tel"
+//                   className="outline-none py-1 w-full"
+//                   {...register("position")}
+//                 />
+//               </div>
+//             </div>
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="leave" className="text-[15px] text-gray">
+//                 Total Leave
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="leave"
+//                   className="outline-none py-1 w-full"
+//                   {...register("totalLeave")}
+//                 />
+//               </div>
+//             </div>
+//           </div>
+//           <div className="flex  gap-10 mt-5">
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="manager" className="text-[15px] text-gray">
+//                 Assign Manager
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="manager"
+//                   type="tel"
+//                   className="outline-none py-1 w-full"
+//                   {...register("manager")}
+//                 />
+//               </div>
+//             </div>
+
+//             <div className="flex flex-col gap-2 w-[30%]">
+//               <label htmlFor="lead" className="text-[15px] text-gray">
+//                 Assign Lead
+//               </label>
+//               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+//                 <input
+//                   id="lead"
+//                   type="tel"
+//                   className="outline-none py-1 w-full"
+//                   {...register("leadEmpID")}
+//                 />
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="mb-20 pt-10 center">
+//             <button
+//               type="submit"
+//               className="text-[15px] cursor-pointer text-white bg-primary px-5 py-3 w-[20%] rounded-md"
+//             >
+//               Next
+//             </button>
+//           </div>
+//         </section>
+
+//         <section className="w-[30%] flex items-center flex-col gap-4">
+//           <div
+//             className="max-w-[150px] w-full h-[150px] rounded-full overflow-hidden cursor-pointer relative border border-gray-200"
+//             onClick={triggerProfileFileInput}
+//           >
+//             {previewImage ? (
+//               <Image
+//                 src={previewImage}
+//                 alt="Profile preview"
+//                 width={150}
+//                 height={150}
+//                 className="object-cover w-full h-full"
+//               />
+//             ) : (
+//               <Image
+//                 src={profileIcon}
+//                 alt="Default profile"
+//                 width={150}
+//                 height={150}
+//                 className="object-cover w-full h-full"
+//               />
+//             )}
+//             <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+//               <span className="text-white text-sm">Change Photo</span>
+//             </div>
+//           </div>
+
+//           <input
+//             type="file"
+//             ref={profileFileInputRef}
+//             onChange={(e) => handleFileChange(e, "profilePhoto")}
+//             accept="image/*"
+//             className="hidden"
+//           />
+
+//           <p className="text-[15px] text-gray">Click to upload</p>
+//           {selectedFile && (
+//             <p className="text-sm text-gray-500 text-center">
+//               Selected: {selectedFile.name}
+//               <br />({(selectedFile.size / 1024).toFixed(1)} KB)
+//             </p>
+//           )}
+//         </section>
+//       </form>
+//     </section>
+//   );
+// };
