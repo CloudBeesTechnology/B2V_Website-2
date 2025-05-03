@@ -122,6 +122,7 @@ export const TableFormate = ({
           </thead>
         )}
         <tbody>
+          
           {list === "OVLA" &&
             ovla.slice(0, 4).map((val, index) => (
               <tr key={index} className="text-center text-sm text-medium_gray border-b border-morelite_grey">
@@ -249,6 +250,7 @@ export const TableFormate = ({
                 </tr>
               );
             })}
+
           {list === "permissionList" &&
             permissionList?.map((val, index) => {
               return (
