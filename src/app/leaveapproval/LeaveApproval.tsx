@@ -1,13 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  query,
+  where,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { DateFormat } from "@/components/DateFormate";
 import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import clsx from "clsx";
+import { ViewLeaveStatus } from "@/components/ViewLeaveStatus";
 
 type LeaveStatus = {
   empID: string;
@@ -25,6 +34,9 @@ type LeaveStatus = {
 type EnrichedLeaveStatus = LeaveStatus & {
   name: string;
   docId: string;
+  leadName?: string;
+  managerName?: string;
+  department?: string;
   remarks?: string;
 };
 
@@ -37,12 +49,39 @@ const LeaveApproval = () => {
   const [remarks, setRemarks] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [leaveDetails, setLeaveDetails] = useState<any | null>(null);
+  const [leaveDetailsPopup, setLeaveDetailsPopup] = useState(false);
+  const checking = async (leave: any) => {
+    const qLead = query(
+      collection(db, "employeeDetails"),
+      where("empID", "==", leave.leadEmpID)
+    );
+    const leadSnapshot = await getDocs(qLead);
+    let leadName = "N/A";
+    if (!leadSnapshot.empty) {
+      leadName = leadSnapshot.docs[0].data().name || "N/A";
+    }
 
+    const qManager = query(
+      collection(db, "employeeDetails"),
+      where("empID", "==", leave.managerEmpID)
+    );
+    const managerSnapshot = await getDocs(qManager);
+    let managerName = "N/A";
+    if (!managerSnapshot.empty) {
+      managerName = managerSnapshot.docs[0].data().name || "N/A";
+    }
+
+    return {
+      leadName,
+      managerName,
+    };
+  };
   useEffect(() => {
     const userRole = localStorage?.getItem("userRole")?.toUpperCase() || null;
     const userEmpID = localStorage?.getItem("empID")?.toUpperCase() || null;
     setUserRoleAccess(userRole);
-    const fetchEmployees = async () => {
+    async function fetchEmployees() {
       try {
         setLoading(true);
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
@@ -59,8 +98,15 @@ const LeaveApproval = () => {
             leadEmpID: doc.data().leadEmpID,
             managerEmpID: doc.data().managerEmpID,
             createdAt: doc.data().createdAt,
+            leadStatus:doc.data().leadStatus,
+            managerStatus:doc.data().managerStatus,
+            leadRemarks:doc.data().  leadRemarks,
+            managerRemarks:doc.data().managerRemarks,
             name: "",
             remarks: doc.data().remarks || "",
+            leadName: "", // To be added
+            managerName: "",
+            department: "",
           })
         );
 
@@ -69,25 +115,40 @@ const LeaveApproval = () => {
         );
         const employeeDetails = employeeSnapshot.docs.map((doc) => ({
           empID: doc.id,
-          ...(doc.data() as { name: string }),
+          ...(doc.data() as {
+            name: string;
+            department: string;
+          }),
         }));
 
-        const empMap = new Map<string, string>();
+        const empMap = new Map<string, { name: string; department: string }>();
         employeeDetails.forEach((emp) => {
-          empMap.set(emp.empID, emp.name);
+          empMap.set(emp.empID, {
+            name: emp.name,
+            department: emp.department,
+          });
         });
 
-        const enrichedList = leaveList
-          .filter(
-            (leave) =>
-              (leave.leaveStatus === "Pending" &&
-                userEmpID === leave.leadEmpID) ||
-              userEmpID === leave.managerEmpID
-          )
-          .map((leave) => ({
-            ...leave,
-            name: empMap.get(leave.empID) || "Unknown",
-          }));
+        const enrichedList: EnrichedLeaveStatus[] = [];
+
+        for (const leave of leaveList) {
+          if (
+            (leave.leaveStatus === "Pending" &&
+              userEmpID === leave.leadEmpID) ||
+            userEmpID === leave.managerEmpID
+          ) {
+            const { leadName, managerName } = await checking(leave);
+            // console.log(leadName,managerName);
+            const empInfo = empMap.get(leave.empID);
+            enrichedList.push({
+              ...leave,
+              name: empInfo?.name || "N/A",
+              department: empInfo?.department || "N/A",
+              leadName,
+              managerName,
+            });
+          }
+        }
 
         setLeaveApproval(enrichedList);
       } catch (error) {
@@ -95,10 +156,11 @@ const LeaveApproval = () => {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchEmployees();
   }, []);
+
   const Heading = [
     "EmpID",
     "Name(s)",
@@ -108,11 +170,14 @@ const LeaveApproval = () => {
     "End Date",
     "Duration(s)",
     userRoleAccess === "LEAD"
+      ? "Manager Name"
+      : userRoleAccess === "MANAGER"
       ? "Lead Name"
-      : userRoleAccess === "Manager" && "Manager Name",
+      : null,
     "Reason(s)",
-    "Actions",
-  ];
+    userRoleAccess === "LEAD" && "Actions",
+    "View",
+  ].filter(Boolean);
 
   const handleStatusChange = (docId: string, newStatus: string) => {
     if (newStatus === "Rejected") {
@@ -131,10 +196,29 @@ const LeaveApproval = () => {
   ) => {
     try {
       const leaveDocRef = doc(db, "leaveStatus", docId);
-      await updateDoc(leaveDocRef, {
-        leaveStatus: status,
-        ...(status === "Rejected" && { remarks: remarksText }),
-      });
+      const dateStatus = new Date().toISOString().split("T")[0];
+
+      // Create update data dynamically based on role
+      let updateData: any = {};
+
+      if (userRoleAccess === "LEAD") {
+        updateData = {
+          ...updateData,
+          leadDate: dateStatus,
+          leadStatus: status,
+          ...(status === "Rejected" && { leadRemarks: remarksText }),
+        };
+      } else if (userRoleAccess === "MANAGER") {
+        updateData = {
+          ...updateData,
+          managerDate: dateStatus,
+          manageremarks: remarksText,
+          ...(status === "Rejected" && { manageremarks: remarksText }),
+        };
+      }
+      // console.log(updateData,"mnjuyyt");
+
+      await updateDoc(leaveDocRef, updateData);
 
       setLeaveApproval((prev) =>
         prev.map((leave) =>
@@ -151,10 +235,20 @@ const LeaveApproval = () => {
       console.error("Failed to update leave status:", err);
     }
   };
+
   if (loading)
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
     );
+const handleClose=()=>{
+  setLeaveDetailsPopup(!leaveDetailsPopup)
+}
+  const handleLeaveDetails = (items: any) => {
+    console.log(items, "7845");
+
+    setLeaveDetails(items);
+    handleClose()
+  };
   return (
     <section>
       <div className="flex justify-start items-center text-[22px] text-gray gap-10 my-10">
@@ -162,7 +256,7 @@ const LeaveApproval = () => {
         <h3>Leave Management</h3>
       </div>
 
-      <div className="py-7 bg-white rounded-xl px-10 space-y-7">
+      <div className="py-7 bg-white rounded-xl px-5 space-y-7 overflow-x-auto">
         <section className="flex justify-between items-center ">
           <h1 className="text-xl font-semibold text-gray">Leave List</h1>
           {/* <div className="center gap-5 py-3 px-4 bg-primary text-white rounded-xl text-lg font-bold ">
@@ -171,8 +265,8 @@ const LeaveApproval = () => {
           </div> */}
         </section>
         {leaveApproval && leaveApproval.length > 0 ? (
-          <table className="min-w-full border border-gray-200">
-            <thead className="bg-gray-100">
+          <table className="min-w-full  overflow-x-auto">
+            <thead className="border-b  border-morelite_grey">
               <tr>
                 {Heading.map((title, idx) => (
                   <th
@@ -186,18 +280,11 @@ const LeaveApproval = () => {
             </thead>
             <tbody>
               {leaveApproval.map((item, index) => {
-                let durationInDays = "-";
-                if (item?.startDate && item?.endDate) {
-                  const startDate = new Date(item.startDate);
-                  const endDate = new Date(item.endDate);
-                  const durationInMs = endDate.getTime() - startDate.getTime();
-                  durationInDays = Math.ceil(
-                    durationInMs / (1000 * 60 * 60 * 24)
-                  ).toString();
-                }
-
                 return (
-                  <tr className="text-sm text-gray" key={index}>
+                  <tr
+                    className="text-sm text-gray border-b  border-morelite_grey"
+                    key={index}
+                  >
                     <td className="px-4 py-2">{item.empID}</td>
                     <td className="px-4 py-2">{item.name}</td>
                     <td className="px-4 py-2 ">
@@ -221,9 +308,33 @@ const LeaveApproval = () => {
                     </td>
                     <td className="px-4 py-2 text-center">{item.takenDay}</td>
 
+                    {/* {item.managerEmpID &&
+                    userRoleAccess?.includes("MANAGER") ? (
+                      <td className="px-4 py-2 pt-3  flex">{item.leadName}</td>
+                    ) : (
+                      <td>N/A</td>
+                    )}
+                    {item.leadEmpID && userRoleAccess?.includes("LEAD") ? (
+                      <td className="px-4 py-2 pt-3 flex">
+                        {item.managerName}
+                      </td>
+                    ) : (
+                      <td>N/A</td>
+                    )} */}
+                    {(userRoleAccess === "LEAD" ||
+                      userRoleAccess === "MANAGER") && (
+                      <td className="px-4 py-2 pt-3">
+                        {userRoleAccess === "LEAD"
+                          ? item.managerName
+                          : item.leadName}
+                      </td>
+                    )}
+
                     <td className="px-4 py-2 w-[250px] pt-3 overflow-y-auto text-wrap overflow-wrap-break-word flex">
                       {item.leaveReason}
                     </td>
+                    {
+                      userRoleAccess === "LEAD" &&
 
                     <td className="px-4 py-2">
                       <select
@@ -268,6 +379,14 @@ const LeaveApproval = () => {
                           Rejected
                         </option>
                       </select>
+                    </td>
+                    }
+                    <td
+                      className="text-approved_blue text-center px-4 py-2"
+                      onClick={() => handleLeaveDetails(item)}
+                    >
+                      {" "}
+                      View
                     </td>
                   </tr>
                 );
@@ -318,6 +437,10 @@ const LeaveApproval = () => {
           </div>
         </div>
       )}
+
+      {/* view form popup */}
+
+      {leaveDetailsPopup && <ViewLeaveStatus leaveData={leaveDetails}  close={handleClose}   userAcess={{ userAcess: userRoleAccess }} />}
     </section>
   );
 };

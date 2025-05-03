@@ -31,7 +31,7 @@ import { db } from "@/lib/firebaseConfig";
 const Sidebar = () => {
   const pathname = usePathname();
   const [storedPermissions, setStoredPermissions] = useState<string[]>([]);
-  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN";
+  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN" |"LEAD" |"MANAGER";
   const userRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
@@ -180,12 +180,36 @@ const Sidebar = () => {
       "Settings",
       "Report",
     ],
+    LEAD: [
+      "Overview",
+      "Employee",
+      "Attendance",
+      "Internship",
+      "User",
+      "Leave Management",
+      "Timesheet",
+      "Settings",
+      "Report",
+    ],
+    MANAGER: [
+      "Overview",
+      "Employee",
+      "Attendance",
+      "Internship",
+      "User",
+      "Leave Management",
+      "Timesheet",
+      "Settings",
+      "Report",
+    ],
   };
 
   const portalMap: Record<string, typeof adminPortal> = {
     ADMIN: adminPortal,
     EMPLOYEE: employeePortal,
     INTERN: internPortal,
+    LEAD:adminPortal,
+    MANGER:adminPortal
   };
 
   const filteredNavList =

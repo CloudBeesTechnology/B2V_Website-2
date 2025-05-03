@@ -194,6 +194,7 @@ export const PersonalInfoForm = () => {
         department: storedEmpData.department || "",
         totalLeave: storedEmpData.totalLeave || "",
         manager: storedEmpData.manager || "",
+        leadEmpID: storedEmpData.leadEmpID || "",
         position: storedEmpData.position || "",
         profilePhoto: storedEmpData.profilePhoto || null,
       });
