@@ -43,7 +43,7 @@ const EmpApplyLeaveTable = () => {
 
       const employeeData = querySnapshot.docs[0].data();
       const leadEmpID = employeeData.leadEmpID || "";
-      const managerEmpID = employeeData.managerEmpID || "";
+      const managerEmpID = employeeData.manager || "";
 
       const createdAt = new Date().toISOString();
       const start = new Date(data.startDate);

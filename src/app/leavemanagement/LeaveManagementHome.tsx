@@ -10,6 +10,7 @@ export const LeaveManagementHome = () => {
       { title: 'Leave History', route: 'leavehistory' },
       { title: 'Leave Policy', route: '' },
       { title: 'Permission List', route: 'permission' },
+      { title: 'Permission History', route: 'permissionhistory' },
     //   route: 'leavepolicy'
     ];
     return (
@@ -21,7 +22,7 @@ export const LeaveManagementHome = () => {
               <p className="text-xl font-medium mb-2">{tile.title}</p>
               <Link href={`/${tile.route}`}>
                 <button className="bg-primary text_size_5 w-[110px] h-[36px] text-white px-14 py-4 rounded flex items-center justify-center gap-2 hover:bg-medium_blue">
-                  <span>Details</span>
+                  <span>View</span>
                   <MdOutlineKeyboardArrowRight />
                 </button>
               </Link>

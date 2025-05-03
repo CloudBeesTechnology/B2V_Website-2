@@ -13,9 +13,6 @@ export const SignInSchema = Yup.object().shape({
 export const signUpSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
   role: Yup.string().required("Role is required"),
-  number: Yup.string()
-    .required("Phone Number is required")
-    .matches(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
   password: Yup.string()
     .required("Password is required")
     .min(6, "Password must be at least 6 characters")
@@ -51,10 +48,7 @@ export const personalInfoSchema = z.object({
   doj: z.string().nonempty("Date of Join is required"),
   alternateNo: z
     .string()
-    .optional()
-    .refine((val) => !val || val.length >= 10, {
-      message: "Alternate number must be at least 10 characters if provided",
-    }),
+    .optional(),
   email: z.string().email("Invalid email address"),
   lang: z.string().min(1, "Language is required"),
   religion: z.string().optional(),
