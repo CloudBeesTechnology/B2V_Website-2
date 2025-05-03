@@ -15,10 +15,11 @@ import { db } from "@/lib/firebaseConfig"; // adjust path as needed
 const CredentialReq: React.FC = () => {
   const router = useRouter();
   const [credentials, setCredentials] = useState<any[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
         const userQuery = query(
           collection(db, "users"),
           orderBy("createdAt", "desc") // Sort by newest first
@@ -31,6 +32,8 @@ const CredentialReq: React.FC = () => {
         setCredentials(users);
       } catch (error) {
         console.error("Error fetching users:", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -54,15 +57,19 @@ const CredentialReq: React.FC = () => {
   const handleStatusChange = (docId: string, newStatus: string) => {
     updateUserStatus(docId, newStatus);
   };
-
+  if (loading)
+    return (
+      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+    );
   return (
     <section>
       <header className="flex justify-start items-center text-[22px] text-gray gap-10 m-10">
         <IoArrowBack onClick={() => router.back()} className="cursor-pointer" />
         <h3>Credential Request</h3>
       </header>
+{credentials&& credentials.length>0 ?
 
-      <div className="center overflow-x-auto">
+      <div className="center overflow-x-auto mb-10">
         <table className="table-fixed w-full max-w-[1500px]">
           <thead>
             <tr className="text-center text-white bg-primary">
@@ -98,7 +105,8 @@ const CredentialReq: React.FC = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>:<p className="text-center py-4 text-gray-400"> User not found</p>
+}
     </section>
   );
 };

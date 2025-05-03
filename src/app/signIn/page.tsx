@@ -83,12 +83,8 @@ export default function SignIn() {
       localStorage.setItem("empID", employeeData.empID);
   
       // Redirect based on user role
-      if (userData.role === "Admin" || userData.role === "Employee" || userData.role === "Intern") {
         router.push("/");
-      } else {
-        alert("Invalid user role.");
-      }
-  
+    
     } catch (error: any) {
       console.error("Sign in error:", error.message);
       alert("Sign in failed. Please check your email and password.");
