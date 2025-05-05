@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 
