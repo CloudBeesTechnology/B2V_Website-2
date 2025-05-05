@@ -14,7 +14,7 @@ export const addUserSchema = yup.object({
     .email("Enter a valid email address"),
   position: yup.string().required("Position is required"),
   department: yup.string().required("Department is required"),
-//   permission: yup.string().required("Permission is required"),
+  //   permission: yup.string().required("Permission is required"),
 });
 
 // 👇 Infer TypeScript type directly from the schema
