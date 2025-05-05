@@ -30,8 +30,9 @@ import { db } from "@/lib/firebaseConfig";
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const [storedPermissions, setStoredPermissions] = useState<string[]>([]);
-  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN" |"LEAD" |"MANAGER";
+  // const [storedPermissions, setStoredPermissions] = useState<string[]>([]);
+  const [allowedMenuItems, setAllowedMenuItems] = useState<string[]>([]);
+  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN";
   const userRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
@@ -42,7 +43,7 @@ const Sidebar = () => {
       ? localStorage.getItem("empID")?.toString()?.toUpperCase()
       : null;
 
-  const adminPortal = [
+  const sidebarMenu = [
     {
       icons: overview,
       icons2: whiteoverview,
@@ -86,26 +87,12 @@ const Sidebar = () => {
       name: "Timesheet",
       path: "/timesheet",
     },
-    {
-      icons: setting,
-      icons2: whitesetting,
-      name: "Settings",
-      path: "/settings",
-    },
+
     {
       icons: report,
       icons2: whitereport,
       name: "Report",
       path: "/report",
-    },
-  ];
-
-  const employeePortal = [
-    {
-      icons: overview,
-      icons2: whiteoverview,
-      name: "Overview",
-      path: "/",
     },
     {
       icons: employee,
@@ -120,39 +107,12 @@ const Sidebar = () => {
       path: "/empApplyLeave",
     },
     {
-      icons: timesheet,
-      icons2: whitetimesheet,
-      name: "Timesheet",
-      path: "/empTimeSheet",
-    },
-    {
-      icons: setting,
-      icons2: whitesetting,
-      name: "Settings",
-      path: "/settings",
-    },
-  ];
-
-  const internPortal = [
-    {
-      icons: overview,
-      icons2: whiteoverview,
-      name: "Overview",
-      path: "/",
-    },
-    {
       icons: employee,
       icons2: whiteemployee,
       name: "Task",
       path: "/internTask",
     },
     {
-      icons: timesheet,
-      icons2: whitetimesheet,
-      name: "Timesheet",
-      path: "/empTimeSheet",
-    },
-    {
       icons: setting,
       icons2: whitesetting,
       name: "Settings",
@@ -160,86 +120,18 @@ const Sidebar = () => {
     },
   ];
 
-  const roleAccessMap = {
-    EMPLOYEE: [
-      "Overview",
-      "Upcoming Holidays",
-      "Apply Leave",
-      "Timesheet",
-      "Settings",
-    ],
-    INTERN: ["Overview", "Task", "Timesheet", "Settings"],
-    ADMIN: [
-      "Overview",
-      "Employee",
-      "Attendance",
-      "Internship",
-      "User",
-      "Leave Management",
-      "Timesheet",
-      "Settings",
-      "Report",
-    ],
-    LEAD: [
-      "Overview",
-      "Employee",
-      "Attendance",
-      "Internship",
-      "User",
-      "Leave Management",
-      "Timesheet",
-      "Settings",
-      "Report",
-    ],
-    MANAGER: [
-      "Overview",
-      "Employee",
-      "Attendance",
-      "Internship",
-      "User",
-      "Leave Management",
-      "Timesheet",
-      "Settings",
-      "Report",
-    ],
-  };
-
-  const portalMap: Record<string, typeof adminPortal> = {
-    ADMIN: adminPortal,
-    EMPLOYEE: employeePortal,
-    INTERN: internPortal,
-    LEAD:adminPortal,
-    MANAGER:adminPortal
-  };
-
-  const filteredNavList =
-    userRole && roleAccessMap[userRole]
-      ? portalMap[userRole].filter((item) =>
-          roleAccessMap[userRole].includes(item.name)
-        )
-      : [];
-
   useEffect(() => {
     const getUserAndPermissions = async (empID: string) => {
-      const empQuery = query(
-        collection(db, "users"),
-        where("empID", "==", empID),
-        where("role", "==", "Admin")
-      );
       const userQuery = query(
-        collection(db, "userDetails"),
+        collection(db, "accessControl"),
         where("empID", "==", empID)
       );
 
-      const [listEmpDetails, listUserDetails] = await Promise.all([
-        getDocs(empQuery),
-        getDocs(userQuery),
-      ]);
+      const [listUserDetails] = await Promise.all([getDocs(userQuery)]);
 
-      const empData = listEmpDetails.docs[0]?.data() || {};
       const userData = listUserDetails.docs[0]?.data() || {};
 
-      return { ...empData, ...userData };
+      return { ...userData };
     };
 
     // let userRole =
@@ -247,109 +139,85 @@ const Sidebar = () => {
 
     if (userID) {
       getUserAndPermissions(userID).then((data) => {
-        setStoredPermissions(data.permission);
+        const flatPermissions = Object?.keys(data.setPermission);
+
+        setAllowedMenuItems(flatPermissions);
       });
     }
   }, []);
+
+  // console.log("storedPermissions : ", storedPermissions);
 
   const RemoveLocalValues = () => {
     localStorage.removeItem("experienceData");
     localStorage.removeItem("personalInfo");
     localStorage.removeItem("educationData");
   };
-const isLinkActive = (linkName:string, linkPath:string) => {
-  const customPaths: Record<string, string[]>  = {
-    "Leave Management": ["/leavemanagement", "/leaveapproval", "/leavehistory"],
-    "Employee": ["/employee", "/employeedetails", "/employeepersonal"],
-    // Add more modules and paths here if needed
-  };
+  const isLinkActive = (linkName: string, linkPath: string) => {
+    const customPaths: Record<string, string[]> = {
+      "Leave Management": [
+        "/leavemanagement",
+        "/leaveapproval",
+        "/leavehistory",
+      ],
+      Employee: ["/employee", "/employeedetails", "/employeepersonal"],
+      // Add more modules and paths here if needed
+    };
 
-  return customPaths[linkName]
-    ? customPaths[linkName].includes(pathname)
-    : pathname === linkPath;
-};
+    return customPaths[linkName]
+      ? customPaths[linkName].includes(pathname)
+      : pathname === linkPath;
+  };
 
   return (
     <section className="p-5 h-full overflow-y-auto">
- 
       <div className="max-w-[100px] w-full h-20 mx-auto center">
         <Image src={logo} alt="logo not found" />
       </div>
-      <div className="h-[calc(100%-5rem)] flex flex-col justify-between ">
+      <div className="h-[calc(100%-7rem)] flex flex-col justify-between">
         <div className=" space-y-5 mt-3">
-          {filteredNavList.map((link, index) => {
-            return (
+          {sidebarMenu
+            .filter((link) => allowedMenuItems.includes(link.name))
+            .map((link, index) => (
               <div key={index}>
-                {userRole === "ADMIN" ? (
-                  <div>
-                    {storedPermissions?.includes(link.name) && (
-                      <div
-                        className={clsx(
-                        isLinkActive(link.name, link.path)
-                            ? "bg-primary px-2 py-2 rounded-sm text-white"
-                            : "px-2 py-2"
-                        )}
-                      >
-                        <Link
-                          href={link.path}
-                          onClick={RemoveLocalValues}
-                          className="flex items-center gap-3"
-                        >
-                          {isLinkActive(link.name, link.path)? (
-                            <Image
-                              src={link.icons2}
-                              alt={`${link.name} not found`}
-                              width={24}
-                              height={24}
-                            />
-                          ) : (
-                            <Image
-                              src={link.icons}
-                              alt={`${link.name} not found`}
-                              width={24}
-                              height={24}
-                            />
-                          )}
-                          <p className="text_size_4">{link.name}</p>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    className={clsx(
-                      pathname === link.path
-                        ? "bg-primary px-2 py-2 rounded-sm text-white"
-                        : "px-2 py-2"
-                    )}
+                <div
+                  className={clsx(
+                    isLinkActive(link.name, link.path)
+                      ? "bg-primary px-2 py-2 rounded-sm text-white"
+                      : "px-2 py-2"
+                  )}
+                >
+                  <Link
+                    href={link.path}
+                    onClick={RemoveLocalValues}
+                    className="flex items-center gap-3"
                   >
-                    <Link
-                      href={link.path}
-                      className="flex items-center gap-3"
-                      onClick={RemoveLocalValues}
-                    >
-                      {pathname === link.path ? (
-                        <Image
-                          src={link.icons2}
-                          alt={`${link.name} not found`}
-                          width={24}
-                          height={24}
-                        />
-                      ) : (
-                        <Image
-                          src={link.icons}
-                          alt={`${link.name} not found`}
-                          width={24}
-                          height={24}
-                        />
-                      )}
-                      <p className="text_size_4">{link.name}</p>
-                    </Link>
-                  </div>
-                )}
+                    {isLinkActive(link.name, link.path) ? (
+                      <Image
+                        src={link.icons2}
+                        alt={`${link.name} not found`}
+                        width={24}
+                        height={24}
+                      />
+                    ) : (
+                      <Image
+                        src={link.icons}
+                        alt={`${link.name} not found`}
+                        width={24}
+                        height={24}
+                      />
+                    )}
+                    <p className="text_size_4">{link.name}</p>
+                  </Link>
+                </div>
               </div>
-            );
-          })}
+            ))}
+        </div>
+        <div className="px-2">
+          <Link href="/logout" className="flex items-center gap-3">
+            <Image src={logout} alt="Logout not found" width={24} height={24} />
+            <p className="text_size_4">Logout</p>
+          </Link>
         </div>
       </div>
     </section>

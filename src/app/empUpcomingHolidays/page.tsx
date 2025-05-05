@@ -68,7 +68,9 @@ const EmpUpcommingHolidays: React.FC = () => {
                 );
               })
             ) : (
-              <p>No upcoming public holidays for the rest of the year.</p>
+              <tr className="text-center text-gray text_size_4"  >
+                <td colSpan={4} className="py-3">No upcoming public holidays for the rest of the year.</td>
+              </tr>
             )}
           </tbody>
         </table>

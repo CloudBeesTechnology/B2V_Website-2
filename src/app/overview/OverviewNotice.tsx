@@ -22,7 +22,7 @@ export const OverviewNotice = () => {
   return (
     <section className="rounded-xl px-5 py-8 shadow-xl">
       <div className="flex justify-between items-center pb-1">
-        <p className="text-gray text-text_size_3">Notice</p>
+        <p className="text-gray text_size_3">Notice</p>
         <p className="text-text_size_6 text-medium_blue flex items-center gap-1">
           All Notice
           <span>

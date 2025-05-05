@@ -24,13 +24,15 @@ export type LeaveStatus = {
   leadStatus: string;
   managerStatus: string;
   leaveType: string;
-  takenDay: string;
+  takenDay?: string;
   startDate: string;
   endDate: string;
   leaveReason: string;
   leadEmpID: string;
   managerEmpID: string;
   createdAt: string;
+  duration?:string;
+  createdDate?:string;
 };
 
 export type EnrichedLeaveStatus = LeaveStatus & {
@@ -137,13 +139,13 @@ const LeaveApproval = () => {
 
           if (
             userRole === "ADMIN" ||
-            (leave.leadStatus == "Pending" && userEmpID === leave.leadEmpID) ||
+            (leave.leadStatus === "Pending" && userEmpID === leave.leadEmpID) ||
             (userEmpID === leave.managerEmpID &&
-              leave.managerStatus == "Pending" &&
+              leave.managerStatus === "Pending" &&
               leave.leadStatus === "Approved") ||
             (userEmpID === leave.managerEmpID &&
               !leave.leadEmpID &&
-              leave.managerStatus == "Pending")
+              leave.managerStatus === "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
             console.log(leadName, managerName);
@@ -157,7 +159,7 @@ const LeaveApproval = () => {
             });
           }
         }
-        console.log(enrichedList);
+        // console.log(enrichedList);
 
         setLeaveApproval(enrichedList);
       } catch (error) {
@@ -196,7 +198,7 @@ const LeaveApproval = () => {
     setLeaveDetailsPopup(!leaveDetailsPopup);
   };
   const handleLeaveDetails = (items: any) => {
-    console.log(items, "7845");
+    // console.log(items, "7845");
 
     setLeaveDetails(items);
     handleClose();
@@ -312,6 +314,7 @@ const LeaveApproval = () => {
           setLeaveApproval={setLeaveApproval}
           close={handleClose}
           userAcess={{ userAcess: userRoleAccess }}
+          hiddenBtn={true}
         />
       )}
     </section>

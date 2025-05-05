@@ -35,9 +35,19 @@ interface Alluser {
   [key: string]: any;
 }
 
+// type SelectedModules = {
+//   [moduleName: string]: {
+//     name: string;
+//     sections: string[];
+//   }[];
+// };
+
+type SelectedModules = {
+  [submoduleName: string]: string[];
+};
 const AddNewUser: React.FC = () => {
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [selectedModules, setSelectedModules] = useState<SelectedModules>({});
   const [allUser, setAllUser] = useState<Alluser[]>([]);
   const router = useRouter();
   const {
@@ -52,12 +62,17 @@ const AddNewUser: React.FC = () => {
   // Create User
   const createUser = async (data: any) => {
     try {
+      const filteredModules = Object.fromEntries(
+        Object.entries(selectedModules).filter(
+          ([_, sections]) => sections.length > 0
+        )
+      );
       let finalData = {
         empID: data.empID,
-        permission: selectedModules,
+        setPermission: filteredModules,
         createdAt: new Date().toISOString(),
       };
-      const userRes = await addDoc(collection(db, "userDetails"), {
+      const userRes = await addDoc(collection(db, "accessControl"), {
         ...finalData,
       });
 
@@ -71,7 +86,7 @@ const AddNewUser: React.FC = () => {
           position: "",
           phone: "",
         });
-        setSelectedModules([]);
+        setSelectedModules({});
       }
     } catch (error) {
       console.error("Error adding user:", error);
@@ -87,13 +102,20 @@ const AddNewUser: React.FC = () => {
     };
     try {
       if (existingUser.id) {
-        const userRef = doc(db, "userDetails", existingUser.id);
+        const filteredModules = Object.fromEntries(
+          Object.entries(selectedModules).filter(
+            ([_, sections]) => sections.length > 0
+          )
+        );
+        const userRef = doc(db, "accessControl", existingUser.id);
 
         let updatedData = {
           empID: data.empID,
-          permission: selectedModules,
+          setPermission: filteredModules,
           createdAt: new Date().toISOString(),
         };
+
+        console.log("updatedData : ", updatedData);
         await updateDoc(userRef, {
           ...updatedData,
         });
@@ -108,7 +130,7 @@ const AddNewUser: React.FC = () => {
           phone: "",
         });
 
-        setSelectedModules([]);
+        setSelectedModules({});
       } else {
         console.log("No user found with the given empId.");
       }
@@ -120,7 +142,7 @@ const AddNewUser: React.FC = () => {
   // Check user exists or not
   const fetchDataByEmpID = async (empID: string) => {
     const fetchQuery = query(
-      collection(db, "userDetails"),
+      collection(db, "accessControl"),
       where("empID", "==", empID)
     );
 
@@ -165,7 +187,7 @@ const AddNewUser: React.FC = () => {
     // get data by using 'where' clause
     try {
       const fetchQuery = query(
-        collection(db, "userDetails"),
+        collection(db, "accessControl"),
         where("empID", "==", user?.empID)
       );
 
@@ -185,8 +207,8 @@ const AddNewUser: React.FC = () => {
         position: user.position || "",
         phone: user.contact || "",
       });
-
-      setSelectedModules((result as any)?.permission || []);
+      console.log(result);
+      setSelectedModules((result as any)?.setPermission || []);
     } catch (error) {
       console.error("Error fetching users by empId:", error);
       alert("Something wrong in the code");

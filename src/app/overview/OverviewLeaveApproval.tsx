@@ -1,8 +1,14 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs, orderBy, query, limit, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  limit,
+  where,
+} from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { TableFormate } from "@/components/TableFormate";
 
@@ -20,8 +26,15 @@ interface LeaveData {
   // Add other properties as needed
 }
 
- export const OverviewLeaveApproval = () => {
-  const Heading = ["EmpID", "Duration", "Start Date", "End Date", "Type", "Actions"];
+export const OverviewLeaveApproval = () => {
+  const Heading = [
+    "EmpID",
+    "Duration",
+    "Start Date",
+    "End Date",
+    "Type",
+    "Actions",
+  ];
   const [empLeave, setEmpLeave] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,7 +43,7 @@ interface LeaveData {
     const fetchLeaves = async () => {
       try {
         setLoading(true);
-        const empID = localStorage.getItem("empID"); 
+        const empID = localStorage.getItem("empID");
         if (!empID) {
           setError("Employee ID not found");
           return;
@@ -44,9 +57,9 @@ interface LeaveData {
             orderBy("createdAt", "desc"),
             limit(3)
           );
-          
+
           const querySnapshot = await getDocs(q);
-          const leaveList = querySnapshot.docs.map(doc => {
+          const leaveList = querySnapshot.docs.map((doc) => {
             const data = doc.data();
             return {
               id: doc.id,
@@ -58,25 +71,31 @@ interface LeaveData {
               leaveStatus: data.leaveStatus || "N/A",
               leaveReason: data.leaveReason || "N/A",
               remarks: data.remarks || "N/A",
-              createdAt: data.createdAt?.toDate?.().toLocaleString() || data.createdAt || "N/A"
+              createdAt:
+                data.createdAt?.toDate?.().toLocaleString() ||
+                data.createdAt ||
+                "N/A",
             } as LeaveData;
           });
-          
+
           setEmpLeave(leaveList);
           setError("");
         } catch (queryError) {
-          console.warn("Optimized query failed, falling back to client-side filtering", queryError);
-          
+          console.warn(
+            "Optimized query failed, falling back to client-side filtering",
+            queryError
+          );
+
           // Option 2: Fallback to client-side filtering if index isn't ready
           const q = query(
             collection(db, "leaveStatus"),
             orderBy("createdAt", "desc"),
             limit(100) // Get more records and filter client-side
           );
-          
+
           const querySnapshot = await getDocs(q);
           const leaveList = querySnapshot.docs
-            .map(doc => {
+            .map((doc) => {
               const data = doc.data();
               return {
                 id: doc.id,
@@ -88,12 +107,15 @@ interface LeaveData {
                 leaveStatus: data.leaveStatus || "N/A",
                 leaveReason: data.leaveReason || "N/A",
                 remarks: data.remarks || "N/A",
-                createdAt: data.createdAt?.toDate?.().toLocaleString() || data.createdAt || "N/A"
+                createdAt:
+                  data.createdAt?.toDate?.().toLocaleString() ||
+                  data.createdAt ||
+                  "N/A",
               } as LeaveData;
             })
             // .filter(item => item.empID === empID)
-            .slice(0, 3); 
-            
+            .slice(0, 3);
+
           setEmpLeave(leaveList);
         }
       } catch (error) {
@@ -107,16 +129,19 @@ interface LeaveData {
     fetchLeaves();
   }, []);
 
-  if (loading) return <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+    );
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <section className="rounded-xl px-5 py-8 shadow-xl h-full">
-    <div className=" pb-1 my-2">
-      <p className="text-gray text-text_size_3">Leave Approval</p>
-    </div>
-       
-      <div className="bg-white py-5 rounded-lg px-4">
+    <section className="rounded-xl px-5 py-7 overflow-hidden shadow-xl h-full ">
+      <div className=" pb-2">
+        <p className="text-gray text_size_3">Leave Approval</p>
+      </div>
+
+      <div className="bg-white py-5 rounded-lg px-4 ">
         <TableFormate
           heading={Heading}
           list="empLeave"
@@ -126,7 +151,7 @@ interface LeaveData {
           leaveApproval={[]}
         />
       </div>
-      <div className="text-mediumlite_grey text-[13px] font-medium flex gap-10 my-5">
+      <div className="text-mediumlite_grey text-[13px] font-medium flex gap-10 my-5 mb-10">
         <p className=" relative before:mx-2 before:w-2.5 before:h-2.5 before:bg-approved_blue before:content-[''] before:inline-block">
           Approved
         </p>
@@ -140,4 +165,3 @@ interface LeaveData {
     </section>
   );
 };
-

@@ -25,13 +25,14 @@ interface TableProps {
   setLeaveApproval?: React.Dispatch<
     React.SetStateAction<EnrichedLeaveStatus[]>
   >;
+  hiddenBtn?:boolean;
 }
 
 export const ViewLeaveStatus = ({
   leaveData,
   close,
   userAcess,
-  setLeaveApproval,
+  setLeaveApproval, hiddenBtn
 }: TableProps) => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
@@ -100,7 +101,7 @@ export const ViewLeaveStatus = ({
 
       setRemarks("");
       setSelectedDocId(null);
-      setShowPopup(false);
+      // setShowPopup(false);
        window.location.href="/leaveapproval"
      
     } catch (err) {
@@ -158,7 +159,7 @@ export const ViewLeaveStatus = ({
             <p className="flex w-[90%]">
               <span className="font-semibold flex-1">Durations</span> :{" "}
               <span className="flex-1 pl-2">
-                {leaveData?.takenDay || "N/A"}
+                {leaveData?.duration || "N/A"}
               </span>
             </p>
             <p className="flex w-[90%]">
@@ -219,6 +220,9 @@ export const ViewLeaveStatus = ({
               </tbody>
             </table>
           </div>
+          {
+            hiddenBtn && 
+            
           <div className="center gap-10 text_size_4">
             <button
               className="border border-approved_blue px-4 py-1 text-gray"
@@ -238,6 +242,7 @@ export const ViewLeaveStatus = ({
               Approve
             </button>
           </div>
+          }
         </div>
       </div>
       {showPopup && (

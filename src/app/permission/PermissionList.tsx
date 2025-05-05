@@ -143,22 +143,22 @@ const PermissionList = () => {
     <section>
       <div className="flex justify-start items-center text-[22px] text-gray gap-10 my-10">
         <IoArrowBack onClick={() => router.back()} className="cursor-pointer" />
-        <h3>Permission List</h3>
+        <h3>Leave Management</h3>
       </div>
 
       <div className="py-7 bg-white rounded-xl px-10 space-y-7">
         <section className="flex justify-between items-center ">
-          <h1 className="text-xl font-semibold text-gray">Leave List</h1>
+          <h1 className="text-xl font-semibold text-gray">Permission List</h1>
         </section>
 
         {permissionHis.length > 0 ? (
-          <table className="min-w-full border border-gray-200">
-            <thead className="bg-gray-100">
+          <table className="min-w-full  border-gray-200">
+            <thead className="border-b text-center border-morelite_grey">
               <tr>
                 {Heading.map((title, idx) => (
                   <th
                     key={idx}
-                    className="px-4 py-2 text-left text-gray text-[16px] font-medium"
+                    className="px-4 py-2  text-gray text-[16px] font-medium"
                   >
                     {title}
                   </th>
@@ -167,7 +167,7 @@ const PermissionList = () => {
             </thead>
             <tbody>
               {permissionHis.map((item, index) => (
-                <tr className="text-sm text-gray" key={index}>
+                <tr className="text-sm text-medium_gray text-center border-b  border-morelite_grey" key={index}>
                   <td className="px-4 py-2">{item.empID}</td>
                   <td className="px-4 py-2">{item.name}</td>
                   <td className="px-4 py-2 text-center">
