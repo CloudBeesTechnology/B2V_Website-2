@@ -1,6 +1,12 @@
 import { IoMdCloseCircle } from "react-icons/io";
 import { DateFormat } from "./DateFormate";
 import clsx from "clsx";
+import { useState } from "react";
+import { RejectedPopup } from "@/app/leaveapproval/RejectedPopup";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+import { EnrichedLeaveStatus } from "../app/leaveapproval/LeaveApproval";
+import { useRouter } from "next/navigation";
 
 interface leaveStatus {
   empID: string;
@@ -11,17 +17,96 @@ interface leaveStatus {
 interface UserAcess {
   userAcess: string | null;
 }
+
 interface TableProps {
   leaveData?: leaveStatus;
   close?: () => void;
   userAcess?: UserAcess;
+  setLeaveApproval?: React.Dispatch<
+    React.SetStateAction<EnrichedLeaveStatus[]>
+  >;
 }
 
 export const ViewLeaveStatus = ({
   leaveData,
   close,
   userAcess,
+  setLeaveApproval,
 }: TableProps) => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("Pending");
+  const router = useRouter();
+  const [remarks, setRemarks] = useState("");
+  const handleClose = () => {
+    setShowPopup(!showPopup);
+  };
+  const handleSharedData = () => {
+    setShowPopup(!showPopup);
+    setRemarks("");
+    setSelectedDocId(null);
+  };
+  const handleStatusChange = (docId: string, newStatus: string) => {
+    if (!docId) {
+      return;
+    }
+    if (newStatus === "Rejected") {
+      setSelectedDocId(docId);
+      setSelectedStatus(newStatus);
+      handleClose();
+    } else {
+      // console.log(newStatus);
+      updateLeaveStatus(docId, newStatus);
+    }
+  };
+
+  const updateLeaveStatus = async (
+    docId: string,
+    status: string,
+    remarksText: string = ""
+  ) => {
+    try {
+      const leaveDocRef = doc(db, "leaveStatus", docId);
+      const dateStatus = new Date().toISOString().split("T")[0];
+
+      // Create update data dynamically based on role
+      let updateData: any = {};
+
+      if (userAcess?.userAcess === "LEAD") {
+        updateData = {
+          ...updateData,
+          leadDate: dateStatus,
+          leadStatus: status,
+          ...(status === "Rejected" && { leadRemarks: remarksText }),
+        };
+      } else if (userAcess?.userAcess === "MANAGER") {
+        updateData = {
+          ...updateData,
+          managerDate: dateStatus,
+          managerStatus: status,
+          ...(status === "Rejected" && { manageRemarks: remarksText }),
+        };
+      }
+      // console.log(updateData, "mnjuyyt");
+
+      await updateDoc(leaveDocRef, updateData);
+      setLeaveApproval?.((prev) =>
+        prev.map((leave) =>
+          leave.docId === docId
+            ? { ...leave, leaveStatus: status, remarks: remarksText }
+            : leave
+        )
+      );
+
+      setRemarks("");
+      setSelectedDocId(null);
+      setShowPopup(false);
+       window.location.href="/leaveapproval"
+     
+    } catch (err) {
+      console.error("Failed to update leave status:", err);
+    }
+  };
   return (
     <section className="fixed inset-0 w-full bg-[#07060788] z-[99999] flex items-center justify-center">
       {" "}
@@ -29,7 +114,7 @@ export const ViewLeaveStatus = ({
         {/* Close Button */}
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto p-6 max-h-[85vh]  border">
+        <div className="overflow-y-auto p-6 max-h-[85vh]">
           <div className="relative">
             <h1 className="text_size_2 text-center text-gray my-5">
               Leave Application Form
@@ -93,24 +178,26 @@ export const ViewLeaveStatus = ({
                 </tr>
               </thead>
               <tbody className=" text-center ">
-                <tr>
-                  <td className="px-3 py-1">Lead</td>
-                  <td
-                    className={clsx(
-                      "px-3 py-1",
-                      leaveData?.leadStatus === "Approved"
-                        ? "text-approved_blue"
-                        : leaveData?.leadStatus === "Rejected"
-                        ? "text-red"
-                        : "text-gray"
-                    )}
-                  >
-                    {leaveData?.leadStatus}
-                  </td>
-                  <td className="px-3 py-1">
-                    {leaveData?.leadRemarks || "No Remaks"}
-                  </td>
-                </tr>
+                {leaveData?.leadEmpID && (
+                  <tr>
+                    <td className="px-3 py-1">Lead</td>
+                    <td
+                      className={clsx(
+                        "px-3 py-1",
+                        leaveData?.leadStatus === "Approved"
+                          ? "text-approved_blue"
+                          : leaveData?.leadStatus === "Rejected"
+                          ? "text-red"
+                          : "text-gray"
+                      )}
+                    >
+                      {leaveData?.leadStatus}
+                    </td>
+                    <td className="px-3 py-1">
+                      {leaveData?.leadRemarks || "No Remaks"}
+                    </td>
+                  </tr>
+                )}
                 <tr>
                   <td className="px-3 py-1">Manager</td>
                   <td
@@ -132,18 +219,37 @@ export const ViewLeaveStatus = ({
               </tbody>
             </table>
           </div>
-          {userAcess?.userAcess === "MANAGER" && (
-            <div className="center gap-10 text_size_4">
-              <button className="border border-approved_blue px-4 py-1 text-gray">
-                Reject
-              </button>
-              <button className="text-white bg-approved_blue px-4 py-1">
-                Approve
-              </button>
-            </div>
-          )}
+          <div className="center gap-10 text_size_4">
+            <button
+              className="border border-approved_blue px-4 py-1 text-gray"
+              onClick={() => {
+                handleStatusChange?.(leaveData?.docId, "Rejected");
+              }}
+            >
+              Reject
+            </button>
+            <button
+              className="text-white bg-approved_blue px-4 py-1"
+              onClick={() => {
+                handleStatusChange?.(leaveData?.docId, "Approved");
+                console.log("784512");
+              }}
+            >
+              Approve
+            </button>
+          </div>
         </div>
       </div>
+      {showPopup && (
+        <RejectedPopup
+          handleSharedData={handleSharedData}
+          remarks={remarks}
+          setRemarks={setRemarks}
+          updateLeaveStatus={updateLeaveStatus}
+          selectedDocId={selectedDocId}
+          selectedStatus={selectedStatus}
+        />
+      )}
     </section>
   );
 };

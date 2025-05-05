@@ -18,9 +18,11 @@ import { IoArrowBack } from "react-icons/io5";
 import clsx from "clsx";
 import { ViewLeaveStatus } from "@/components/ViewLeaveStatus";
 
-type LeaveStatus = {
+export type LeaveStatus = {
   empID: string;
   leaveStatus: string;
+  leadStatus: string;
+  managerStatus: string;
   leaveType: string;
   takenDay: string;
   startDate: string;
@@ -31,7 +33,7 @@ type LeaveStatus = {
   createdAt: string;
 };
 
-type EnrichedLeaveStatus = LeaveStatus & {
+export type EnrichedLeaveStatus = LeaveStatus & {
   name: string;
   docId: string;
   leadName?: string;
@@ -42,41 +44,40 @@ type EnrichedLeaveStatus = LeaveStatus & {
 
 const LeaveApproval = () => {
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [userRoleAccess, setUserRoleAccess] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string>("Pending");
-  const [remarks, setRemarks] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [leaveDetails, setLeaveDetails] = useState<any | null>(null);
   const [leaveDetailsPopup, setLeaveDetailsPopup] = useState(false);
   const checking = async (leave: any) => {
-    const qLead = query(
-      collection(db, "employeeDetails"),
-      where("empID", "==", leave.leadEmpID)
-    );
-    const leadSnapshot = await getDocs(qLead);
     let leadName = "N/A";
-    if (!leadSnapshot.empty) {
-      leadName = leadSnapshot.docs[0].data().name || "N/A";
+    if (leave?.leadEmpID) {
+      const qLead = query(
+        collection(db, "employeeDetails"),
+        where("empID", "==", leave.leadEmpID)
+      );
+      const leadSnap = await getDocs(qLead);
+      if (!leadSnap.empty) {
+        leadName = leadSnap.docs[0].data().name || "N/A";
+      }
     }
-
-    const qManager = query(
-      collection(db, "employeeDetails"),
-      where("empID", "==", leave.managerEmpID)
-    );
-    const managerSnapshot = await getDocs(qManager);
     let managerName = "N/A";
-    if (!managerSnapshot.empty) {
-      managerName = managerSnapshot.docs[0].data().name || "N/A";
+    if (leave?.managerEmpID) {
+      const qManager = query(
+        collection(db, "employeeDetails"),
+        where("empID", "==", leave.managerEmpID)
+      );
+      const managerSnapshot = await getDocs(qManager);
+      if (!managerSnapshot.empty) {
+        managerName = managerSnapshot.docs[0].data().name || "N/A";
+      }
     }
-
     return {
       leadName,
       managerName,
     };
   };
+
   useEffect(() => {
     const userRole = localStorage?.getItem("userRole")?.toUpperCase() || null;
     const userEmpID = localStorage?.getItem("empID")?.toUpperCase() || null;
@@ -98,10 +99,10 @@ const LeaveApproval = () => {
             leadEmpID: doc.data().leadEmpID,
             managerEmpID: doc.data().managerEmpID,
             createdAt: doc.data().createdAt,
-            leadStatus:doc.data().leadStatus,
-            managerStatus:doc.data().managerStatus,
-            leadRemarks:doc.data().  leadRemarks,
-            managerRemarks:doc.data().managerRemarks,
+            leadStatus: doc.data().leadStatus,
+            managerStatus: doc.data().managerStatus,
+            leadRemarks: doc.data().leadRemarks,
+            managerRemarks: doc.data().managerRemarks,
             name: "",
             remarks: doc.data().remarks || "",
             leadName: "", // To be added
@@ -132,13 +133,20 @@ const LeaveApproval = () => {
         const enrichedList: EnrichedLeaveStatus[] = [];
 
         for (const leave of leaveList) {
+          console.log(userRole);
+
           if (
-            (leave.leaveStatus === "Pending" &&
-              userEmpID === leave.leadEmpID) ||
-            userEmpID === leave.managerEmpID
+            userRole === "ADMIN" ||
+            (leave.leadStatus == "Pending" && userEmpID === leave.leadEmpID) ||
+            (userEmpID === leave.managerEmpID &&
+              leave.managerStatus == "Pending" &&
+              leave.leadStatus === "Approved") ||
+            (userEmpID === leave.managerEmpID &&
+              !leave.leadEmpID &&
+              leave.managerStatus == "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
-            // console.log(leadName,managerName);
+            console.log(leadName, managerName);
             const empInfo = empMap.get(leave.empID);
             enrichedList.push({
               ...leave,
@@ -149,6 +157,7 @@ const LeaveApproval = () => {
             });
           }
         }
+        console.log(enrichedList);
 
         setLeaveApproval(enrichedList);
       } catch (error) {
@@ -174,80 +183,23 @@ const LeaveApproval = () => {
       : userRoleAccess === "MANAGER"
       ? "Lead Name"
       : null,
+
     "Reason(s)",
-    userRoleAccess === "LEAD" && "Actions",
     "View",
   ].filter(Boolean);
-
-  const handleStatusChange = (docId: string, newStatus: string) => {
-    if (newStatus === "Rejected") {
-      setSelectedDocId(docId);
-      setSelectedStatus(newStatus);
-      setShowPopup(true);
-    } else {
-      updateLeaveStatus(docId, newStatus);
-    }
-  };
-
-  const updateLeaveStatus = async (
-    docId: string,
-    status: string,
-    remarksText: string = ""
-  ) => {
-    try {
-      const leaveDocRef = doc(db, "leaveStatus", docId);
-      const dateStatus = new Date().toISOString().split("T")[0];
-
-      // Create update data dynamically based on role
-      let updateData: any = {};
-
-      if (userRoleAccess === "LEAD") {
-        updateData = {
-          ...updateData,
-          leadDate: dateStatus,
-          leadStatus: status,
-          ...(status === "Rejected" && { leadRemarks: remarksText }),
-        };
-      } else if (userRoleAccess === "MANAGER") {
-        updateData = {
-          ...updateData,
-          managerDate: dateStatus,
-          manageremarks: remarksText,
-          ...(status === "Rejected" && { manageremarks: remarksText }),
-        };
-      }
-      // console.log(updateData,"mnjuyyt");
-
-      await updateDoc(leaveDocRef, updateData);
-
-      setLeaveApproval((prev) =>
-        prev.map((leave) =>
-          leave.docId === docId
-            ? { ...leave, leaveStatus: status, remarks: remarksText }
-            : leave
-        )
-      );
-
-      setShowPopup(false);
-      setRemarks("");
-      setSelectedDocId(null);
-    } catch (err) {
-      console.error("Failed to update leave status:", err);
-    }
-  };
 
   if (loading)
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
     );
-const handleClose=()=>{
-  setLeaveDetailsPopup(!leaveDetailsPopup)
-}
+  const handleClose = () => {
+    setLeaveDetailsPopup(!leaveDetailsPopup);
+  };
   const handleLeaveDetails = (items: any) => {
     console.log(items, "7845");
 
     setLeaveDetails(items);
-    handleClose()
+    handleClose();
   };
   return (
     <section>
@@ -326,61 +278,16 @@ const handleClose=()=>{
                       <td className="px-4 py-2 pt-3">
                         {userRoleAccess === "LEAD"
                           ? item.managerName
-                          : item.leadName}
+                          : userRoleAccess === "MANAGER" && item.leadEmpID
+                          ? item.leadName
+                          : "N/A"}
                       </td>
                     )}
 
                     <td className="px-4 py-2 w-[250px] pt-3 overflow-y-auto text-wrap overflow-wrap-break-word flex">
                       {item.leaveReason}
                     </td>
-                    {
-                      userRoleAccess === "LEAD" &&
 
-                    <td className="px-4 py-2">
-                      <select
-                        value={item.leaveStatus}
-                        className={clsx(
-                          "border border-gray-300 rounded px-2 py-1 outline-none",
-                          item.leaveStatus === "Pending"
-                            ? "text-medium_orange bg-lite_orange"
-                            : item.leaveStatus === "Approved"
-                            ? "text-approved_blue bg-lite_blue"
-                            : item.leaveStatus === "Rejected"
-                            ? "text-red bg-lite_red"
-                            : ""
-                        )}
-                        onChange={(e) =>
-                          handleStatusChange(item.docId, e.target.value)
-                        }
-                      >
-                        <option
-                          className={clsx(
-                            item.leaveStatus === "Pending" && "text-red"
-                          )}
-                          value="Pending"
-                        >
-                          Pending
-                        </option>
-                        <option
-                          className={clsx(
-                            item.leaveStatus === "Approved" &&
-                              "text-medium_orange"
-                          )}
-                          value="Approved"
-                        >
-                          Approved
-                        </option>
-                        <option
-                          className={clsx(
-                            item.leaveStatus === "Rejected" && "text-red"
-                          )}
-                          value="Rejected"
-                        >
-                          Rejected
-                        </option>
-                      </select>
-                    </td>
-                    }
                     <td
                       className="text-approved_blue text-center px-4 py-2"
                       onClick={() => handleLeaveDetails(item)}
@@ -398,49 +305,15 @@ const handleClose=()=>{
         )}
       </div>
 
-      {/* POPUP Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[400px] shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">
-              Add Rejection Remarks
-            </h3>
-            <textarea
-              className="w-full border border-gray-300 rounded p-2 outline-none"
-              rows={4}
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Enter remarks for rejection..."
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                className="bg-gray-300 text-black px-4 py-2 rounded"
-                onClick={() => {
-                  setShowPopup(false);
-                  setRemarks("");
-                  setSelectedDocId(null);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-primary text-white px-4 py-2 rounded"
-                onClick={() => {
-                  if (selectedDocId) {
-                    updateLeaveStatus(selectedDocId, selectedStatus, remarks);
-                  }
-                }}
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* view form popup */}
-
-      {leaveDetailsPopup && <ViewLeaveStatus leaveData={leaveDetails}  close={handleClose}   userAcess={{ userAcess: userRoleAccess }} />}
+      {leaveDetailsPopup && (
+        <ViewLeaveStatus
+          leaveData={leaveDetails}
+          setLeaveApproval={setLeaveApproval}
+          close={handleClose}
+          userAcess={{ userAcess: userRoleAccess }}
+        />
+      )}
     </section>
   );
 };

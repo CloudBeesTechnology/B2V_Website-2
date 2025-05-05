@@ -209,7 +209,7 @@ const Sidebar = () => {
     EMPLOYEE: employeePortal,
     INTERN: internPortal,
     LEAD:adminPortal,
-    MANGER:adminPortal
+    MANAGER:adminPortal
   };
 
   const filteredNavList =
