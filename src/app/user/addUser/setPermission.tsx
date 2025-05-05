@@ -183,19 +183,7 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
           );
         })}
       </div>
-       {/* Selected Output */}
-       <div className="mt-4">
-        <h3 className="text-base font-semibold">Selected Output:</h3>
-        <pre className="text-sm bg-gray-100 p-2 mt-1 rounded overflow-x-auto">
-          {JSON.stringify(
-            Object.entries(selectedModules)
-              .map(([submodule, sections]) => ({ submodule, sections }))
-              .filter((s) => s.sections.length > 0),
-            null,
-            2
-          )}
-        </pre>
-      </div>
+      {/* Selected Output */}
     </section>
   );
 };
