@@ -1,7 +1,12 @@
+"use client";
+import useCheckPermission from "../utils/customHooks/useCheckPermission";
 import { EmployeeHome } from "./EmployeeHome";
 
 export default function Employee() {
-  return <div>
-    <EmployeeHome/>
-  </div>
+  const { hasPermission } = useCheckPermission();
+  return (
+    <div>
+      {hasPermission("Employee", "Add Employee Info") && <EmployeeHome />}
+    </div>
+  );
 }
