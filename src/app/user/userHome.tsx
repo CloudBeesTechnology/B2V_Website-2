@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import useCheckPermission from "../utils/customHooks/useCheckPermission";
 type CardType = {
   title: string;
   btnName: string;
@@ -22,6 +23,8 @@ const tiles: CardType[] = [
 ];
 
 const UserHome: React.FC = () => {
+  const { hasPermission } = useCheckPermission();
+
   const router = useRouter();
 
   const handleClick = (route: string) => {

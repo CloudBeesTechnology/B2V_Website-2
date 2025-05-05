@@ -46,7 +46,7 @@ const EmpHistoryOfLeave = () => {
 
   if (loading)
     return (
-      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+      <div className="text-center text-gray my-20 text-lg">Loading...</div>
     );
 
   return (

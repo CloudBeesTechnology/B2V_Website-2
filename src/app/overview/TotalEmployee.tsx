@@ -24,17 +24,13 @@ const TotalEmployee: React.FC<TotalEmployeeProps> = ({ allEmployee }) => {
 
   useEffect(() => {
     const getAllEmployee = async () => {
-      const allEmpData = allEmployee.map((val) => ({
-        ...val,
-        gender: val.name === "Vedambigai@Sevanthi" ? "female" : "male",
-      }));
-
       let maleCount = 0;
       let femaleCount = 0;
 
-      allEmployee.forEach((val) => {
-        if (val?.gender === "male") maleCount++;
-        else if (val?.gender === "female") femaleCount++;
+      allEmployee.map((val) => {
+        let gender = val?.gender?.toUpperCase();
+        if (gender === "MALE") maleCount++;
+        else if (gender === "FEMALE") femaleCount++;
       });
 
       setMaleEmpCount(maleCount);

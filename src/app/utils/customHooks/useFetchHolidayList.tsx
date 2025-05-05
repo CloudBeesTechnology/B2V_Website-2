@@ -53,6 +53,7 @@ const useFetchHolidayList = () => {
 
       let India = "IN";
       let Year = `${getCurrentYear}`;
+
       try {
         const response = await fetch(
           `https://calendarific.com/api/v2/holidays?api_key=KaX8Jjn8nBTUDWalYku3aMvqgJ7A8sz3&country=${India}&year=${Year}`
@@ -66,6 +67,7 @@ const useFetchHolidayList = () => {
         if (data?.response?.holidays) {
           const holidayRes = data.response.holidays;
 
+          console.log("holidayRes : ", holidayRes);
           const finalHolidayList = HolidayList?.map((val) => {
             // find the holiday in API response that matches apiHname
 
