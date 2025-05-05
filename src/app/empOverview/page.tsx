@@ -71,7 +71,9 @@ const EmpOverview: React.FC = () => {
         {hasPermission("Overview", "Today task") && <EmpTodayTask />}
       </section>
 
-      {hasPermission("Overview", "Leave Requests") && <EmpLeaveStatusTable />}
+      {hasPermission("Overview", "Leave Applications") && (
+        <EmpLeaveStatusTable />
+      )}
     </main>
   );
 };

@@ -34,6 +34,7 @@ const modulesData: Submodule[] = [
       "Holidays",
       "Employee card",
       "Available Leaves",
+      "Leave Applications",
       "Today task",
     ],
   },
