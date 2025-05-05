@@ -116,6 +116,8 @@ export default function SignUp() {
               <option value="">Select role</option>
               <option value="Admin">Admin</option>
               <option value="Employee">Employee</option>
+              <option value="Lead">Lead</option>
+              <option value="Manager">Manager</option>
               <option value="Intern">Intern</option>
             </select>
           </div>
@@ -147,7 +149,7 @@ export default function SignUp() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10"
+          className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10 "
         >
           SIGN UP
         </button>
@@ -303,6 +305,3 @@ export default function SignUp() {
 //     </AuthLayout>
 //   );
 // }
-
-
-

@@ -139,7 +139,7 @@ const Sidebar = () => {
 
     if (userID) {
       getUserAndPermissions(userID).then((data) => {
-        const flatPermissions = Object.keys(data.setPermission);
+        const flatPermissions = Object?.keys(data.setPermission);
 
         setAllowedMenuItems(flatPermissions);
       });

@@ -33,7 +33,7 @@ interface FamilyDetails {
 
 export const FamilyHome = () => {
   const [popup, setPopup] = useState(false);
-  const { storedEmpData,handleStoredData } = UseEmployeeList();
+  const { storedEmpData, handleStoredData } = UseEmployeeList();
 
   const {
     register,
@@ -71,28 +71,31 @@ export const FamilyHome = () => {
         orderBy("empID", "desc"),
         limit(1)
       );
-
       const querySnapshot = await getDocs(empQuery);
-      const allEmpData  = query(
-        collection(db, "employeeDetails"),
-        where("empID", "==", storedEmpData.empID)
-      );
-      
-      const allQuerySnapShot = await getDocs(allEmpData);
+      if (storedEmpData?.empID) {
+        const allEmpData = query(
+          collection(db, "employeeDetails"),
+          where("empID", "==", storedEmpData.empID)
+        );
 
-      if (!allQuerySnapShot.empty) {
-    
-        const combinedData = {
-          ...parsedExperienceData,
-          ...parsedPersonalInfo,
-          ...parsedEducationInfo,
-          ...data,
-        };
-        // console.log(allQuerySnapShot.docs[0].id);
-        
-        const updatedocRef =  doc(db, "employeeDetails", allQuerySnapShot.docs[0].id);
-       const finalResult= await updateDoc(updatedocRef , combinedData); 
-       
+        const allQuerySnapShot = await getDocs(allEmpData);
+
+        if (!allQuerySnapShot.empty) {
+          const combinedData = {
+            ...parsedExperienceData,
+            ...parsedPersonalInfo,
+            ...parsedEducationInfo,
+            ...data,
+          };
+          // console.log(allQuerySnapShot.docs[0].id);
+
+          const updatedocRef = doc(
+            db,
+            "employeeDetails",
+            allQuerySnapShot.docs[0].id
+          );
+          const finalResult = await updateDoc(updatedocRef, combinedData);
+        }
       } else {
         // console.log("not match");
 
@@ -121,7 +124,7 @@ export const FamilyHome = () => {
         // // console.log("Data successfully written with ID:", docRef.id);
       }
 
-      handleStoredData("")
+      handleStoredData("");
       localStorage.removeItem("experienceData");
       localStorage.removeItem("personalInfo");
       localStorage.removeItem("educationData");

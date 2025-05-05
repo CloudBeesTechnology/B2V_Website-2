@@ -76,7 +76,7 @@ export default function EmailVerify() {
           type="submit"
           className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10"
         >
-          SEND RESET LINK
+          VERIFY
         </button>
       </form>
     </AuthLayout>

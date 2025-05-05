@@ -47,6 +47,15 @@ interface empPermission {
   reason: string;
   status: string;
 }
+interface permissionList {
+  empID: string;
+  name: string;
+  date: string;
+  hours: string;
+  reason: string;
+  status: string;
+  remarks?: string;
+}
 
 interface allEmployee {
   profile?: string;
@@ -62,9 +71,10 @@ interface allEmployee {
 interface TableProps {
   heading?: string[];
   ovla?: Ovla[];
-  list?: "OVLA" | "AllEmp" | "LeaveApproval" | "empLeave" | "empPermission";
+  list?: "OVLA" | "AllEmp" | "LeaveApproval" | "empLeave" | "empPermission" | "permissionList";
   allEmp?: allEmployee[];
   leaveApproval?: LA[];
+  permissionList?: permissionList[];
   secondaryEmpPermission?: empPermission[];
   secondaryEmpLeave?: EmpLeave[];
   filterStatus?: "Approved" | "Rejected";
@@ -77,6 +87,7 @@ export const TableFormate = ({
   list,
   allEmp,
   leaveApproval,
+  permissionList,
   secondaryEmpPermission,
   secondaryEmpLeave,
   filterStatus,
@@ -111,6 +122,7 @@ export const TableFormate = ({
           </thead>
         )}
         <tbody>
+          
           {list === "OVLA" &&
             ovla.slice(0, 4).map((val, index) => (
               <tr key={index} className="text-center text-sm text-medium_gray border-b border-morelite_grey">
@@ -239,6 +251,43 @@ export const TableFormate = ({
               );
             })}
 
+          {list === "permissionList" &&
+            permissionList?.map((val, index) => {
+              return (
+                <tr
+                  key={index}
+                  className="text-center text-sm text-medium_gray border-b border-morelite_grey"
+                >
+                  <td className=" py-3 px-4">{val.empID || "N/A"}</td>
+                  <td className=" py-3 px-4">{val.name || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.date ? DateFormat(val?.date) : "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.reason}</td>
+
+                  <td className=" py-3 px-4">
+                    <span
+                      className={`
+      ${
+        val?.status === "Pending"
+          ? "bg-lite_orange text-medium_orange"
+          : ""
+      }
+      ${val?.status === "Rejected" ? "bg-lite_red text-medium_red" : ""}
+      ${val?.status === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
+    `}
+                    >
+                      {val?.status || "N/A"}
+                    </span>
+                  </td>
+                  {/* {filterStatus === "Rejected" && (
+                    <td className=" py-3 px-4 text-wrap overflow-wrap-break-word w-[250px]">
+                      {val?.remarks || "No remarks"}
+                    </td>
+                  )} */}
+                </tr>
+              );
+            })}
+
           {list === "empLeave" &&
             secondaryEmpLeave?.map((val, index) => (
               <tr
@@ -276,16 +325,6 @@ export const TableFormate = ({
                     {val?.leaveStatus || "N/A"}
                   </span>
                 </td>
-                {/* <td className="text-start py-3 px-4 border-b border-t border-morelite_grey">
-  {val.createdAt ? (
-    <>
-      <div>{new Date(val.createdAt).toLocaleDateString()}</div>
-      <div className="text-sm text-gray-500">
-        {new Date(val.createdAt).toLocaleTimeString()}
-      </div>
-    </>
-  ) : "N/A"}
-</td> */}
               </tr>
             ))}
         </tbody>
