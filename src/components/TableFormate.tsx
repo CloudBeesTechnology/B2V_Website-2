@@ -36,6 +36,7 @@ interface EmpLeave {
   leaveType: string;
   takenDay?: string;
   leaveStatus: string;
+  finalStatus?: string;
   remarks?: string;
   leaveReason?: string;
   createdAt?: string;
@@ -99,7 +100,8 @@ export const TableFormate = ({
   secondaryEmpPermission,
   secondaryEmpLeave,
   filterStatus,
-  viewData,handleLeaveDetails
+  viewData,
+  handleLeaveDetails,
 }: TableProps) => {
   const [selectedLeave, setSelectedLeave] = useState<EmpLeave | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -213,12 +215,11 @@ export const TableFormate = ({
                   <td className=" py-3 px-4">{val?.duration}</td>
                   <td className=" py-3 px-4">{val?.leaveReason}</td>
                   <td
-                      className="text-approved_blue text-center px-4 py-2"
-                      onClick={() => handleLeaveDetails?.(val)}
-                    >
-                  
-                      View
-                    </td>
+                    className="text-approved_blue text-center px-4 py-2"
+                    onClick={() => handleLeaveDetails?.(val)}
+                  >
+                    View
+                  </td>
                   {filterStatus === "Rejected" && (
                     <td className=" py-3 px-4 text-wrap overflow-wrap-break-word w-[250px]">
                       {val?.remarks || "No remarks"}
@@ -328,15 +329,15 @@ export const TableFormate = ({
                   <span
                     className={`
       ${
-        val?.leaveStatus === "Pending"
+        val?.finalStatus === "Pending"
           ? "bg-lite_orange text-medium_orange"
           : ""
       }
-      ${val?.leaveStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
-      ${val?.leaveStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
+      ${val?.finalStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
+      ${val?.finalStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
     `}
                   >
-                    {val?.leaveStatus || "N/A"}
+                    {val?.finalStatus || "N/A"}
                   </span>
                 </td>
               </tr>

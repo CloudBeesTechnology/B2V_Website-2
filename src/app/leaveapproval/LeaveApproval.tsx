@@ -42,6 +42,7 @@ export type EnrichedLeaveStatus = LeaveStatus & {
   managerName?: string;
   department?: string;
   remarks?: string;
+  finalValue?:string;
 };
 
 const LeaveApproval = () => {
