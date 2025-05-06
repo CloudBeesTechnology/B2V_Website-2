@@ -163,7 +163,7 @@ const {storedEmpData}=UseEmployeeList()
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-10 mt-5 pr-20">
+            <div className="grid grid-cols-3 gap-10 ">
               <div className="flex flex-col gap-2 ">
                 <label htmlFor="manager" className="text-[15px] text-gray ">
                   Manager 
