@@ -12,9 +12,16 @@ import { LeaveStatus } from "../leaveapproval/LeaveApproval";
 import { EnrichedLeaveStatus } from "../leaveapproval/LeaveApproval";
 import { ViewLeaveStatus } from "@/components/ViewLeaveStatus";
 
+type LeaveEntry = {
+  empID: string;
+  [key: string]: string | undefined;
+};
 const LeaveHistory = () => {
   const router = useRouter();
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
+  const [finalData, setFinalData] = useState<LeaveEntry[]>([]);
   const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">(
     "Approved"
   );
@@ -185,6 +192,8 @@ const LeaveHistory = () => {
               <label className="text-[#7E7D7D] mb-1">Start Date</label>
               <input
                 type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 className="border border-[#9D9393]   text-gray rounded px-3 py-2"
               />
             </div>
@@ -192,6 +201,8 @@ const LeaveHistory = () => {
               <label className="text-[#7E7D7D] mb-1">End Date</label>
               <input
                 type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
                 className="border border-[#9D9393] text-gray rounded px-3 py-2"
               />
             </div>
@@ -247,3 +258,4 @@ const LeaveHistory = () => {
 };
 
 export default LeaveHistory;
+
