@@ -18,7 +18,7 @@ type LeaveStatus = {
   endDate: string;
   createdDate: string;
   remarks?: string;
-  reason?:string
+  reason?: string;
 };
 
 type EnrichedLeaveStatus = LeaveStatus & {
@@ -26,9 +26,16 @@ type EnrichedLeaveStatus = LeaveStatus & {
   docId: string;
 };
 
+type LeaveEntry = {
+  empID: string;
+  [key: string]: string | undefined;
+};
 const LeaveHistory = () => {
   const router = useRouter();
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [leaveApproval, setLeaveApproval] = useState<EnrichedLeaveStatus[]>([]);
+  const [finalData, setFinalData] = useState<LeaveEntry[]>([]);
   const [filterStatus, setFilterStatus] = useState<"Approved" | "Rejected">(
     "Approved"
   );
@@ -65,7 +72,6 @@ const LeaveHistory = () => {
             name: "",
           })
         );
-        
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")
@@ -85,7 +91,12 @@ const LeaveHistory = () => {
           name: empMap.get(leave.empID) || "Unknown",
         }));
 
-        setLeaveApproval(enrichedList);
+        const filteredData = enrichedList.filter(
+          (item) => item.leaveStatus === filterStatus
+        );
+
+        setLeaveApproval(filteredData);
+        setFinalData(filteredData);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -96,9 +107,32 @@ const LeaveHistory = () => {
     fetchEmployees();
   }, []);
 
-  const filteredData = leaveApproval.filter(
-    (item) => item.leaveStatus === filterStatus
-  );
+  useEffect(() => {
+    function filterByDateRange(data: any, startDate: string, endDate: string) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      return data.filter((item: any) => {
+        const itemStart = new Date(item.startDate);
+        const itemEnd = new Date(item.endDate);
+
+        return itemStart >= start && itemEnd <= end;
+      });
+    }
+
+    if (startDate && endDate && leaveApproval) {
+      const filteredByDate = filterByDateRange(
+        leaveApproval,
+        startDate,
+        endDate
+      );
+
+      setFinalData(filteredByDate);
+    } else {
+      setFinalData(leaveApproval);
+    }
+  }, [leaveApproval, startDate, endDate]);
+
   if (loading)
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
@@ -117,6 +151,8 @@ const LeaveHistory = () => {
               <label className="text-[#7E7D7D] mb-1">Start Date</label>
               <input
                 type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 className="border border-[#9D9393]   text-gray rounded px-3 py-2"
               />
             </div>
@@ -124,6 +160,8 @@ const LeaveHistory = () => {
               <label className="text-[#7E7D7D] mb-1">End Date</label>
               <input
                 type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
                 className="border border-[#9D9393] text-gray rounded px-3 py-2"
               />
             </div>
@@ -152,11 +190,11 @@ const LeaveHistory = () => {
           </button>
         </div>
         <div className="my-10">
-          {filteredData && filteredData?.length > 0 ? (
+          {finalData && finalData?.length > 0 ? (
             <TableFormate
               heading={Heading}
               list="LeaveApproval"
-              leaveApproval={filteredData}
+              leaveApproval={finalData}
               filterStatus={filterStatus}
             />
           ) : (
