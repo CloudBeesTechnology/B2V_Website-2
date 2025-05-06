@@ -56,6 +56,7 @@ const Searchbox: React.FC<SearchboxProps> = ({
     handleSelect?.(user);
     setSearchTerm(`${user.empID}`);
     setShowDropdown(false);
+    setSearchTerm("");
   };
 
   useEffect(() => {

@@ -183,6 +183,7 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
           );
         })}
       </div>
+      {/* Selected Output */}
     </section>
   );
 };

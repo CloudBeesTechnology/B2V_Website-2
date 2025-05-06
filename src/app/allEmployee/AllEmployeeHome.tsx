@@ -18,7 +18,7 @@ export const AllEmployeeHome = () => {
     "Contact",
     "Email ID",
     "ViewForm",
-    "Edit"
+    "Edit",
   ];
   const [allEmp, setAllEmp] = useState<Array<any> | null>([]);
   const [empPopupData, setEmpPopupData] = useState<any | null>(null);
@@ -34,7 +34,6 @@ export const AllEmployeeHome = () => {
           empID: doc.id,
           ...doc.data(),
         }));
- 
 
         setAllEmp(employeeList);
       } catch (error) {
@@ -46,14 +45,14 @@ export const AllEmployeeHome = () => {
 
     fetchEmployees();
   }, []);
-  const handleClose=()=>{
-    setShowingPopUp(!showingPopUp)
-  }
-const handleViewData=(data:any)=>{
-  // console.log(data);
-  setEmpPopupData(data)
-handleClose()
-}
+  const handleClose = () => {
+    setShowingPopUp(!showingPopUp);
+  };
+  const handleViewData = (data: any) => {
+    // console.log(data);
+    setEmpPopupData(data);
+    handleClose();
+  };
   if (loading)
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
@@ -82,10 +81,9 @@ handleClose()
           <p className="text-center py-4 text-gray-400">Data not found</p>
         )}
       </div>
-      {
-        showingPopUp && <ViewEmpData   allEmp={empPopupData ?? []} close={handleClose}/>
-      }
-
+      {showingPopUp && (
+        <ViewEmpData allEmp={empPopupData ?? []} close={handleClose} />
+      )}
     </section>
   );
 };

@@ -194,7 +194,7 @@ export const TableFormate = ({
 
           {list === "LeaveApproval" &&
             leaveApproval?.map((val, index) => {
-              console.log(val?.name, val);
+              // console.log(val?.name, val);
 
               return (
                 <tr

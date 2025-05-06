@@ -6,7 +6,9 @@ import notepen from "../../../public/assets/employee/notePen.png";
 import Link from "next/link";
 import { db } from "@/lib/firebaseConfig"; // your firestore instance
 import { collection, getDocs } from "firebase/firestore";
+import useCheckPermission from "../utils/customHooks/useCheckPermission";
 export const EmployeeHome = () => {
+  const { hasPermission } = useCheckPermission();
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -30,25 +32,37 @@ export const EmployeeHome = () => {
 
   return (
     <section className="flex gap-10 items-center my-10">
-      <Link
-        href="/allEmployee"
-        onClick={RemoveLocalValues}
-        className="border border-primary center flex-col py-5 rounded-md w-[20%] h-[150px] bg-white shadow-2xl"
-      >
-        <Image
-          src={handperson}
-          alt="hand person not found"
-          width={50}
-          height={50}
-        />
+      {hasPermission("Employee", "All Employee") && (
+        <Link
+          href="/allEmployee"
+          onClick={RemoveLocalValues}
+          className="border border-primary center flex-col py-5 rounded-md w-[20%] h-[150px]"
+        >
+          <Image
+            src={handperson}
+            alt="hand person not found"
+            width={50}
+            height={50}
+          />
 
-        <p className="text_size_8 text-gray">All Employee</p>
-      </Link>
-      <Link href="/employeeDetails" onClick={RemoveLocalValues} className="border border-primary center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px] bg-white shadow-2xl">
-        <Image src={notepen} alt="note with pen not found" width={50}
-          height={50} />
-        <p className="text_size_8 text-gray">Add Employee Info</p>
-      </Link>
+          <p className="text_size_8 text-gray">All Employee</p>
+        </Link>
+      )}
+      {hasPermission("Employee", "Add Employee Info") && (
+        <Link
+          href="/employeeDetails"
+          onClick={RemoveLocalValues}
+          className="border border-primary center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px]"
+        >
+          <Image
+            src={notepen}
+            alt="note with pen not found"
+            width={50}
+            height={50}
+          />
+          <p className="text_size_8 text-gray">Add Employee Info</p>
+        </Link>
+      )}
     </section>
   );
 };
