@@ -25,6 +25,11 @@ const EmpHistoryOfPermission = () => {
         const querySnapshot = await getDocs(collection(db, "applyPermission"));
 
         const permissionData = querySnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
           .map((doc) => doc.data())
           .filter((item) => item.empID === empID); // Only that person's data
 

@@ -29,14 +29,14 @@ const RowSecond: React.FC<FormProps> = ({ register, errors }) => {
           register={register}
           errors={errors?.contact?.message}
         />
-        <div className="center gap-3">
-          <FormField
+        {/* <div className="center gap-3"> */}
+          {/* <FormField
             label="INT ID"
             name="intId"
             type="text"
             register={register}
             errors={errors?.intId?.message}
-          />
+          /> */}
 
           <SelectDropdown
             label="Gender"
@@ -45,7 +45,7 @@ const RowSecond: React.FC<FormProps> = ({ register, errors }) => {
             errors={errors?.gender?.message}
             options={["Male", "Female", "Other"]}
           />
-        </div>
+        {/* </div> */}
       </div>
     </section>
   );

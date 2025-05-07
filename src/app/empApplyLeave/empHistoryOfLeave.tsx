@@ -31,7 +31,11 @@ const EmpHistoryOfLeave = () => {
 
         const querySnapshot = await getDocs(collection(db, "leaveStatus"));
 
-        const leaveList: EnrichedLeaveStatus[] = querySnapshot.docs
+        const leaveList: EnrichedLeaveStatus[] = querySnapshot.docs.sort((a, b) => {
+          const dateA = new Date(a.data().createdAt).getTime();
+          const dateB = new Date(b.data().createdAt).getTime();
+          return dateB - dateA; // descending: latest first
+        })
         .map((doc) => {
           const data = doc.data();
           let finalStatus = "";

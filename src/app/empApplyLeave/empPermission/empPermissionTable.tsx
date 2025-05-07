@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   PermissionFormSchema,
@@ -8,8 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import { SuccessPopUp } from "@/components/SuccessPopUp";
+import { useState } from "react";
 
 const EmpPermissionTable: React.FC = () => {
+  const [showPopup, setShowPopup] = useState(false);
   const {
     register,
     handleSubmit,
@@ -43,6 +46,7 @@ const EmpPermissionTable: React.FC = () => {
       console.log("finalData : ", finalData);
       await createEmpPermission(finalData);
       alert("Form submitted successfully!");
+      setShowPopup(true);
     }
   };
   return (
@@ -107,6 +111,7 @@ const EmpPermissionTable: React.FC = () => {
           </div>
         </div>
       </form>
+      {showPopup && <SuccessPopUp path="/empApplyLeave" />}
     </section>
   );
 };
