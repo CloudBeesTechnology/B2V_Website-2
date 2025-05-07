@@ -27,7 +27,7 @@ interface InternshipFormData {
   status: string;
 }
 
-const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
+const InternStatus: React.FC<InternTableProps> = ({ data }) => {
   const router = useRouter();
 
   const onSubmit = async (formData: InternshipFormData) => {
@@ -140,6 +140,6 @@ const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
   );
 };
 
-export default InternshipTable;
+export default InternStatus;
 
 

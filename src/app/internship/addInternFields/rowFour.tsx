@@ -21,7 +21,7 @@ const RowFour: React.FC<FormProps> = ({ register, errors }) => {
         <FormField
           label="Duration Start"
           name="durationStart"
-          type="text"
+          type="date"
           register={register}
           errors={errors?.durationStart?.message}
         />
@@ -29,7 +29,7 @@ const RowFour: React.FC<FormProps> = ({ register, errors }) => {
         <FormField
           label="Duration End"
           name="durationEnd"
-          type="text"
+          type="date"
           register={register}
           errors={errors?.durationEnd?.message}
         />

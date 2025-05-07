@@ -4,63 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FaPlus } from "react-icons/fa6";
 import InternshipTable from "../internshipTable";
-import AddInternship from "../addIntership";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig"; // Make sure this is your correct Firestore config
 
 interface InternshipData {
-  name: string;
+  intID: string;
+  firstName: string;
   role: string;
   category: string;
   courseContent: string;
   email: string;
+  status: string; // "Pending" | "Approved" | "Rejected"
 }
 
-const requestInterns: InternshipData[] = [
-  {
-    name: "Sriram C",
-    role: "Intern",
-    category: "Web Developer",
-    courseContent: "Basic",
-    email: "dummy@gmail.com",
-  },
-  {
-    name: "Krishna",
-    role: "Intern",
-    category: "Web Developer",
-    courseContent: "Basic",
-    email: "dummy@gmail.com",
-  },
-];
-const approvedInterns: InternshipData[] = [
-  {
-    name: "Hariharan",
-    role: "Intern",
-    category: "UI/UX Designer",
-    courseContent: "Intermediate",
-    email: "john@gmail.com",
-  },
-  {
-    name: "Murali",
-    role: "Intern",
-    category: "UI/UX Designer",
-    courseContent: "Intermediate",
-    email: "john@gmail.com",
-  },
-];
-const rejectedInterns: InternshipData[] = [
-  {
-    name: "Ragul",
-    role: "Intern",
-    category: "Software Engineer",
-    courseContent: "Advanced",
-    email: "jane@gmail.com",
-  },
-];
-
-const Internship: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+const Intern: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const getURLparam = searchParams.get("tab") || "request";
 
   const tabs = [
@@ -72,40 +31,71 @@ const Internship: React.FC = () => {
   const tabRefs = useRef<(HTMLParagraphElement | null)[]>([]);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
 
+  const [interns, setInterns] = useState<InternshipData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchInterns = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "Internship"));
+      const fetchedData: InternshipData[] = querySnapshot.docs.map((doc) => ({
+        intID: doc.id,
+        ...doc.data(),
+      })) as InternshipData[];
+      setInterns(fetchedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching interns:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInterns();
+  }, []);
+
   const handleTabClick = (status: string) => {
-    router.push(`/internship?tab=${status}`);
+    router.push(`/internship/tabs?tab=${status}`);
   };
 
   let tableData: InternshipData[] = [];
-  let ActionData = {};
+  let ActionData: { text: string; textColor: string; bgColor: string };
 
-  if (getURLparam === "request") {
-    tableData = requestInterns;
+  if (getURLparam === "all") {
+    tableData = interns;
     ActionData = {
-      text: "Action",
-      textColor: "text-medium_orange",
-      bgColor: "bg-lite_orange",
+      text: "Status",
+      textColor: "text-gray-700",
+      bgColor: "bg-gray-200",
     };
-  } else if (getURLparam === "approved") {
-    tableData = approvedInterns;
+  } else {
+    tableData = interns.filter(
+      (item) =>
+        item.status.toLowerCase() ===
+        (getURLparam === "request" ? "pending" : getURLparam)
+    );
     ActionData = {
-      text: "Approved",
-      textColor: "text-medium_blue",
-      bgColor: "bg-lite_blue",
-    };
-  } else if (getURLparam === "rejected") {
-    tableData = rejectedInterns;
-    ActionData = {
-      text: "Rejected",
-      textColor: "text-medium_red",
-      bgColor: "bg-lite_red",
+      text:
+        getURLparam === "request"
+          ? "Action"
+          : getURLparam.charAt(0).toUpperCase() + getURLparam.slice(1),
+      textColor:
+        getURLparam === "request"
+          ? "text-medium_orange"
+          : getURLparam === "approved"
+          ? "text-medium_blue"
+          : "text-medium_red",
+      bgColor:
+        getURLparam === "request"
+          ? "bg-lite_orange"
+          : getURLparam === "approved"
+          ? "bg-lite_blue"
+          : "bg-lite_red",
     };
   }
 
   useEffect(() => {
     const activeIndex = tabs.findIndex((tab) => tab.path === getURLparam);
     const activeTab = tabRefs.current[activeIndex];
-
     if (activeTab) {
       setUnderlineStyle({
         left: activeTab.offsetLeft,
@@ -113,6 +103,10 @@ const Internship: React.FC = () => {
       });
     }
   }, [getURLparam]);
+
+  const handleClick = () => {
+    router.push("/internship/addInternship");
+  };
 
   return (
     <main>
@@ -124,7 +118,6 @@ const Internship: React.FC = () => {
         <nav className="relative flex justify-between p-7 text-xl font-semibold text-gray">
           {/* Tabs Section */}
           <div className="relative center gap-20">
-            {/* Moving Underline */}
             <div
               className="absolute bottom-0 h-[2px] bg-primary transition-all duration-300 ease-in-out"
               style={{
@@ -132,7 +125,6 @@ const Internship: React.FC = () => {
                 width: underlineStyle.width,
               }}
             />
-
             {tabs.map((tab, idx) => (
               <p
                 key={tab.path}
@@ -149,11 +141,10 @@ const Internship: React.FC = () => {
             ))}
           </div>
 
-          {/* Add Button */}
           <div>
             <button
               className="center rounded space-x-2 bg-primary text-white px-5 py-2"
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleClick}
             >
               <span>Add</span>
               <FaPlus />
@@ -162,11 +153,13 @@ const Internship: React.FC = () => {
         </nav>
       </section>
 
-      {/* Table and Modal */}
-      <InternshipTable data={tableData} ActionData={ActionData} />
-      {isModalOpen && <AddInternship onClose={() => setIsModalOpen(false)} />}
+      {loading ? (
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : (
+        <InternshipTable data={tableData}  />
+      )}
     </main>
   );
 };
 
-export default Internship;
+export default Intern;
