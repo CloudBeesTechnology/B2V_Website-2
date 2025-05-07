@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FaPlus } from "react-icons/fa6";
 import InternshipTable from "../internshipTable";
-import AddInternship from "../addIntership";
+
 
 interface InternshipData {
   name: string;
@@ -57,7 +57,7 @@ const rejectedInterns: InternshipData[] = [
 ];
 
 const Internship: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -113,7 +113,9 @@ const Internship: React.FC = () => {
       });
     }
   }, [getURLparam]);
-
+  const handleClick = () => {
+    router.push("/internship/addInternship"); // navigates to /about
+  };
   return (
     <main>
       <header className="center my-10 text-xl font-semibold text-gray">
@@ -153,7 +155,7 @@ const Internship: React.FC = () => {
           <div>
             <button
               className="center rounded space-x-2 bg-primary text-white px-5 py-2"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => handleClick()}
             >
               <span>Add</span>
               <FaPlus />
@@ -164,7 +166,7 @@ const Internship: React.FC = () => {
 
       {/* Table and Modal */}
       <InternshipTable data={tableData} ActionData={ActionData} />
-      {isModalOpen && <AddInternship onClose={() => setIsModalOpen(false)} />}
+      {/* {isModalOpen && <AddInternship onClose={() => setIsModalOpen(false)} />} */}
     </main>
   );
 };

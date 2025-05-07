@@ -1,19 +1,23 @@
-import { useForm } from "react-hook-form";
+"use client";
 import {
   InternshipFormData,
   internshipSchema,
-} from "../services/validations/InternshipValidation/internValidation";
+} from "@/app/services/validations/InternshipValidation/internValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import RowFirst from "./addInternFields/rowFirst";
+import { useForm } from "react-hook-form";
 import { MdOutlineCancel } from "react-icons/md";
-import RowSecond from "./addInternFields/rowSecond";
-import RowThree from "./addInternFields/rowThree";
-import RowFour from "./addInternFields/rowFour";
+import RowFirst from "../addInternFields/rowFirst";
+import RowSecond from "../addInternFields/rowSecond";
+import RowFour from "../addInternFields/rowFour";
+import RowThree from "../addInternFields/rowThree";
+import { FaArrowLeft } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 interface AddInternModalProps {
   onClose: () => void;
 }
 const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -26,8 +30,16 @@ const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
     console.log("Form Data:", data);
   };
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 ">
-      <div className="bg-white p-20 rounded-xl w-fit  ">
+    <div className=" flex items-center justify-center">
+      <button
+        className="text-[#202020] cursor-pointer mb-auto"
+        onClick={() => {
+          router.back();
+        }}
+      >
+        <FaArrowLeft size={28} />
+      </button>
+      <div className="bg-white p-20 rounded-xl w-fit">
         <header className="flex justify-between items-center pb-4 ">
           <h2 className="text-xl font-semibold text-[#202020]">
             Add Internship

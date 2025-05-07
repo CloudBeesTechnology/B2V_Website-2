@@ -31,8 +31,8 @@ export type LeaveStatus = {
   leadEmpID: string;
   managerEmpID: string;
   createdAt: string;
-  duration?:string;
-  createdDate?:string;
+  duration?: string;
+  createdDate?: string;
 };
 
 export type EnrichedLeaveStatus = LeaveStatus & {
@@ -42,7 +42,7 @@ export type EnrichedLeaveStatus = LeaveStatus & {
   managerName?: string;
   department?: string;
   remarks?: string;
-  finalValue?:string;
+  finalValue?: string;
 };
 
 const LeaveApproval = () => {
@@ -89,8 +89,13 @@ const LeaveApproval = () => {
       try {
         setLoading(true);
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
-        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map(
-          (doc) => ({
+        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
+          .map((doc) => ({
             docId: doc.id,
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
@@ -111,8 +116,7 @@ const LeaveApproval = () => {
             leadName: "", // To be added
             managerName: "",
             department: "",
-          })
-        );
+          }));
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")

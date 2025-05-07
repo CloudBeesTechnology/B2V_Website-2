@@ -25,14 +25,15 @@ interface TableProps {
   setLeaveApproval?: React.Dispatch<
     React.SetStateAction<EnrichedLeaveStatus[]>
   >;
-  hiddenBtn?:boolean;
+  hiddenBtn?: boolean;
 }
 
 export const ViewLeaveStatus = ({
   leaveData,
   close,
   userAcess,
-  setLeaveApproval, hiddenBtn
+  setLeaveApproval,
+  hiddenBtn,
 }: TableProps) => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
@@ -102,8 +103,7 @@ export const ViewLeaveStatus = ({
       setRemarks("");
       setSelectedDocId(null);
       // setShowPopup(false);
-       window.location.href="/leaveapproval"
-     
+      window.location.href = "/leaveapproval";
     } catch (err) {
       console.error("Failed to update leave status:", err);
     }
@@ -220,29 +220,27 @@ export const ViewLeaveStatus = ({
               </tbody>
             </table>
           </div>
-          {
-            hiddenBtn && 
-            
-          <div className="center gap-10 text_size_4">
-            <button
-              className="border border-approved_blue px-4 py-1 text-gray"
-              onClick={() => {
-                handleStatusChange?.(leaveData?.docId, "Rejected");
-              }}
-            >
-              Reject
-            </button>
-            <button
-              className="text-white bg-approved_blue px-4 py-1"
-              onClick={() => {
-                handleStatusChange?.(leaveData?.docId, "Approved");
-                console.log("784512");
-              }}
-            >
-              Approve
-            </button>
-          </div>
-          }
+          {hiddenBtn || userAcess?.userAcess !== "ADMIN" && (
+            <div className="center gap-10 text_size_4">
+              <button
+                className="border border-approved_blue px-4 py-1 text-gray"
+                onClick={() => {
+                  handleStatusChange?.(leaveData?.docId, "Rejected");
+                }}
+              >
+                Reject
+              </button>
+              <button
+                className="text-white bg-approved_blue px-4 py-1"
+                onClick={() => {
+                  handleStatusChange?.(leaveData?.docId, "Approved");
+                  console.log("784512");
+                }}
+              >
+                Approve
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {showPopup && (

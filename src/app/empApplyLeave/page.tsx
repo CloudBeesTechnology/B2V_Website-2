@@ -11,8 +11,6 @@ import { DiVim } from "react-icons/di";
 
 const EmpApplyLeave: React.FC = () => {
   const [empLeave, setEmpLeave] = useState<any>(null);
-  const [empLeaveStatus, setEmpLeaveStatus] = useState<Array<any>>([]);
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const getURLparam = searchParams.get("tab") || "applyLeave";
@@ -53,32 +51,14 @@ const EmpApplyLeave: React.FC = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchLeaves = async () => {
-      try {
-        const empID = localStorage.getItem("empID"); // Example: "CBT0002"
-        if (!empID) return;
 
-        const querySnapshot = await getDocs(collection(db, "leaveStatus"));
 
-        const leaveList = querySnapshot.docs
-          .map((doc) => doc.data())
-          .filter((item) => item.empID === empID); // Only that person's data
-
-        setEmpLeaveStatus(leaveList);
-      } catch (error) {
-        console.error("Error fetching leave data:", error);
-      }
-    };
-
-    fetchLeaves();
-  }, []);
   return (
     <main>
       <header className="center gap-10 py-14 px-6">
         <h2 className="text-2xl font-medium text-[#303030]">Apply Leave</h2>
       </header>
-      <EmpLeaveCounts data={empLeave} leaveStatus={empLeaveStatus} />
+      <EmpLeaveCounts  data={empLeave} />
 
       <div className="flex justify-start gap-10 pt-15  text-xl font-bold">
         {tabs.map((tab, index) => {
