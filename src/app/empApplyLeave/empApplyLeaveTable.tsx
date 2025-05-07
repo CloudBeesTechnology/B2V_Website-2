@@ -16,8 +16,17 @@ import { useForm } from "react-hook-form";
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 
+
+export type Holiday = {
+  date: string; // Required
+  name?: string; // Optional
+  description?: string; // Optional
+  [key: string]: any;
+};
+
 const EmpApplyLeaveTable = () => {
   const { publicHolidays } = useFetchHolidayList();
+// console.log(publicHolidays,"7986453210");
 
   const {
     register,
@@ -68,13 +77,18 @@ const EmpApplyLeaveTable = () => {
 
       let takenDay = 0;
 
-      if (isSameDate) {
-        takenDay = isHalfDay ? 0.5 : 1;
-      } else {
-        const timeDiff = end.getTime() - start.getTime();
-        const days = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1;
-        takenDay = isHalfDay ? days + 0.5 : days;
-      }
+      //       if (isSameDate) {
+      //         console.log("5412");
+
+      //         takenDay = isHalfDay ? 0.5 : 1;
+      //       } else {
+      //         const timeDiff = end.getTime() - start.getTime();
+      //         const days = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1;
+      //         console.log(days,"days");
+
+      //         takenDay = isHalfDay ? days - 0.5 : days;
+      //       }
+      // console.log(takenDay);
 
       const halfDayValue = isHalfDay ? "0.5" : "0";
 
@@ -101,24 +115,25 @@ const EmpApplyLeaveTable = () => {
 
       const validLeaveDates = await checkNonWorkingDays(
         leaveDetails,
-        publicHolidays
+        publicHolidays as Holiday[]
       );
 
       if (validLeaveDates.length > 0) {
-        if (takenDay === 0.5) {
-          leaveDetails.takenDay = "0.5";
-        } else if (leaveDetails.takenDay >= 1) {
-          leaveDetails.takenDay = validLeaveDates.length.toString();
-        }
+        // Use the actual filtered length for taken days
+        const takenDays = validLeaveDates.length;
+        leaveDetails.takenDay = isHalfDay
+          ? (takenDays - 0.5).toString()
+          : takenDays.toString();
       } else {
         leaveDetails.takenDay = "0";
       }
+      // console.log(leaveDetails, "drfg");
 
-      await setDoc(doc(db, "leaveStatus", createdAt), {
-        ...leaveDetails,
-      });
+      // await setDoc(doc(db, "leaveStatus", createdAt), {
+      //   ...leaveDetails,
+      // });
 
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");
@@ -127,6 +142,7 @@ const EmpApplyLeaveTable = () => {
 
   return (
     <section className="mt-7">
+   
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="bg-white border-[#D7D5D5] rounded-md py-5">
           <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">

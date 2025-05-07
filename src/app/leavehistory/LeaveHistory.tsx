@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
@@ -78,8 +77,13 @@ const LeaveHistory = () => {
       try {
         setLoading(true);
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
-        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map(
-          (doc) => ({
+        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
+          .map((doc) => ({
             docId: doc.id,
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
@@ -101,8 +105,7 @@ const LeaveHistory = () => {
             department: "",
             leadEmpID: doc.data().leadEmpID,
             managerEmpID: doc.data().managerEmpID,
-          })
-        );
+          }));
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")
@@ -127,7 +130,7 @@ const LeaveHistory = () => {
         const enrichedList: EnrichedLeaveStatus[] = [];
 
         for (const leave of leaveList) {
-          console.log(userRole);
+          // console.log(userRole);
 
           if (
             userRole === "ADMIN" ||
@@ -139,7 +142,7 @@ const LeaveHistory = () => {
               leave.managerStatus !== "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
-            console.log(leadName, managerName);
+            // console.log(leadName, managerName);
             const empInfo = empMap.get(leave.empID);
             enrichedList.push({
               ...leave,
@@ -152,6 +155,7 @@ const LeaveHistory = () => {
         }
 
         setLeaveApproval(enrichedList);
+        setFinalData(enrichedList);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -161,12 +165,12 @@ const LeaveHistory = () => {
 
     fetchEmployees();
   }, []);
-  console.log(leaveApproval);
+
   const handleClose = () => {
     setLeaveDetailsPopup(!leaveDetailsPopup);
   };
   const handleLeaveDetails = (items: any) => {
-    console.log(items, "7845");
+    // console.log(items, "7845");
 
     setLeaveDetails(items);
     handleClose();
@@ -174,6 +178,32 @@ const LeaveHistory = () => {
   // const filteredData = leaveApproval.filter(
   //   (item) => item.leaveStatus === filterStatus
   // );
+
+  useEffect(() => {
+    function filterByDateRange(data: any, startDate: string, endDate: string) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      return data.filter((item: any) => {
+        const itemStart = new Date(item.startDate);
+        const itemEnd = new Date(item.endDate);
+
+        return itemStart >= start && itemEnd <= end;
+      });
+    }
+
+    if (startDate && endDate && leaveApproval) {
+      const filteredByDate = filterByDateRange(
+        leaveApproval,
+        startDate,
+        endDate
+      );
+
+      setFinalData(filteredByDate);
+    } else {
+      setFinalData(leaveApproval);
+    }
+  }, [leaveApproval, startDate, endDate]);
   if (loading)
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
@@ -231,11 +261,11 @@ const LeaveHistory = () => {
           </button>
         </div> */}
         <div className="my-10">
-          {leaveApproval && leaveApproval?.length > 0 ? (
+          {finalData && finalData?.length > 0 ? (
             <TableFormate
               heading={Heading}
               list="LeaveApproval"
-              leaveApproval={leaveApproval}
+              leaveApproval={finalData}
               filterStatus={filterStatus}
               handleLeaveDetails={handleLeaveDetails}
             />
@@ -258,4 +288,3 @@ const LeaveHistory = () => {
 };
 
 export default LeaveHistory;
-
