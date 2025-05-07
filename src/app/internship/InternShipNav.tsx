@@ -14,7 +14,7 @@ const InternNav = () => {
       {/* {hasPermission("", "") && ( */}
         <Link
           href="/internship/tabs"
-          className="border border-primary center flex-col py-5 rounded-md w-[20%] h-[150px]"
+          className="border border-primary center bg-white shadow-2xl flex-col py-5 rounded-md w-[20%] h-[150px]"
         >
           <Image
             src={handperson}
@@ -28,7 +28,7 @@ const InternNav = () => {
       {/* {hasPermission("", "") && ( */}
         <Link
           href="/internship/internStatus"
-          className="border border-primary center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px]"
+          className="border border-primary bg-white shadow-2xl center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px]"
         >
           <Image
             src={notepen}

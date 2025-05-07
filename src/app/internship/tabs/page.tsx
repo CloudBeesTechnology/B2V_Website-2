@@ -6,6 +6,8 @@ import { FaPlus } from "react-icons/fa6";
 import InternshipTable from "../internshipTable";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig"; // Make sure this is your correct Firestore config
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import Link from "next/link";
 
 interface InternshipData {
   intID: string;
@@ -110,10 +112,13 @@ const Intern: React.FC = () => {
 
   return (
     <main>
-      <header className="center my-10 text-xl font-semibold text-gray">
-        <h2>Internship</h2>
-      </header>
-
+  
+      <h1 className="flex gap-2 items-center text-mediumlite_grey text_size_2 my-5">
+              <Link href="/internship" className="text-3xl">
+                <MdOutlineKeyboardBackspace />
+              </Link>
+              Internship
+            </h1>
       <section>
         <nav className="relative flex justify-between p-7 text-xl font-semibold text-gray">
           {/* Tabs Section */}

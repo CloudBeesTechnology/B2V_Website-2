@@ -20,7 +20,16 @@ const RowThree: React.FC<FormProps> = ({ register, errors }) => {
           name="category"
           register={register}
           errors={errors?.category?.message}
-          options={["Basic", "intermediate", "Advance"]}
+          options={[
+             "Mobile Developer",
+             "Web Developer",
+             "Digital Marketing",
+             "UI/UX",
+             "Flutter",
+             "Cloud",
+             "Backend Develope",
+             "Data Scientist",
+          ]}
         />
 
         <SelectDropdown

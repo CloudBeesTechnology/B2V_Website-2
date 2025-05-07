@@ -25,15 +25,8 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
-interface AddInternModalProps {
-  onClose: () => void;
-  storedEmpData?: { intID: string }; // Optional prop to update existing intern
-}
 
-const AddInternship: React.FC<AddInternModalProps> = ({
-  onClose,
-  storedEmpData,
-}) => {
+const AddInternship = () => {
   const router = useRouter();
   const {
     register,
@@ -46,28 +39,6 @@ const AddInternship: React.FC<AddInternModalProps> = ({
   const onSubmit = async (data: InternshipFormData) => {
     try {
       const internshipCollection = collection(db, "Internship");
-
-      if (storedEmpData?.intID) {
-        const matchQuery = query(
-          internshipCollection,
-          where("intID", "==", storedEmpData.intID)
-        );
-        const matchSnapshot = await getDocs(matchQuery);
-
-        if (!matchSnapshot.empty) {
-          const docId = matchSnapshot.docs[0].id;
-          const updateRef = doc(db, "Internship", docId);
-
-          await updateDoc(updateRef, {
-            ...data,
-            updatedAt: new Date().toISOString(),
-          });
-
-          console.log("Document updated with ID:", docId);
-          router.push("/internship");
-          return;
-        }
-      }
 
       const newData = {
         ...data,
@@ -87,7 +58,7 @@ const AddInternship: React.FC<AddInternModalProps> = ({
   return (
     <div>
       <h1 className="flex gap-2 items-center text-mediumlite_grey text_size_2 my-5">
-        <Link href="/internship" className="text-3xl">
+        <Link href="/internship/tabs" className="text-3xl">
           <MdOutlineKeyboardBackspace />
         </Link>
         Internship
