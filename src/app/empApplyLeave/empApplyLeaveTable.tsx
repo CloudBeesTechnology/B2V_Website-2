@@ -4,7 +4,14 @@ import {
 } from "@/app/services/validations/empPortalValidation/applyLeaveValitaion";
 import { db } from "@/lib/firebaseConfig";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
@@ -110,7 +117,7 @@ const EmpApplyLeaveTable = () => {
       await setDoc(doc(db, "leaveStatus", createdAt), {
         ...leaveDetails,
       });
-      
+
       window.location.reload();
     } catch (error) {
       console.error("Error applying for leave:", error);
@@ -125,7 +132,9 @@ const EmpApplyLeaveTable = () => {
           <div className="space-y-4 grid grid-cols-3 gap-10 justify-center items-center px-20 my-5 py-3">
             {/* Leave Type */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-medium_gray mb-1">Leave Type</label>
+              <label className="text_size_5 text-medium_gray mb-1">
+                Leave Type
+              </label>
               <select
                 {...register("leaveType")}
                 className="rounded-md px-2 py-2 border text-mediumlite_grey border-lite_gray shadow-md text_size_5 outline-none"
@@ -145,7 +154,9 @@ const EmpApplyLeaveTable = () => {
 
             {/* Start Date */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-medium_gray mb-1">Start Date</label>
+              <label className="text_size_5 text-medium_gray mb-1">
+                Start Date
+              </label>
               <input
                 type="date"
                 {...register("startDate")}
@@ -160,7 +171,9 @@ const EmpApplyLeaveTable = () => {
 
             {/* End Date */}
             <div className="flex flex-col">
-              <label className="text_size_5 text-medium_gray mb-1">End Date</label>
+              <label className="text_size_5 text-medium_gray mb-1">
+                End Date
+              </label>
               <input
                 type="date"
                 {...register("endDate")}
@@ -175,7 +188,9 @@ const EmpApplyLeaveTable = () => {
 
             {/* Leave Reason */}
             <div className="flex flex-col ">
-              <label className="text_size_5 text-medium_gray mb-1">Leave Reason</label>
+              <label className="text_size_5 text-medium_gray mb-1">
+                Leave Reason
+              </label>
               <input
                 type="text"
                 {...register("leaveReason")}
@@ -214,9 +229,6 @@ const EmpApplyLeaveTable = () => {
 };
 
 export default EmpApplyLeaveTable;
-
-
-
 
 // import {
 //   LeaveFormData,
@@ -416,7 +428,7 @@ export default EmpApplyLeaveTable;
 //             </button>
 //           </div>
 //         </div>
-       
+
 //       </form>
 //     </section>
 //   );
