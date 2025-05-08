@@ -25,9 +25,12 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
+<<<<<<< HEAD
 // interface AddInternModalProps {
 //   storedEmpData?: { intID: string }; // Optional prop to update existing intern
 // }
+=======
+>>>>>>> b65651e867c3b5ee9f4353f2d2c5f18e80f0a449
 
 const AddInternship = () => {
   const router = useRouter();
@@ -43,6 +46,7 @@ const AddInternship = () => {
     try {
       const internshipCollection = collection(db, "Internship");
 
+<<<<<<< HEAD
       // if (storedEmpData?.intID) {
       //   const matchQuery = query(
       //     internshipCollection,
@@ -65,6 +69,8 @@ const AddInternship = () => {
       //   }
       // }
 
+=======
+>>>>>>> b65651e867c3b5ee9f4353f2d2c5f18e80f0a449
       const newData = {
         ...data,
         status:"Pending",
@@ -83,7 +89,7 @@ const AddInternship = () => {
   return (
     <div>
       <h1 className="flex gap-2 items-center text-mediumlite_grey text_size_2 my-5">
-        <Link href="/internship" className="text-3xl">
+        <Link href="/internship/tabs" className="text-3xl">
           <MdOutlineKeyboardBackspace />
         </Link>
         Internship

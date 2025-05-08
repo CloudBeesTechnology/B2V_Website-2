@@ -3,6 +3,8 @@ import { collection, query, orderBy, limit, getDocs, doc, updateDoc, where } fro
 import { db } from "@/lib/firebaseConfig"; // Update the path to match your project
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import Link from "next/link";
 
 interface InternTableProps {
   data: RequestInternData[];
@@ -73,12 +75,14 @@ const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
         }
 
         updatePayload.intID = newIntID;
+        updatePayload.approvedStatus = "Approved";
       }
 
       await updateDoc(updateRef, updatePayload);
       console.log("Document updated:", docId);
 
-      router.push("/internship");
+      // router.push("/internship");
+      window.location.reload();
 
     } catch (error) {
       console.error("Error updating intern:", error);
@@ -87,6 +91,9 @@ const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
 
   return (
     <section className="bg-white rounded-md my-3">
+        {data.length === 0 ? (
+        <p className="text-center text-gray-500 py-4">No data available.</p>
+      ) : (
       <table className="table-fixed w-full">
         <thead>
           <tr className="font-semibold text-gray text-center border-b border-[#D2D2D240]">
@@ -110,36 +117,36 @@ const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
               <td className="py-5">{intern.courseContent}</td>
               <td className="py-5">{intern.email}</td>
               <td className="center py-5">
-                <select
-                  className="text-sm px-2 py-1 rounded border bg-white text-gray-700"
-                  defaultValue=""
-                  onChange={(e) => {
-                    const selectedStatus = e.target.value;
-                    if (selectedStatus) {
-                      onSubmit({
-                        firstName: intern.firstName,
-                        role: intern.role,
-                        category: intern.category,
-                        courseContent: intern.courseContent,
-                        email: intern.email,
-                        status: selectedStatus,
-                      });
-                    }
-                  }}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+              <select
+  className="text-sm px-2 py-1 rounded border bg-white text-gray-700"
+  value={intern.status}
+  onChange={(e) => {
+    const selectedStatus = e.target.value;
+    if (selectedStatus !== intern.status) {
+      onSubmit({
+        firstName: intern.firstName,
+        role: intern.role,
+        category: intern.category,
+        courseContent: intern.courseContent,
+        email: intern.email,
+        status: selectedStatus,
+      });
+    }
+  }}
+>
+  <option value="Pending">Pending</option>
+  <option value="Approved">Approved</option>
+  <option value="Rejected">Rejected</option>
+</select>
+
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      )}
     </section>
   );
 };
 
 export default InternshipTable;
-
-
