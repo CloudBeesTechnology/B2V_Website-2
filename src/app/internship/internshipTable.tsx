@@ -1,10 +1,10 @@
 "use client";
-import { collection, query, orderBy, limit, getDocs, doc, updateDoc, where } from "firebase/firestore";
-import { db } from "@/lib/firebaseConfig"; // Update the path to match your project
+
+import { useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
-import { useRouter } from "next/navigation";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
+import InternPopup from "./InternPopup";
 
 interface InternTableProps {
   data: RequestInternData[];
@@ -13,140 +13,136 @@ interface InternTableProps {
 interface RequestInternData {
   intID?: string;
   firstName: string;
-  role: string;
+  lastName?: string;
+  role?: string;
   category: string;
   courseContent: string;
   email: string;
-  status: string;
-}
-
-interface InternshipFormData {
-  firstName: string;
-  role: string;
-  category: string;
-  courseContent: string;
-  email: string;
-  status: string;
+  status?: string;
+  dateOfBirth?: string;
+  contact?: string;
+  gender?: string;
+  doj?: string;
+  durationStart?: string;
+  durationEnd?: string;
+  mentor?: string;
 }
 
 const InternshipTable: React.FC<InternTableProps> = ({ data }) => {
-  const router = useRouter();
+  const [selectedIntern, setSelectedIntern] = useState<RequestInternData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const onSubmit = async (formData: InternshipFormData) => {
-    try {
-      const internshipCollection = collection(db, "Internship");
-
-      // Find document by email
-      const matchQuery = query(
-        internshipCollection,
-        where("email", "==", formData.email)
-      );
-      const matchSnapshot = await getDocs(matchQuery);
-
-      if (matchSnapshot.empty) {
-        console.error("No matching document found.");
-        return;
-      }
-
-      const docId = matchSnapshot.docs[0].id;
-      const updateRef = doc(db, "Internship", docId);
-
-      // Prepare update object
-      let updatePayload: any = {
-        status: formData.status,
-        updatedAt: new Date().toISOString(),
-      };
-
-      if (formData.status === "Approved") {
-        // Get latest intID and increment
-        const latestEmpQuery = query(
-          internshipCollection,
-          orderBy("intID", "desc"),
-          limit(1)
-        );
-        const latestSnapshot = await getDocs(latestEmpQuery);
-
-        let newIntID = "INT0001";
-        if (!latestSnapshot.empty) {
-          const lastIntID = latestSnapshot.docs[0].data().intID;
-          const lastNumber = parseInt(lastIntID.replace("INT", ""), 10);
-          const nextNumber = lastNumber + 1;
-          newIntID = `INT${String(nextNumber).padStart(4, "0")}`;
-        }
-
-        updatePayload.intID = newIntID;
-        updatePayload.approvedStatus = "Approved";
-      }
-
-      await updateDoc(updateRef, updatePayload);
-      console.log("Document updated:", docId);
-
-      // router.push("/internship");
-      window.location.reload();
-
-    } catch (error) {
-      console.error("Error updating intern:", error);
-    }
+  const handleView = (intern: RequestInternData) => {
+    setSelectedIntern(intern);
+    setIsModalOpen(true);
   };
 
   return (
-    <section className="bg-white rounded-md my-3">
-        {data.length === 0 ? (
+    <section className="bg-white rounded-md my-3 p-4">
+      {data.length === 0 ? (
         <p className="text-center text-gray-500 py-4">No data available.</p>
       ) : (
-      <table className="table-fixed w-full">
-        <thead>
-          <tr className="font-semibold text-gray text-center border-b border-[#D2D2D240]">
-            <th className="py-5">Name</th>
-            <th className="py-5">Role</th>
-            <th className="py-5">Category</th>
-            <th className="py-5">Course Content</th>
-            <th className="py-5">Email ID</th>
-            <th className="py-5">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((intern, index) => (
-            <tr
-              key={index}
-              className="text-center text-sm border-b border-[#D2D2D240]"
-            >
-              <td className="py-5">{intern.firstName}</td>
-              <td className="py-5">{intern.role}</td>
-              <td className="py-5">{intern.category}</td>
-              <td className="py-5">{intern.courseContent}</td>
-              <td className="py-5">{intern.email}</td>
-              <td className="center py-5">
-              <select
-  className="text-sm px-2 py-1 rounded border bg-white text-gray-700"
-  value={intern.status}
-  onChange={(e) => {
-    const selectedStatus = e.target.value;
-    if (selectedStatus !== intern.status) {
-      onSubmit({
-        firstName: intern.firstName,
-        role: intern.role,
-        category: intern.category,
-        courseContent: intern.courseContent,
-        email: intern.email,
-        status: selectedStatus,
-      });
-    }
-  }}
->
-  <option value="Pending">Pending</option>
-  <option value="Approved">Approved</option>
-  <option value="Rejected">Rejected</option>
-</select>
-
-              </td>
+        <table className="table-fixed w-full">
+          <thead>
+            <tr className="font-semibold text-gray text-center border-b border-[#D2D2D240]">
+              <th className="py-5">Int ID</th>
+              <th className="py-5">Name</th>
+              <th className="py-5">Category</th>
+              <th className="py-5">Course Content</th>
+              <th className="py-5">Email ID</th>
+              <th className="py-5">View Form</th>
             </tr>
-          ))}
+          </thead>
+          <tbody>
+            {data.map((intern, index) => (
+              <tr key={index} className="text-center text-sm border-b border-[#D2D2D240]">
+                <td className="py-5">{intern.intID}</td>
+                <td className="py-5">{intern.firstName}</td>
+                <td className="py-5">{intern.category}</td>
+                <td className="py-5">{intern.courseContent}</td>
+                <td className="py-5">{intern.email}</td>
+                <td className="py-5">
+                  <button
+                    onClick={() => handleView(intern)}
+                    className="text-blue-600 underline"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+{isModalOpen && selectedIntern && (
+  <InternPopup onClose={() => setIsModalOpen(false)}>
+    <div className="text-sm text-left">
+      <h2 className="text-lg text-center font-semibold mb-3">Intern Details</h2>
+      <table className="table-auto w-full border border-gray-300">
+        <tbody>
+        <tr>
+            <td className="font-semibold  px-4 py-2">Int ID </td>
+            <td className=" px-4 py-2">: {selectedIntern.intID || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Name</td>
+            <td className=" px-4 py-2">: {selectedIntern.firstName}</td>
+          </tr>
+         
+          <tr>
+            <td className="font-semibold  px-4 py-2">Date of Birth</td>
+            <td className=" px-4 py-2">: {selectedIntern.dateOfBirth || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Email</td>
+            <td className=" px-4 py-2">: {selectedIntern.email}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Contact</td>
+            <td className=" px-4 py-2">: {selectedIntern.contact || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Gender</td>
+            <td className=" px-4 py-2">: {selectedIntern.gender || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Category</td>
+            <td className=" px-4 py-2">: {selectedIntern.category}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Course Content</td>
+            <td className=" px-4 py-2">: {selectedIntern.courseContent}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Date of Joining</td>
+            <td className=" px-4 py-2">: {selectedIntern.doj || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Duration Start</td>
+            <td className=" px-4 py-2">: {selectedIntern.durationStart || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Duration End</td>
+            <td className=" px-4 py-2">: {selectedIntern.durationEnd || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Mentor</td>
+            <td className=" px-4 py-2">: {selectedIntern.mentor || "N/A"}</td>
+          </tr>
+          <tr>
+            <td className="font-semibold  px-4 py-2">Status</td>
+            <td className=" px-4 py-2">: {selectedIntern.status || "N/A"}</td>
+          </tr>
         </tbody>
       </table>
-      )}
+    </div>
+  </InternPopup>
+)}
+
     </section>
   );
 };
 
 export default InternshipTable;
+

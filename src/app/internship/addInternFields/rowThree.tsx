@@ -42,10 +42,10 @@ const RowThree: React.FC<FormProps> = ({ register, errors }) => {
 
         <FormField
           label="Date of Joining"
-          name="dateOfJoining"
+          name="doj"
           type="date"
           register={register}
-          errors={errors?.dateOfJoining?.message}
+          errors={errors?.doj?.message}
         />
       </div>
     </section>

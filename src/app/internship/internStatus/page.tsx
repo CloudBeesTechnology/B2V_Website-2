@@ -17,17 +17,17 @@ interface RequestInternData {
   category: string;
   courseContent: string;
   email: string;
-  approvedStatus: string;
+  status: string;
 }
 
 interface StatusUpdateData {
   intID: string;
-  approvedStatus: string;
+  status: string;
 }
 
 const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
   const router = useRouter();
-  const [filter, setFilter] = useState<"Approved" | "Completed" | "Processing" | "Droped">("Approved");
+  const [filter, setFilter] = useState<"Pending" | "Completed" | "Processing" | "Droped">("Pending");
   const [internData, setInternData] = useState<RequestInternData[]>([]);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
     fetchData();
   }, []);
 
-  const onSubmit = async ({ intID, approvedStatus }: StatusUpdateData) => {
+  const onSubmit = async ({ intID, status }: StatusUpdateData) => {
     try {
       // Query the 'Internship' collection to find the document with the matching intID
       const querySnapshot = await getDocs(collection(db, "Internship"));
@@ -73,28 +73,28 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
   
       // Update the 'status' field and the 'updatedAt' field
       await updateDoc(docRef, {
-        approvedStatus,           // Update the status
+        status,           // Update the status
         updatedAt: new Date().toISOString(), // Add a timestamp for the update
       });
   
       // Log success
-      console.log("approvedStatus updated for intID:", intID);
+      console.log("status updated for intID:", intID);
   
       // Update the internData state to reflect the new status
       setInternData((prevData) =>
         prevData.map((intern) =>
-          intern.intID === intID ? { ...intern, approvedStatus } : intern
+          intern.intID === intID ? { ...intern, status } : intern
         )
       );
   
       // Optionally refresh the page or perform additional actions
       router.refresh(); // Or use your own method to update UI
     } catch (error) {
-      console.error("Error updating approvedStatus:", error);
+      console.error("Error updating status:", error);
     }
   };
   
-  const filteredData = internData.filter((item) => item.approvedStatus === filter);
+  const filteredData = internData.filter((item) => item.status === filter);
 
   return (
     <section className=" my-3 p-4">
@@ -108,10 +108,10 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
       <div className="flex justify-between items-center mt-5 mb-4">
         <div className="space-x-2">
           <button
-            onClick={() => setFilter("Approved")}
-            className={`px-4 py-2 rounded ${filter === "Approved" ? "bg-[#146ADC] text-white" : "bg-gray-200"}`}
+            onClick={() => setFilter("Pending")}
+            className={`px-4 py-2 rounded ${filter === "Pending" ? "bg-[#146ADC] text-white" : "bg-gray-200"}`}
           >
-            Approved Candidate
+            Pending Candidate
           </button>
           <button
             onClick={() => setFilter("Completed")}
@@ -140,8 +140,8 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
         <table className="table-fixed w-full">
           <thead>
             <tr className="font-semibold text-gray text-center border-b border-[#D2D2D240]">
+              <th className="py-5">Int ID</th>
               <th className="py-5">Name</th>
-              <th className="py-5">Role</th>
               <th className="py-5">Category</th>
               <th className="py-5">Course Content</th>
               <th className="py-5">Email ID</th>
@@ -151,26 +151,26 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
           <tbody>
             {filteredData.map((intern) => (
               <tr key={intern.intID} className="text-center text-sm border-b border-[#D2D2D240]">
+                <td className="py-5">{intern.intID}</td>
                 <td className="py-5">{intern.firstName}</td>
-                <td className="py-5">{intern.role}</td>
                 <td className="py-5">{intern.category}</td>
                 <td className="py-5">{intern.courseContent}</td>
                 <td className="py-5">{intern.email}</td>
                 <td className="center py-5">
                   <select
                     className="text-sm px-2 py-1 rounded border bg-white text-gray-700"
-                    value={intern.approvedStatus}
+                    value={intern.status}
                     onChange={(e) => {
                       const selectedStatus = e.target.value;
-                      if (selectedStatus !== intern.approvedStatus) {
+                      if (selectedStatus !== intern.status) {
                         onSubmit({
                           intID: intern.intID,
-                          approvedStatus: selectedStatus,
+                          status: selectedStatus,
                         });
                       }
                     }}
                   >
-                    <option value="Approved">Approved</option>
+                    <option value="Pending">Pending</option>
                     <option value="Completed">Completed</option>
                     <option value="Processing">Processing</option>
                     <option value="Droped">Dropped</option>
@@ -185,6 +185,5 @@ const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
     </section>
   );
 };
-
 
 export default InternStatus;
