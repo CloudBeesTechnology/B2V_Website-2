@@ -13,6 +13,7 @@ export const internshipSchema = z.object({
   durationStart: z.string().min(1, "Duration Start is required"),
   durationEnd: z.string().min(1, "Duration End is required"),
   mentor: z.string().min(1, "Mentor name is required"),
+  intID: z.string().optional(), // Now it's optional
 });
 
 // Define TypeScript type based on schema
