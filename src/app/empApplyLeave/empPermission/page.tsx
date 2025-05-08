@@ -1,10 +1,10 @@
 import EmpHistoryOfPermission from "./empHistoryOfPermission";
-import EmpPermissionTable from "./empPermissionTable";
+import EmpPermission from "./empPermission";
 
 const EmpPermission: React.FC = () => {
   return (
     <section>
-      <EmpPermissionTable />
+      <EmpPermission />
       <EmpHistoryOfPermission />
     </section>
   );

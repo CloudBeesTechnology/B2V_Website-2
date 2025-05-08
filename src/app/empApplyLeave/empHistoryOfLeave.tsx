@@ -85,7 +85,7 @@ const EmpHistoryOfLeave = () => {
         })
         .filter((item) => item.empID === empID);
       
-        console.log(leaveList, "leavelist");
+        // console.log(leaveList, "leavelist");
 
         setSecondaryEmpLeave(leaveList);
         setEmpLeave(leaveList);

@@ -11,7 +11,7 @@ import { db } from "@/lib/firebaseConfig";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
 import { useState } from "react";
 
-const EmpPermissionTable: React.FC = () => {
+const EmpPermission: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const {
     register,
@@ -115,4 +115,4 @@ const EmpPermissionTable: React.FC = () => {
     </section>
   );
 };
-export default EmpPermissionTable;
+export default EmpPermission;
