@@ -26,15 +26,8 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { useState } from "react";
 
-interface AddInternModalProps {
-  onClose: () => void;
-  storedEmpData?: { intID: string }; // Optional prop to update existing intern
-}
 
-const AddInternship: React.FC<AddInternModalProps> = ({
-  onClose,
-  storedEmpData,
-}) => {
+const AddInternship = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,29 +44,28 @@ const AddInternship: React.FC<AddInternModalProps> = ({
     try {
       const internshipCollection = collection(db, "Internship");
 
-      if (storedEmpData?.intID) {
-        const matchQuery = query(
-          internshipCollection,
-          where("intID", "==", storedEmpData.intID)
-        );
-        const matchSnapshot = await getDocs(matchQuery);
+      // if (storedEmpData?.intID) {
+      //   const matchQuery = query(
+      //     internshipCollection,
+      //     where("intID", "==", storedEmpData.intID)
+      //   );
+      //   const matchSnapshot = await getDocs(matchQuery);
 
-        if (!matchSnapshot.empty) {
-          const docId = matchSnapshot.docs[0].id;
-          const updateRef = doc(db, "Internship", docId);
+      //   if (!matchSnapshot.empty) {
+      //     const docId = matchSnapshot.docs[0].id;
+      //     const updateRef = doc(db, "Internship", docId);
 
-          await updateDoc(updateRef, {
-            ...data,
-            updatedAt: new Date().toISOString(),
-          });
+      //     await updateDoc(updateRef, {
+      //       ...data,
+      //       updatedAt: new Date().toISOString(),
+      //     });
 
-          console.log("Document updated with ID:", docId);
-          router.push("/internship");
-          return;
-        }
-      }
+      //     console.log("Document updated with ID:", docId);
+      //     router.push("/internship");
+      //     return;
+      //   }
+      // }
 
-      // If not updating, generate new intID and create document
       let newIntID = "INT0001";
       const latestEmpQuery = query(
         internshipCollection,
@@ -146,7 +138,6 @@ const AddInternship: React.FC<AddInternModalProps> = ({
     </button>
   )}
 </div>
-
           </div>
         </form>
       </div>

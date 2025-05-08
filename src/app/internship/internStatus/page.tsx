@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import Link from "next/link";
 
-interface InternTableProps {
-  data: RequestInternData[];
-}
+// interface InternTableProps {
+//   data: RequestInternData[];
+// }
 
 interface RequestInternData {
   intID: string;
@@ -25,7 +25,7 @@ interface StatusUpdateData {
   status: string;
 }
 
-const InternStatus: React.FC<InternTableProps> = ({ data = [] }) => {
+const InternStatus = () => {
   const router = useRouter();
   const [filter, setFilter] = useState<"Pending" | "Completed" | "Processing" | "Droped">("Pending");
   const [internData, setInternData] = useState<RequestInternData[]>([]);
