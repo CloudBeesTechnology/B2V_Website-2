@@ -26,15 +26,7 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { useState } from "react";
 
-interface AddInternModalProps {
-  onClose: () => void;
-  storedEmpData?: { intID: string }; // Optional prop to update existing intern
-}
-
-const AddInternship: React.FC<AddInternModalProps> = ({
-  onClose,
-  storedEmpData,
-}) => {
+const AddInternship = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,28 +43,6 @@ const AddInternship: React.FC<AddInternModalProps> = ({
     try {
       const internshipCollection = collection(db, "Internship");
 
-      if (storedEmpData?.intID) {
-        const matchQuery = query(
-          internshipCollection,
-          where("intID", "==", storedEmpData.intID)
-        );
-        const matchSnapshot = await getDocs(matchQuery);
-
-        if (!matchSnapshot.empty) {
-          const docId = matchSnapshot.docs[0].id;
-          const updateRef = doc(db, "Internship", docId);
-
-          await updateDoc(updateRef, {
-            ...data,
-            updatedAt: new Date().toISOString(),
-          });
-
-          console.log("Document updated with ID:", docId);
-          router.push("/internship");
-          return;
-        }
-      }
-
       // If not updating, generate new intID and create document
       let newIntID = "INT0001";
       const latestEmpQuery = query(
@@ -85,15 +55,14 @@ const AddInternship: React.FC<AddInternModalProps> = ({
       if (!latestSnapshot.empty) {
         const lastIntID = latestSnapshot.docs[0].data().intID;
         const lastNumber = parseInt(lastIntID.replace("INT", ""), 10);
-        const nextNumber = lastNumber + 1;   
+        const nextNumber = lastNumber + 1;
         newIntID = `INT${String(nextNumber).padStart(4, "0")}`;
-    
       }
 
       const newData = {
         ...data,
         intID: newIntID,
-        status:"Pending",
+        status: "Pending",
         createdAt: new Date().toISOString(),
       };
 
@@ -128,25 +97,24 @@ const AddInternship: React.FC<AddInternModalProps> = ({
           <RowThree register={register} errors={errors} />
           <RowFour register={register} errors={errors} />
           <div className="flex justify-center mt-5">
-          <div className="flex justify-center mt-5">
-  {isSubmitting ? (
-    <button
-      type="button"
-      disabled
-      className="bg-primary text-white px-12 py-2 rounded font-bold cursor-not-allowed"
-    >
-      Submitting...
-    </button>
-  ) : (
-    <button
-      type="submit"
-      className="bg-primary text-white px-12 py-2 rounded font-bold"
-    >
-      Submit
-    </button>
-  )}
-</div>
-
+            <div className="flex justify-center mt-5">
+              {isSubmitting ? (
+                <button
+                  type="button"
+                  disabled
+                  className="bg-primary text-white px-12 py-2 rounded font-bold cursor-not-allowed"
+                >
+                  Submitting...
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="bg-primary text-white px-12 py-2 rounded font-bold"
+                >
+                  Submit
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>
