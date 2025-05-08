@@ -159,7 +159,7 @@ export const ViewLeaveStatus = ({
             <p className="flex w-[90%]">
               <span className="font-semibold flex-1">Durations</span> :{" "}
               <span className="flex-1 pl-2">
-                {leaveData?.duration || "N/A"}
+                {leaveData?.takenDay || "N/A"}
               </span>
             </p>
             <p className="flex w-[90%]">

@@ -255,7 +255,7 @@ const LeaveApproval = () => {
                     </td>
                     <td className="px-4 py-2 text-center">
                       {item.createdAt
-                        ? new Date(item.createdAt).toLocaleDateString()
+                        ? DateFormat(item.createdAt)
                         : "-"}
                     </td>
 

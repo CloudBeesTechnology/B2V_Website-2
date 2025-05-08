@@ -25,14 +25,11 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
-interface AddInternModalProps {
-  storedEmpData?: { intID: string }; // Optional prop to update existing intern
-}
+// interface AddInternModalProps {
+//   storedEmpData?: { intID: string }; // Optional prop to update existing intern
+// }
 
-const AddInternship: React.FC<AddInternModalProps> = ({
-
-  storedEmpData,
-}) => {
+const AddInternship = () => {
   const router = useRouter();
   const {
     register,

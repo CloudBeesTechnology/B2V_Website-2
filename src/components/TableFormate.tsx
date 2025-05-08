@@ -186,7 +186,7 @@ export const TableFormate = ({
                     onClick={() => {
                       handleStoredData(val);
                       router.push("/employeeDetails");
-                      console.log("784512qawesdrtfgyhujk");
+                      // console.log("784512qawesdrtfgyhujk");
                     }}
                   >
                     <FaEdit />
@@ -323,7 +323,7 @@ export const TableFormate = ({
                   {val.endDate ? DateFormat(val.endDate) : "N/A"}
                 </td>
                 <td className=" py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.leaveType || "N/A"}
+                  {val.leaveType.charAt(0).toUpperCase() + val.leaveType.slice(1).toLowerCase() || "N/A"}
                 </td>
                 <td className=" py-3 px-4">
                   <span

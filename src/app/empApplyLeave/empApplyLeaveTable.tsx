@@ -15,6 +15,8 @@ import {
 import { useForm } from "react-hook-form";
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
+import { useState } from "react";
+import { SuccessPopUp } from "@/components/SuccessPopUp";
 
 
 export type Holiday = {
@@ -27,7 +29,7 @@ export type Holiday = {
 const EmpApplyLeaveTable = () => {
   const { publicHolidays } = useFetchHolidayList();
 // console.log(publicHolidays,"7986453210");
-
+  const [showPopup, setShowPopup] = useState(false);
   const {
     register,
     handleSubmit,
@@ -129,11 +131,11 @@ const EmpApplyLeaveTable = () => {
       }
       // console.log(leaveDetails, "drfg");
 
-      // await setDoc(doc(db, "leaveStatus", createdAt), {
-      //   ...leaveDetails,
-      // });
+      await setDoc(doc(db, "leaveStatus", createdAt), {
+        ...leaveDetails,
+      });
 
-      // window.location.reload();
+      setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");
@@ -240,6 +242,7 @@ const EmpApplyLeaveTable = () => {
           </div>
         </div>
       </form>
+        {showPopup && <SuccessPopUp path="/empApplyLeave" />}
     </section>
   );
 };
