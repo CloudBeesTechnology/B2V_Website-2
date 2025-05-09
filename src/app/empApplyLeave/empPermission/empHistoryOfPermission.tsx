@@ -14,7 +14,7 @@ const EmpHistoryOfPermission = () => {
   >([]);
 
   const [loading, setLoading] = useState(true);
-  const Heading = ["EmpID", "Duration", "Applied Date", "Reason", "Status"];
+  const Heading = ["EmpID","Timing", "Duration", "Applied Date", "Reason", "Status"];
   useEffect(() => {
     const fetchLeaves = async () => {
       try {

@@ -16,11 +16,19 @@ export const leaveSchema = z
 export type LeaveFormData = z.infer<typeof leaveSchema>;
 
 // for Permission
-export const permissionSchema = z.object({
-  date: z.string().nonempty("Date is required."),
-  hours: z
-  .string()
-  .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Hours must be in HH:MM format"),
+  export const permissionSchema = z.object({
+    date: z.string().nonempty("Date is required."),
+    fromTime: z.string().nonempty("From Time is required.")  .regex(
+      /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
+      "Invalid time. Time should be in the format HH:MM, without 0 or 00."
+    ),
+    toTime: z.string().nonempty("To Time is required.")  .regex(
+      /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
+      "Invalid time. Time should be in the format HH:MM, without 0 or 00."
+    ),
+  // hours: z
+  // .string()
+  // .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Hours must be in HH:MM format"),
   reason: z.string().min(3, "Reason must be at least 3 characters."),
 });
 

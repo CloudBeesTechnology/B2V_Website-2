@@ -6,7 +6,7 @@ import { RejectedPopup } from "@/app/leaveapproval/RejectedPopup";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { EnrichedLeaveStatus } from "../app/leaveapproval/LeaveApproval";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface leaveStatus {
   empID: string;
@@ -39,6 +39,7 @@ export const ViewLeaveStatus = ({
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("Pending");
   const router = useRouter();
+  const pathName = usePathname();
   const [remarks, setRemarks] = useState("");
   const handleClose = () => {
     setShowPopup(!showPopup);
@@ -108,6 +109,8 @@ export const ViewLeaveStatus = ({
       console.error("Failed to update leave status:", err);
     }
   };
+  console.log(hiddenBtn);
+
   return (
     <section className="fixed inset-0 w-full bg-[#07060788] z-[99999] flex items-center justify-center">
       {" "}
@@ -220,27 +223,29 @@ export const ViewLeaveStatus = ({
               </tbody>
             </table>
           </div>
-          {hiddenBtn || userAcess?.userAcess !== "ADMIN" && (
-            <div className="center gap-10 text_size_4">
-              <button
-                className="border border-approved_blue px-4 py-1 text-gray"
-                onClick={() => {
-                  handleStatusChange?.(leaveData?.docId, "Rejected");
-                }}
-              >
-                Reject
-              </button>
-              <button
-                className="text-white bg-approved_blue px-4 py-1"
-                onClick={() => {
-                  handleStatusChange?.(leaveData?.docId, "Approved");
-                  console.log("784512");
-                }}
-              >
-                Approve
-              </button>
-            </div>
-          )}
+          {hiddenBtn &&
+            pathName !== "/leavehistory" &&
+            userAcess?.userAcess !== "ADMIN" && (
+              <div className="center gap-10 text_size_4">
+                <button
+                  className="border border-approved_blue px-4 py-1 text-gray"
+                  onClick={() => {
+                    handleStatusChange?.(leaveData?.docId, "Rejected");
+                  }}
+                >
+                  Reject
+                </button>
+                <button
+                  className="text-white bg-approved_blue px-4 py-1"
+                  onClick={() => {
+                    handleStatusChange?.(leaveData?.docId, "Approved");
+                    console.log("784512");
+                  }}
+                >
+                  Approve
+                </button>
+              </div>
+            )}
         </div>
       </div>
       {showPopup && (

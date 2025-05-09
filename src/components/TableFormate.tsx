@@ -45,16 +45,20 @@ interface EmpLeave {
 interface empPermission {
   empID: string;
   date: string;
-  hours: string;
+  totalHours: string;
   reason: string;
+  fromTime: string;
+  toTime: string;
   status: string;
 }
 interface permissionList {
   empID: string;
   name: string;
   date: string;
-  hours: string;
+  totalHours: string;
   reason: string;
+  fromTime: string;
+  toTime: string;
   status: string;
   remarks?: string;
 }
@@ -237,7 +241,8 @@ export const TableFormate = ({
                   className="text-center text-sm text-medium_gray border-b border-morelite_grey"
                 >
                   <td className=" py-3 px-4">{val.empID || "N/A"}</td>
-                  <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.fromTime || "N/A"} to {val?.toTime || "N/A"} </td>
+                  <td className=" py-3 px-4">{val?.totalHours || "N/A"}</td>
 
                   <td className=" py-3 px-4">
                     {val?.date ? DateFormat(val?.date) : "N/A"}
@@ -270,6 +275,8 @@ export const TableFormate = ({
 
           {list === "permissionList" &&
             permissionList?.map((val, index) => {
+
+              
               return (
                 <tr
                   key={index}
@@ -280,8 +287,11 @@ export const TableFormate = ({
                   <td className=" py-3 px-4">
                     {val?.date ? DateFormat(val?.date) : "N/A"}
                   </td>
-                  <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
-                  <td className=" py-3 px-4">{val?.reason}</td>
+                  <td className="px-4 py-2">
+                    {val?.fromTime || "N/A"} to {val?.toTime || "N/A"}
+                  </td>
+                  <td className="px-4 py-2">{val.totalHours || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.reason || "N/A"}</td>
 
                   <td className=" py-3 px-4">
                     <span

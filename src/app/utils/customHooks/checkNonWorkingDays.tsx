@@ -1,4 +1,4 @@
-import { Holiday } from "@/app/empApplyLeave/empApplyLeaveTable";
+import { Holiday } from "@/app/empApplyLeave/empApplyLeave";
 
 const checkNonWorkingDays = async (leaveDetails: any, publicHolidays: Holiday[]) => {
   const { startDate, endDate } = leaveDetails;

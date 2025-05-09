@@ -11,15 +11,35 @@ import { db } from "@/lib/firebaseConfig";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
 import { useState } from "react";
 
-const EmpPermission: React.FC = () => {
+const EmpPermissionPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [fromTimeRange, setFromTimeRange] = useState("");
+  const [toTimeRange, setToTimeRange] = useState("");
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<PermissionFormSchema>({
     resolver: zodResolver(permissionSchema),
   });
+  const handleTimeChange = (time: string, period: string, type: string) => {
+ 
+
+    if (!time) {
+      alert("Please enter a valid time in HH:MM format.");
+      return (window.location.href = "/empApplyLeave?tab=permission");
+    }
+
+    const combinedTime = `${time}${period}`;
+    if (type === "fromTime") {
+      setValue("fromTime", time);
+      setFromTimeRange(combinedTime);
+    } else if (type === "toTime") {
+      setValue("toTime", time);
+      setToTimeRange(combinedTime);
+    }
+  };
 
   const createEmpPermission = async (data: any) => {
     try {
@@ -35,19 +55,57 @@ const EmpPermission: React.FC = () => {
   const onSubmit = async (data: PermissionFormSchema) => {
     const empID = localStorage.getItem("empID");
     if (data) {
+      const FromtimeValue = parseTime(fromTimeRange);
+      const TotimeValue = parseTime(toTimeRange);
+      const totalHoursValue = calculateTimeDifference(
+        FromtimeValue,
+        TotimeValue
+      );
       let finalData = {
         empID: empID,
         date: data?.date,
-        hours: data?.hours,
+        fromTime: fromTimeRange,
+        toTime: toTimeRange,
         reason: data?.reason,
         status: "Pending",
+        totalHours: totalHoursValue,
         createdAt: new Date().toISOString(),
       };
-      console.log("finalData : ", finalData);
+      // console.log("finalData : ", finalData);
       await createEmpPermission(finalData);
-      alert("Form submitted successfully!");
       setShowPopup(true);
     }
+  };
+
+  const parseTime = (time: string): Date => {
+    const [timePart, period] = [time.slice(0, -2), time.slice(-2)];
+    const [hours, minutes] = timePart.split(":").map(Number);
+    const date = new Date();
+    date.setHours(
+      period === "PM" && hours !== 12
+        ? hours + 12
+        : period === "AM" && hours === 12
+        ? 0
+        : hours
+    );
+    date.setMinutes(minutes || 0);
+    date.setSeconds(0);
+    return date;
+  };
+  const calculateTimeDifference = (start: Date, end: Date): string => {
+    let diff = end.getTime() - start.getTime();
+
+    // Handle overnight cases
+    if (diff < 0) diff += 24 * 60 * 60 * 1000;
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    // Format the result
+    const formattedHours = hours > 0 ? `${hours}hr ` : "";
+    const formattedMinutes = minutes > 0 ? `${minutes}min` : "";
+
+    return formattedHours + formattedMinutes || "0min";
   };
   return (
     <section className="mt-7">
@@ -71,17 +129,70 @@ const EmpPermission: React.FC = () => {
             </div>
 
             {/* Hours */}
-            <div className="flex flex-col ">
-              <label className="text_size_5 text-gray mb-1">Hours</label>
-              <input
-                type="text"
-                {...register("hours")}
-                placeholder="HH:MM"
-                className="border border-lite_gray rounded-md p-2 shadow-md text_size_5 outline-none"
-              />
-              {errors.hours && (
+            <div className="flex flex-col">
+              <label className="text_size_5 text-gray mb-1">From</label>
+              <div className="flex gap-2 border-lite_gray border shadow-md rounded-md">
+                <input
+                  type="text"
+                  {...register("fromTime")}
+                  placeholder="HH:MM"
+                  className="p-2 text_size_5 outline-none w-full"
+                  onChange={(e) =>
+                    handleTimeChange(e.target.value, "AM", "fromTime")
+                  }
+                />
+                <select
+                  // {...register("fromPeriod")}
+                  className="p-2 text_size_5 outline-none"
+                  onChange={(e) =>
+                    handleTimeChange(
+                      fromTimeRange.replace(/[AP]M$/, ""),
+                      e.target.value,
+                      "fromTime"
+                    )
+                  }
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+              {errors.fromTime && (
                 <p className="text-dark_red text-sm py-1">
-                  {errors.hours.message}
+                  {errors.fromTime.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col ">
+              <label className="text_size_5 text-gray mb-1">To</label>
+              <div className="flex gap-2 border border-lite_gray rounded-md shadow-md">
+                <input
+                  type="text"
+                  {...register("toTime")}
+                  placeholder="HH:MM"
+                  className=" p-2  text_size_5 outline-none w-full"
+                  onChange={(e) =>
+                    handleTimeChange(e.target.value, "AM", "toTime")
+                  }
+                />
+                <select
+                  // {...register("toPeriod")}
+                  className=" p-2 text_size_5 outline-none"
+                  onChange={(e) =>
+                    handleTimeChange(
+                      toTimeRange.replace(/[AP]M$/, ""),
+                      e.target.value,
+                      "toTime"
+                    )
+                  }
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+              {errors.toTime && (
+                <p className="text-dark_red text-sm py-1">
+                  {errors.toTime.message}
                 </p>
               )}
             </div>
@@ -111,8 +222,8 @@ const EmpPermission: React.FC = () => {
           </div>
         </div>
       </form>
-      {showPopup && <SuccessPopUp path="/empApplyLeave" />}
+      {showPopup && <SuccessPopUp path="/empApplyLeave?tab=permission" />}
     </section>
   );
 };
-export default EmpPermission;
+export default EmpPermissionPage;
