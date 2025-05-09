@@ -140,7 +140,7 @@ const LeaveApproval = () => {
         const enrichedList: EnrichedLeaveStatus[] = [];
 
         for (const leave of leaveList) {
-          console.log(userRole);
+          // console.log(userRole);
 
           if (
             userRole === "ADMIN" ||
@@ -153,7 +153,7 @@ const LeaveApproval = () => {
               leave.managerStatus === "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
-            console.log(leadName, managerName);
+            // console.log(leadName, managerName);
             const empInfo = empMap.get(leave.empID);
             enrichedList.push({
               ...leave,

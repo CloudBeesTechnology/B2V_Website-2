@@ -1,5 +1,5 @@
 "use client";
-import EmpApplyLeaveTable from "./empApplyLeaveTable";
+import EmpApplyLeave from "./empApplyLeave";
 import EmpLeaveCounts from "./empLeaveCounts";
 import EmpHistoryOfLeave from "./empHistoryOfLeave";
 import { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import EmpPermission from "./empPermission/page";
 import { DiVim } from "react-icons/di";
 
-const EmpApplyLeave: React.FC = () => {
+const EmpApplyLeavePage: React.FC = () => {
   const [empLeave, setEmpLeave] = useState<any>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,11 +79,11 @@ const EmpApplyLeave: React.FC = () => {
         <EmpPermission />
       ) : (
         <section>
-          <EmpApplyLeaveTable />
+          <EmpApplyLeave />
           <EmpHistoryOfLeave />
         </section>
       )}
     </main>
   );
 };
-export default EmpApplyLeave;
+export default EmpApplyLeavePage;

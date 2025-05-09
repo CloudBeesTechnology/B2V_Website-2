@@ -255,7 +255,7 @@ const {storedEmpData}=UseEmployeeList()
           <div className="mt-10 center">
             <button
               type="submit"
-              className="text-[15px] text-white bg-blue-600 hover:bg-blue-700 px-5 py-3 w-[20%] rounded-md"
+              className="text-[15px] text-white bg-primary px-5 py-3 w-[20%] rounded-md"
             >
               Next
             </button>

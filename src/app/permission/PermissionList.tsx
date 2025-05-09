@@ -8,23 +8,28 @@ import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import clsx from "clsx";
 
-type PermissionHis = {
+export type PermissionHis = {
   empID: string;
   status: string;
   date: string;
-  hours: string;
+  totalHours: string;
+  fromTime: string;
+  toTime: string;
   reason: string;
-  createdAt: string;
+  createdAt?: string;
+  createdDate?: string;
 };
 
-type EnrichedPermissionHis = PermissionHis & {
+export type EnrichedPermissionHis = PermissionHis & {
   name: string;
   docId: string;
   remarks?: string;
 };
 
 const PermissionList = () => {
-  const [permissionHis, setPermissionHis] = useState<EnrichedPermissionHis[]>([]);
+  const [permissionHis, setPermissionHis] = useState<EnrichedPermissionHis[]>(
+    []
+  );
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [userRoleAccess, setUserRoleAccess] = useState<string | null>(null);
@@ -48,7 +53,9 @@ const PermissionList = () => {
             empID: doc.data().empID,
             status: doc.data().status,
             date: doc.data().date,
-            hours: doc.data().hours,
+            totalHours: doc.data().totalHours,
+            fromTime: doc.data().fromTime,
+            toTime: doc.data().toTime,
             reason: doc.data().reason,
             createdAt: doc.data().createdAt,
             name: "",
@@ -91,6 +98,7 @@ const PermissionList = () => {
     "EmpID",
     "Name(s)",
     "Apply Date",
+    "Timing",
     "Hours",
     "Reason(s)",
     "Actions",
@@ -167,14 +175,19 @@ const PermissionList = () => {
             </thead>
             <tbody>
               {permissionHis.map((item, index) => (
-                <tr className="text-sm text-medium_gray text-center border-b  border-morelite_grey" key={index}>
+                <tr
+                  className="text-sm text-medium_gray text-center border-b  border-morelite_grey"
+                  key={index}
+                >
                   <td className="px-4 py-2">{item.empID}</td>
                   <td className="px-4 py-2">{item.name}</td>
                   <td className="px-4 py-2 text-center">
-                  {item?.date ? DateFormat(item?.date) : "N/A"}
-
+                    {item?.date ? DateFormat(item?.date) : "N/A"}
                   </td>
-                  <td className="px-4 py-2">{item.hours}</td>
+                  <td className="px-4 py-2">
+                    {item?.fromTime || "N/A"} to {item?.toTime || "N/A"}
+                  </td>
+                  <td className="px-4 py-2">{item.totalHours}</td>
                   <td className="px-4 py-2">{item.reason}</td>
                   <td className="px-4 py-2">
                     <select
@@ -211,7 +224,9 @@ const PermissionList = () => {
       {showPopup && (
         <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-[400px] shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Add Rejection Remarks</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Add Rejection Remarks
+            </h3>
             <textarea
               className="w-full border border-gray-300 rounded p-2 outline-none"
               rows={4}
