@@ -15,6 +15,11 @@ type CardType = {
 const tiles: CardType[] = [
   {
     image: employeeDetails,
+    title: "Attendance Report",
+    route: "/report/reportDetails",
+  },
+  {
+    image: employeeDetails,
     title: "Employee Details",
     route: "/report/reportDetails",
   },
@@ -25,8 +30,13 @@ const tiles: CardType[] = [
   },
   {
     image: Certificate,
-    title: "Certificate",
-    route: "/report/certificate",
+    title: "Candidate records",
+    route: "/report/records",
+  },
+  {
+    image: Certificate,
+    title: "Permission Report",
+    route: "/report/records",
   },
 ];
 
@@ -39,7 +49,7 @@ const ReportTiles: React.FC = () => {
   return (
     <section className="py-10 bg-gray-100 min-h-screen flex items-start justify-start">
       {/* grid grid-cols-1 md:grid-cols-3 */}
-      <div className="flex justify-start gap-10 max-w-5xl w-full">
+      <div className="grid grid-cols-3 gap-10 max-w-5xl w-full">
         {tiles.map((card, index) => (
           <article
             key={index}
