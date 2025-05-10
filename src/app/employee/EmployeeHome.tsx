@@ -31,12 +31,12 @@ export const EmployeeHome = () => {
   };
 
   return (
-    <section className="flex gap-10 items-center my-10">
+    <section className="flex flex-wrap gap-10 items-center my-10">
       {hasPermission("Employee", "All Employee") && (
         <Link
           href="/allEmployee"
           onClick={RemoveLocalValues}
-          className="border border-primary center flex-col py-5 rounded-md w-[20%] h-[150px]"
+          className="border border-primary text-center bg-white shadow-lg center flex-col py-5 rounded-md max-w-xs w-full h-[150px]"
         >
           <Image
             src={handperson}
@@ -52,8 +52,8 @@ export const EmployeeHome = () => {
         <Link
           href="/employeeDetails"
           onClick={RemoveLocalValues}
-          className="border border-primary center flex-col gap-3 py-5 rounded-md w-[20%] h-[150px]"
-        >
+          className="border border-primary text-center bg-white shadow-lg center flex-col gap-3 py-5 rounded-md max-w-xs  w-full h-[150px]"
+        > 
           <Image
             src={notepen}
             alt="note with pen not found"

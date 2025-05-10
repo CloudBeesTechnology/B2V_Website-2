@@ -73,11 +73,7 @@ const EmpApplyLeave = () => {
 
       // Check for overlapping leave dates
       const leaveStatusRef = collection(db, "leaveStatus");
-      const leaveQuery = query(
-        leaveStatusRef,
-        where("empID", "==", empID),
-        where("leaveStatus", "in", ["Pending", "Approved"])
-      );
+      const leaveQuery = query(leaveStatusRef, where("empID", "==", empID));
       const leaveSnapshot = await getDocs(leaveQuery);
 
       const isOverlap = leaveSnapshot.docs.some((doc) => {
@@ -85,12 +81,44 @@ const EmpApplyLeave = () => {
         const leaveStart = new Date(leave.startDate);
         const leaveEnd = new Date(leave.endDate);
 
-        // Check if the requested date range overlaps with an existing leave
-        return (
-          (start <= leaveEnd && start >= leaveStart) ||
-          (end <= leaveEnd && end >= leaveStart) ||
-          (start <= leaveStart && end >= leaveEnd)
+        // Check if the leave is rejected
+        const isRejected =
+          leave.leadStatus === "Rejected" || leave.managerStatus === "Rejected";
+
+        // Log to verify the status and date ranges
+        console.log(
+          "Rejected:",
+          isRejected,
+          leave.leadStatus,
+          leave.managerStatus,
+          "Leave Range:",
+          leaveStart,
+          leaveEnd
         );
+
+        // If the leave is rejected, ignore it
+        if (isRejected) return false;
+
+        // Check for overlap
+        const isOverlap =
+          (start <= leaveEnd && start >= leaveStart) || // Start within range
+          (end <= leaveEnd && end >= leaveStart) || // End within range
+          (start <= leaveStart && end >= leaveEnd); // Covers entire range
+
+        console.log(
+          "Overlap Detected:",
+          isOverlap,
+          "Leave Range:",
+          leaveStart,
+          leaveEnd
+        );
+        return isOverlap;
+        // Check if the requested date range overlaps with an existing leave
+        // return (
+        //   (start <= leaveEnd && start >= leaveStart) ||
+        //   (end <= leaveEnd && end >= leaveStart) ||
+        //   (start <= leaveStart && end >= leaveEnd)
+        // );
       });
 
       if (isOverlap) {
@@ -136,13 +164,13 @@ const EmpApplyLeave = () => {
       } else {
         leaveDetails.takenDay = "0";
       }
-      // console.log(leaveDetails, "drfg");
+      console.log(leaveDetails, "drfg");
 
-      await setDoc(doc(db, "leaveStatus", createdAt), {
-        ...leaveDetails,
-      });
+      // await setDoc(doc(db, "leaveStatus", createdAt), {
+      //   ...leaveDetails,
+      // });
 
-      setShowPopup(true);
+      // setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");

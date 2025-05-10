@@ -47,14 +47,14 @@ const ReportTiles: React.FC = () => {
     router.push(route);
   };
   return (
-    <section className="py-10 bg-gray-100 min-h-screen flex items-start justify-start">
+    <section className="my-10 bg-gray-100 min-h-screen">
       {/* grid grid-cols-1 md:grid-cols-3 */}
-      <div className="grid grid-cols-3 gap-10 max-w-5xl w-full">
+      <div className="grid grid-cols-3 gap-10 w-full">
         {tiles.map((card, index) => (
           <article
             key={index}
             onClick={() => handleClick(card.route)}
-            className="bg-white rounded-xl shadow-xl p-5 flex flex-col items-center text-center border border-primary w-full"
+            className="bg-white rounded-xl shadow-xl p-5 flex flex-col items-center text-center border border-primary  w-full"
           >
             <Image
               src={card.image}
