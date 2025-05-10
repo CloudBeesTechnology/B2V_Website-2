@@ -14,12 +14,22 @@ const RowThree: React.FC<FormProps> = ({ register, errors }) => {
     <section>
       {/* Dynamic Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-        <FormField
-          label="Role"
-          name="role"
-          type="text"
+        
+        <SelectDropdown
+          label="Category"
+          name="category"
           register={register}
-          errors={errors?.role?.message}
+          errors={errors?.category?.message}
+          options={[
+             "Mobile Developer",
+             "Web Developer",
+             "Digital Marketing",
+             "UI/UX",
+             "Flutter",
+             "Cloud",
+             "Backend Develope",
+             "Data Scientist",
+          ]}
         />
 
         <SelectDropdown
@@ -27,15 +37,15 @@ const RowThree: React.FC<FormProps> = ({ register, errors }) => {
           name="courseContent"
           register={register}
           errors={errors?.courseContent?.message}
-          options={["Javascript", "React js", "Node js", "Express js"]}
+          options={["Basic", "intermediate", "Advance"]}
         />
 
         <FormField
           label="Date of Joining"
-          name="dateOfJoining"
+          name="doj"
           type="date"
           register={register}
-          errors={errors?.dateOfJoining?.message}
+          errors={errors?.doj?.message}
         />
       </div>
     </section>

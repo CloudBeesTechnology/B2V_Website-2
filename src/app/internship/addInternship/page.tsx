@@ -5,20 +5,32 @@ import {
 } from "@/app/services/validations/InternshipValidation/internValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { MdOutlineCancel } from "react-icons/md";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import RowFirst from "../addInternFields/rowFirst";
 import RowSecond from "../addInternFields/rowSecond";
-import RowFour from "../addInternFields/rowFour";
 import RowThree from "../addInternFields/rowThree";
-import { FaArrowLeft } from "react-icons/fa6";
+import RowFour from "../addInternFields/rowFour";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  doc,
+  updateDoc,
+  addDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+import { useState } from "react";
 
-interface AddInternModalProps {
-  onClose: () => void;
-}
 
-const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
+const AddInternship = () => {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -27,44 +39,109 @@ const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
     resolver: zodResolver(internshipSchema),
   });
 
-  const onSubmit = (data: InternshipFormData) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data: InternshipFormData) => {
+    setIsSubmitting(true);
+    try {
+      const internshipCollection = collection(db, "Internship");
+
+      // if (storedEmpData?.intID) {
+      //   const matchQuery = query(
+      //     internshipCollection,
+      //     where("intID", "==", storedEmpData.intID)
+      //   );
+      //   const matchSnapshot = await getDocs(matchQuery);
+
+      //   if (!matchSnapshot.empty) {
+      //     const docId = matchSnapshot.docs[0].id;
+      //     const updateRef = doc(db, "Internship", docId);
+
+      //     await updateDoc(updateRef, {
+      //       ...data,
+      //       updatedAt: new Date().toISOString(),
+      //     });
+
+      //     console.log("Document updated with ID:", docId);
+      //     router.push("/internship");
+      //     return;
+      //   }
+      // }
+
+      let newIntID = "INT0001";
+      const latestEmpQuery = query(
+        internshipCollection,
+        orderBy("intID", "desc"),
+        limit(1)
+      );
+      const latestSnapshot = await getDocs(latestEmpQuery);
+
+      if (!latestSnapshot.empty) {
+        const lastIntID = latestSnapshot.docs[0].data().intID;
+        const lastNumber = parseInt(lastIntID.replace("INT", ""), 10);
+        const nextNumber = lastNumber + 1;
+        newIntID = `INT${String(nextNumber).padStart(4, "0")}`;
+      }
+
+      const newData = {
+        ...data,
+        intID: newIntID,
+        status: "Pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      await addDoc(internshipCollection, newData);
+      console.log("Document created with intID:", newIntID);
+      router.push("/internship");
+    } catch (error) {
+      console.error("Error writing document to Firestore:", error);
+      setIsSubmitting(false);
+    }
   };
+
   return (
-    <div className=" flex items-center justify-center">
-      <button
-        className="text-[#202020] cursor-pointer mb-auto"
-        onClick={() => {
-          router.back();
-        }}
-      >
-        <FaArrowLeft size={28} />
-      </button>
-      <div className="bg-white p-20 rounded-xl w-fit">
-        <header className="flex justify-between items-center pb-4 ">
+    <div>
+      <h1 className="flex gap-2 items-center text-mediumlite_grey text_size_2 my-5">
+        <Link href="/internship" className="text-3xl">
+          <MdOutlineKeyboardBackspace />
+        </Link>
+        Internship
+      </h1>
+
+      <div className="bg-white py-20 px-10 rounded-xl">
+        <header className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-[#202020]">
             Add Internship
           </h2>
-          <button onClick={onClose} className="text-[#202020] cursor-pointer">
-            <MdOutlineCancel size={28} />
-          </button>
         </header>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10  mt-4">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 mt-4">
           <RowFirst register={register} errors={errors} />
           <RowSecond register={register} errors={errors} />
           <RowThree register={register} errors={errors} />
           <RowFour register={register} errors={errors} />
           <div className="flex justify-center mt-5">
-            <button
-              type="submit"
-              className="bg-primary text-white px-12 py-2 rounded font-bold"
-            >
-              Submit
-            </button>
+          <div className="flex justify-center mt-5">
+  {isSubmitting ? (
+    <button
+      type="button"
+      disabled
+      className="bg-primary text-white px-12 py-2 rounded font-bold cursor-not-allowed"
+    >
+      Submitting...
+    </button>
+  ) : (
+    <button
+      type="submit"
+      className="bg-primary text-white px-12 py-2 rounded font-bold"
+    >
+      Submit
+    </button>
+  )}
+</div>
           </div>
         </form>
       </div>
     </div>
   );
 };
+
 export default AddInternship;

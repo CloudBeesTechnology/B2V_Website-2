@@ -25,7 +25,11 @@ const CredentialReq: React.FC = () => {
           orderBy("createdAt", "desc") // Sort by newest first
         );
         const userSnapshot = await getDocs(userQuery);
-        const users = userSnapshot.docs.map((doc) => ({
+        const users = userSnapshot.docs  .sort((a, b) => {
+          const dateA = new Date(a.data().createdAt).getTime();
+          const dateB = new Date(b.data().createdAt).getTime();
+          return dateB - dateA; // descending: latest first
+        }).map((doc) => ({
           ...doc.data(),
           docId: doc.id,
         }));
@@ -74,7 +78,8 @@ const CredentialReq: React.FC = () => {
           <thead>
             <tr className="text-center text-white bg-primary">
               <th className="rounded-tl-md py-3">S.No</th>
-              <th className="py-3">Email Id</th>
+              <th className="py-3">Employee ID</th>
+              <th className="py-3">Email ID</th>
               <th className="py-3">Roles</th>
               <th className="py-3">Status</th>
             </tr>
@@ -86,6 +91,7 @@ const CredentialReq: React.FC = () => {
                 className="text-center text-gray border-b border-[#D2D2D240] bg-white"
               >
                 <td className="py-3">{index + 1}</td>
+                <td className="py-3">{cred.empID}</td>
                 <td className="py-3">{cred.email}</td>
                 <td className="py-3">{cred.role}</td>
                 <td className="px-4 py-2">

@@ -293,7 +293,7 @@ export const FamilyHome = () => {
           </div>
         </section>
       </form>
-      {popup && <SuccessPopUp />}
+      {popup && <SuccessPopUp path="/employee" />}
     </section>
   );
 };

@@ -1,10 +1,11 @@
 import React from "react";
 import Internship from "./tabs/page";
+import InternNav from "./InternShipNav";
 
 const InternshipPage = () => {
   return (
     <main>
-      <Internship />
+      <InternNav/>
     </main>
   );
 };

@@ -5,7 +5,7 @@ const Report: React.FC = () => {
   return (
     <main>
       <ReportTiles />
-      <ReportDetails />
+      {/* <ReportDetails /> */}
     </main>
   );
 };

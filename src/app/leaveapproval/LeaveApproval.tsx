@@ -31,8 +31,8 @@ export type LeaveStatus = {
   leadEmpID: string;
   managerEmpID: string;
   createdAt: string;
-  duration?:string;
-  createdDate?:string;
+  duration?: string;
+  createdDate?: string;
 };
 
 export type EnrichedLeaveStatus = LeaveStatus & {
@@ -42,6 +42,7 @@ export type EnrichedLeaveStatus = LeaveStatus & {
   managerName?: string;
   department?: string;
   remarks?: string;
+  finalValue?: string;
 };
 
 const LeaveApproval = () => {
@@ -88,8 +89,13 @@ const LeaveApproval = () => {
       try {
         setLoading(true);
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
-        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map(
-          (doc) => ({
+        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
+          .map((doc) => ({
             docId: doc.id,
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
@@ -110,8 +116,7 @@ const LeaveApproval = () => {
             leadName: "", // To be added
             managerName: "",
             department: "",
-          })
-        );
+          }));
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")
@@ -135,7 +140,7 @@ const LeaveApproval = () => {
         const enrichedList: EnrichedLeaveStatus[] = [];
 
         for (const leave of leaveList) {
-          console.log(userRole);
+          // console.log(userRole);
 
           if (
             userRole === "ADMIN" ||
@@ -148,7 +153,7 @@ const LeaveApproval = () => {
               leave.managerStatus === "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
-            console.log(leadName, managerName);
+            // console.log(leadName, managerName);
             const empInfo = empMap.get(leave.empID);
             enrichedList.push({
               ...leave,
@@ -250,7 +255,7 @@ const LeaveApproval = () => {
                     </td>
                     <td className="px-4 py-2 text-center">
                       {item.createdAt
-                        ? new Date(item.createdAt).toLocaleDateString()
+                        ? DateFormat(item.createdAt)
                         : "-"}
                     </td>
 

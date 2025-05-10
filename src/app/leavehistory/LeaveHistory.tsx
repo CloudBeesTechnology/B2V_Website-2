@@ -77,8 +77,13 @@ const LeaveHistory = () => {
       try {
         setLoading(true);
         const leaveSnapshot = await getDocs(collection(db, "leaveStatus"));
-        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs.map(
-          (doc) => ({
+        const leaveList: EnrichedLeaveStatus[] = leaveSnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
+          .map((doc) => ({
             docId: doc.id,
             empID: doc.data().empID,
             leaveStatus: doc.data().leaveStatus,
@@ -100,8 +105,7 @@ const LeaveHistory = () => {
             department: "",
             leadEmpID: doc.data().leadEmpID,
             managerEmpID: doc.data().managerEmpID,
-          })
-        );
+          }));
 
         const employeeSnapshot = await getDocs(
           collection(db, "employeeDetails")
@@ -126,7 +130,7 @@ const LeaveHistory = () => {
         const enrichedList: EnrichedLeaveStatus[] = [];
 
         for (const leave of leaveList) {
-          console.log(userRole);
+          // console.log(userRole);
 
           if (
             userRole === "ADMIN" ||
@@ -138,7 +142,7 @@ const LeaveHistory = () => {
               leave.managerStatus !== "Pending")
           ) {
             const { leadName, managerName } = await checking(leave);
-            console.log(leadName, managerName);
+            // console.log(leadName, managerName);
             const empInfo = empMap.get(leave.empID);
             enrichedList.push({
               ...leave,
@@ -166,7 +170,7 @@ const LeaveHistory = () => {
     setLeaveDetailsPopup(!leaveDetailsPopup);
   };
   const handleLeaveDetails = (items: any) => {
-    console.log(items, "7845");
+    // console.log(items, "7845");
 
     setLeaveDetails(items);
     handleClose();

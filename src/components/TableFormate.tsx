@@ -36,6 +36,7 @@ interface EmpLeave {
   leaveType: string;
   takenDay?: string;
   leaveStatus: string;
+  finalStatus?: string;
   remarks?: string;
   leaveReason?: string;
   createdAt?: string;
@@ -44,16 +45,20 @@ interface EmpLeave {
 interface empPermission {
   empID: string;
   date: string;
-  hours: string;
+  totalHours: string;
   reason: string;
+  fromTime: string;
+  toTime: string;
   status: string;
 }
 interface permissionList {
   empID: string;
   name: string;
   date: string;
-  hours: string;
+  totalHours: string;
   reason: string;
+  fromTime: string;
+  toTime: string;
   status: string;
   remarks?: string;
 }
@@ -99,7 +104,8 @@ export const TableFormate = ({
   secondaryEmpPermission,
   secondaryEmpLeave,
   filterStatus,
-  viewData,handleLeaveDetails
+  viewData,
+  handleLeaveDetails,
 }: TableProps) => {
   const [selectedLeave, setSelectedLeave] = useState<EmpLeave | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -184,7 +190,7 @@ export const TableFormate = ({
                     onClick={() => {
                       handleStoredData(val);
                       router.push("/employeeDetails");
-                      console.log("784512qawesdrtfgyhujk");
+                      // console.log("784512qawesdrtfgyhujk");
                     }}
                   >
                     <FaEdit />
@@ -213,12 +219,11 @@ export const TableFormate = ({
                   <td className=" py-3 px-4">{val?.duration}</td>
                   <td className=" py-3 px-4">{val?.leaveReason}</td>
                   <td
-                      className="text-approved_blue text-center px-4 py-2"
-                      onClick={() => handleLeaveDetails?.(val)}
-                    >
-                  
-                      View
-                    </td>
+                    className="text-approved_blue text-center px-4 py-2"
+                    onClick={() => handleLeaveDetails?.(val)}
+                  >
+                    View
+                  </td>
                   {filterStatus === "Rejected" && (
                     <td className=" py-3 px-4 text-wrap overflow-wrap-break-word w-[250px]">
                       {val?.remarks || "No remarks"}
@@ -236,7 +241,8 @@ export const TableFormate = ({
                   className="text-center text-sm text-medium_gray border-b border-morelite_grey"
                 >
                   <td className=" py-3 px-4">{val.empID || "N/A"}</td>
-                  <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.fromTime || "N/A"} to {val?.toTime || "N/A"} </td>
+                  <td className=" py-3 px-4">{val?.totalHours || "N/A"}</td>
 
                   <td className=" py-3 px-4">
                     {val?.date ? DateFormat(val?.date) : "N/A"}
@@ -269,6 +275,8 @@ export const TableFormate = ({
 
           {list === "permissionList" &&
             permissionList?.map((val, index) => {
+
+              
               return (
                 <tr
                   key={index}
@@ -279,8 +287,11 @@ export const TableFormate = ({
                   <td className=" py-3 px-4">
                     {val?.date ? DateFormat(val?.date) : "N/A"}
                   </td>
-                  <td className=" py-3 px-4">{val?.hours || "N/A"}</td>
-                  <td className=" py-3 px-4">{val?.reason}</td>
+                  <td className="px-4 py-2">
+                    {val?.fromTime || "N/A"} to {val?.toTime || "N/A"}
+                  </td>
+                  <td className="px-4 py-2">{val.totalHours || "N/A"}</td>
+                  <td className=" py-3 px-4">{val?.reason || "N/A"}</td>
 
                   <td className=" py-3 px-4">
                     <span
@@ -322,21 +333,21 @@ export const TableFormate = ({
                   {val.endDate ? DateFormat(val.endDate) : "N/A"}
                 </td>
                 <td className=" py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.leaveType || "N/A"}
+                  {val.leaveType.charAt(0).toUpperCase() + val.leaveType.slice(1).toLowerCase() || "N/A"}
                 </td>
                 <td className=" py-3 px-4">
                   <span
                     className={`
       ${
-        val?.leaveStatus === "Pending"
+        val?.finalStatus === "Pending"
           ? "bg-lite_orange text-medium_orange"
           : ""
       }
-      ${val?.leaveStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
-      ${val?.leaveStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
+      ${val?.finalStatus === "Rejected" ? "bg-lite_red text-medium_red" : ""}
+      ${val?.finalStatus === "Approved" ? "bg-lite_blue text-medium_blue" : ""}
     `}
                   >
-                    {val?.leaveStatus || "N/A"}
+                    {val?.finalStatus || "N/A"}
                   </span>
                 </td>
               </tr>

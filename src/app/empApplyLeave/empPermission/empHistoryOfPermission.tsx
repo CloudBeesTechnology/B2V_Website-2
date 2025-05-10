@@ -14,7 +14,14 @@ const EmpHistoryOfPermission = () => {
   >([]);
 
   const [loading, setLoading] = useState(true);
-  const Heading = ["EmpID", "Duration", "Applied Date", "Reason", "Status"];
+  const Heading = [
+    "EmpID",
+    "Timing",
+    "Duration",
+    "Applied Date",
+    "Reason",
+    "Status",
+  ];
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
@@ -25,11 +32,23 @@ const EmpHistoryOfPermission = () => {
         const querySnapshot = await getDocs(collection(db, "applyPermission"));
 
         const permissionData = querySnapshot.docs
+          .sort((a, b) => {
+            const dateA = new Date(a.data().createdAt).getTime();
+            const dateB = new Date(b.data().createdAt).getTime();
+            return dateB - dateA; // descending: latest first
+          })
           .map((doc) => doc.data())
           .filter((item) => item.empID === empID); // Only that person's data
 
+        const currentYear = new Date().getFullYear();
+
+        const filteredData = permissionData.filter((item) => {
+          const itemYear = new Date(item.date).getFullYear();
+          return itemYear === currentYear;
+        });
+
         setEmpPermission(permissionData);
-        setSecondaryEmpPermission(permissionData);
+        setSecondaryEmpPermission(filteredData);
       } catch (error) {
         console.error("Error fetching leave data:", error);
       } finally {
