@@ -15,5 +15,9 @@ export const useYearChange = () => {
     }
   }, []);
 
-  return hasYearChanged;
+  const currentYear = new Date().getFullYear();
+  const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0)).getTime();
+  const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)).getTime();
+
+  return { hasYearChanged, currentYear, startOfYear, endOfYear };
 };

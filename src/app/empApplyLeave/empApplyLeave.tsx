@@ -17,7 +17,6 @@ import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
-import { useYearChange } from "../utils/customHooks/useYearChange";
 
 export type Holiday = {
   date: string; 
@@ -40,10 +39,6 @@ const EmpApplyLeave = () => {
   });
 
   const isHalfDay = watch("halfDay");
-  const yearChanged = useYearChange();
-
-  console.log("Year", yearChanged);
-  
 
   const onSubmit = async (data: LeaveFormData) => {
     const empID = localStorage.getItem("empID");
@@ -51,7 +46,6 @@ const EmpApplyLeave = () => {
       alert("Employee ID not found.");
       return;
     }
-
     // Fetch employee details to get leadEmpID and managerEmpID
     try {
       const employeesRef = collection(db, "employeeDetails");
@@ -96,8 +90,7 @@ const EmpApplyLeave = () => {
         // Check if the leave is rejected
         const isRejected =
           leadStatus === "Rejected" || managerStatus === "Rejected";
-
-        // const isApprovedOrPending = leadStatus === "Pending" || leadStatus === "Approved" || managerStatus === "Pending" || managerStatus === "Approved";
+          
         const isApprovedOrPending =
           (hasLead && (leadStatus === "Pending" || leadStatus === "Approved")) ||
           (hasManager && (managerStatus === "Pending" || managerStatus === "Approved"));
