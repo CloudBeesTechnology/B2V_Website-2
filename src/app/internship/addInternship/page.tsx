@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 interface AddInternModalProps {
   onClose: () => void;
 }
+
 const AddInternship: React.FC<AddInternModalProps> = ({ onClose }) => {
   const router = useRouter();
   const {
