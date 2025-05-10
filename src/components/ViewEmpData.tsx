@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
+import { DateFormat } from "./DateFormate";
 
 interface allEmployee {
   profile?: string;
@@ -39,6 +40,7 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
     { label: "Total Leave", key: "totalLeave" },
     { label: "Manager", key: "manager" },
     { label: "Lead", key: "leadEmpID" },
+    { label: "Effective Date", key: "effectiveDate" },
   ];
   const educMenu = [
     { label: "Degree", key: "degree" },
@@ -101,7 +103,12 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
                     <div key={key} className="flex w-full">
                       <p className="px-2 py-1 font-semibold w-1/3">{label}</p>
                       <p className="px-2 py-1 font-semibold w-1/12">:</p>
-                      <p className="px-2 py-1 w-1/2">{allEmp[key] || "N/A"}</p>
+                      <p className="px-2 py-1 w-1/2">
+                        {["dob", "doj", "effectiveDate"].includes(key) &&
+                        allEmp[key]
+                          ? DateFormat(allEmp[key])
+                          : allEmp[key] || "N/A"}
+                      </p>
                     </div>
                   )
               )}

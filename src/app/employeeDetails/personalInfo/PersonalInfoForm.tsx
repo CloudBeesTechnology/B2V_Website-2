@@ -30,6 +30,7 @@ interface PersonalInfoFormData {
   totalLeave?: string;
   manager?: string;
   leadEmpID?: string;
+  effectiveDate?: string;
   profilePhoto?: string | null;
 }
 
@@ -469,6 +470,19 @@ export const PersonalInfoForm = () => {
                   type="tel"
                   className="outline-none py-1 w-full"
                   {...register("leadEmpID")}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 w-[30%]">
+              <label htmlFor="effectiveDate" className="text-[15px] text-gray">
+               Effective Date
+              </label>
+              <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
+                <input
+                  id="effectiveDate"
+                  type="tel"
+                  className="outline-none py-1 w-full"
+                  {...register("effectiveDate")}
                 />
               </div>
             </div>
