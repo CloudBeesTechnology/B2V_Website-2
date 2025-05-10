@@ -138,7 +138,7 @@ const AddNewUser: React.FC = () => {
       console.error("Error updating user:", error);
     }
   };
-
+ 
   // Check user exists or not
   const fetchDataByEmpID = async (empID: string) => {
     const fetchQuery = query(

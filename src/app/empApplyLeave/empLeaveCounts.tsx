@@ -40,6 +40,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import { useYearChange } from "../utils/customHooks/useYearChange";
 
 type ItemValue = {
   totalLeave: string;
@@ -53,7 +54,6 @@ interface LeaveData {
   id: string;
   empID: string;
   leaveStatus: "Pending" | "Approved" | "Rejected" | "Cancelled";
-  // Other fields can remain if needed
 }
 
 const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
@@ -61,18 +61,31 @@ const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
   const [rejectedCount, setRejectedCount] = useState<number>(0);
   const [approvedCount, setApprovedCount] = useState<number>(0);
 
+  const yearChanged = useYearChange();
+
   const empID =
     typeof window !== "undefined"
       ? localStorage.getItem("empID")?.toString()?.toUpperCase()
       : null;
 
-      // console.log("emp", empID);
-      
+  // console.log("emp", empID);
+
+  const currentYear = new Date().getFullYear();
+
+  // Start of year (Jan 1, 00:00:00 UTC) as ISO string
+  const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0)).toISOString();
+
+  // End of year (Dec 31, 23:59:59.999 UTC) as ISO string
+  const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)).toISOString();
+
+
   useEffect(() => {
     const fetchDataByEmpID = async () => {
       const fetchQuery = query(
         collection(db, "leaveStatus"),
-        where("empID", "==", empID)
+        where("empID", "==", empID),
+        where("createdAt", ">=", startOfYear),
+        where("createdAt", "<=", endOfYear)
       );
 
       const querySnapshot = await getDocs(fetchQuery);
@@ -99,6 +112,9 @@ const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
 
     fetchDataByEmpID();
   }, []);
+
+  console.log("Pending", pendingCount);
+
 
   return (
     <article className="flex justify-around p-5 gap-5 border h-48 border-[#E4E4E4] bg-white rounded-md">
