@@ -112,6 +112,7 @@ export const FamilyHome = () => {
           ...parsedPersonalInfo,
           ...parsedEducationInfo,
           ...data,
+          // role:"Employee",
           empID: newEmpID,
           createdAt: new Date().toISOString(),
         };
