@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import attendance from "../../public/assets/sidebar/attendance.svg";
 import overview from "../../public/assets/sidebar/overview.svg";
 import internship from "../../public/assets/sidebar/internship.svg";
@@ -31,6 +31,7 @@ import { auth } from "@/lib/firebaseConfig";
 import { signOut } from "firebase/auth";
 
 const Sidebar = () => {
+  const hasRedirected = useRef(false);
   const pathname = usePathname();
   const router = useRouter();
   const [allowedMenuItems, setAllowedMenuItems] = useState<string[]>([]);
@@ -110,52 +111,45 @@ const Sidebar = () => {
   ];
 
   useEffect(() => {
+    if (!userID || hasRedirected.current) return;
+
     const getUserAndPermissions = async (empID: string) => {
       const userQuery = query(
         collection(db, "accessControl"),
         where("empID", "==", empID)
       );
-
       const userSnapshot = await getDocs(userQuery);
       const userData = userSnapshot.docs[0]?.data() || {};
       return { ...userData };
     };
 
-    if (userID) {
-      getUserAndPermissions(userID).then((data) => {
-        const flatPermissions = Object.keys(data.setPermission || {});
-        const filteredKeys = flatPermissions.filter(
-          (key) =>
-            Array.isArray(data.setPermission?.[key]) &&
-            data.setPermission[key].length > 0
+    getUserAndPermissions(userID).then((data) => {
+      const flatPermissions = Object.keys(data.setPermission || {});
+      const filteredKeys = flatPermissions.filter(
+        (key) =>
+          Array.isArray(data.setPermission?.[key]) &&
+          data.setPermission[key].length > 0
+      );
+
+      setAllowedMenuItems(filteredKeys);
+
+      const isCurrentPathAllowed = sidebarMenu.some(
+        (item) => filteredKeys.includes(item.name) && item.path === pathname
+      );
+
+      if (!isCurrentPathAllowed) {
+        const firstAllowed = sidebarMenu.find((item) =>
+          filteredKeys.includes(item.name)
         );
-
-        setAllowedMenuItems(filteredKeys);
-
-        // Navigate to first allowed path
-        // const firstAllowed = sidebarMenu.find((item) =>
-        //   filteredKeys.includes(item.name)
-        // );
-        // if (firstAllowed) {
-        //   router.push(firstAllowed.path);
-        // }
-
-        const isCurrentPathAllowed = sidebarMenu.some(
-          (item) => filteredKeys.includes(item.name) && item.path === pathname
-        );
-
-        if (!isCurrentPathAllowed) {
-          const firstAllowed = sidebarMenu.find((item) =>
-            filteredKeys.includes(item.name)
-          );
-          if (firstAllowed) {
-            router.push(firstAllowed.path);
-            console.log("RE-directing ");
-          }
+        if (firstAllowed) {
+          hasRedirected.current = true;
+          router.push(firstAllowed.path);
         }
-      });
-    }
-  }, []);
+      } else {
+        hasRedirected.current = true;
+      }
+    });
+  }, [userID]);
 
   const RemoveLocalValues = () => {
     localStorage.removeItem("experienceData");
