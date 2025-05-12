@@ -1,9 +1,12 @@
+import HeaderPermission from "./homePermission/headerPermission";
+import ListOfPermissions from "./homePermission/listOfPermissions";
+
 const Permission: React.FC = () => {
-    return (
-      <main>
-        <h2>Permission</h2>
-      </main>
-    );
-  };
-  export default Permission;
-  
+  return (
+    <main>
+      <HeaderPermission />
+      <ListOfPermissions />
+    </main>
+  );
+};
+export default Permission;

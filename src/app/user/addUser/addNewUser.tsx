@@ -103,10 +103,9 @@ const AddNewUser: React.FC = () => {
     try {
       if (existingUser.id) {
         const filteredModules = Object.fromEntries(
-          Object.entries(selectedModules).filter(
-            ([_, sections]) => sections.length > 0
-          )
+          Object.entries(selectedModules).filter(([key]) => isNaN(Number(key)))
         );
+
         const userRef = doc(db, "accessControl", existingUser.id);
 
         let updatedData = {
@@ -115,7 +114,6 @@ const AddNewUser: React.FC = () => {
           createdAt: new Date().toISOString(),
         };
 
-        console.log("updatedData : ", updatedData);
         await updateDoc(userRef, {
           ...updatedData,
         });

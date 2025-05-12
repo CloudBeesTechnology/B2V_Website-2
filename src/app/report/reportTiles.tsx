@@ -36,7 +36,7 @@ const tiles: CardType[] = [
   {
     image: Certificate,
     title: "Permission Report",
-    route: "/report/records",
+    route: "/report/permission",
   },
 ];
 
