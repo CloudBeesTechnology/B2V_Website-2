@@ -8,7 +8,11 @@ interface InternContextType {
 
 const InternContext = createContext<InternContextType | undefined>(undefined);
 
-export const InternProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const InternProvider= ({ 
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [editIntern, setEditIntern] = useState<RequestInternData | null>(null);
 
   return (

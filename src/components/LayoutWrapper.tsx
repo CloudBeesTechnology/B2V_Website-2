@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { EmployeeContextProvider } from "@/app/utils/EmpContext";
+import { InternProvider } from "@/app/utils/InternContext";
 
 const pathList = [
   "/signIn",
@@ -53,7 +54,9 @@ export default function LayoutWrapper({
           <Navbar />
         </div>
         <main className="px-10">
-          <EmployeeContextProvider>{children}</EmployeeContextProvider>
+          <EmployeeContextProvider>
+            <InternProvider>{children}</InternProvider>
+          </EmployeeContextProvider>
         </main>
       </div>
     </section>
