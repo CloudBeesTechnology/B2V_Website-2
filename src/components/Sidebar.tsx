@@ -1,7 +1,8 @@
+
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import attendance from "../../public/assets/sidebar/attendance.svg";
 import overview from "../../public/assets/sidebar/overview.svg";
 import internship from "../../public/assets/sidebar/internship.svg";
@@ -27,11 +28,8 @@ import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
-import { auth } from "@/lib/firebaseConfig";
-import { signOut } from "firebase/auth";
 
 const Sidebar = () => {
-  const hasRedirected = useRef(false);
   const pathname = usePathname();
   const router = useRouter();
   const [allowedMenuItems, setAllowedMenuItems] = useState<string[]>([]);
@@ -110,46 +108,41 @@ const Sidebar = () => {
     },
   ];
 
+  let onetimeExecute = false;
   useEffect(() => {
-    if (!userID || hasRedirected.current) return;
-
     const getUserAndPermissions = async (empID: string) => {
       const userQuery = query(
         collection(db, "accessControl"),
         where("empID", "==", empID)
       );
+
       const userSnapshot = await getDocs(userQuery);
       const userData = userSnapshot.docs[0]?.data() || {};
       return { ...userData };
     };
 
-    getUserAndPermissions(userID).then((data) => {
-      const flatPermissions = Object.keys(data.setPermission || {});
-      const filteredKeys = flatPermissions.filter(
-        (key) =>
-          Array.isArray(data.setPermission?.[key]) &&
-          data.setPermission[key].length > 0
-      );
+    if (userID && !onetimeExecute) {
+      onetimeExecute = true;
+      getUserAndPermissions(userID).then((data) => {
+        const flatPermissions = Object.keys(data.setPermission || {});
+        const filteredKeys = flatPermissions.filter(
+          (key) =>
+            Array.isArray(data.setPermission?.[key]) &&
+            data.setPermission[key].length > 0
+        );
 
-      setAllowedMenuItems(filteredKeys);
+        setAllowedMenuItems(filteredKeys);
 
-      const isCurrentPathAllowed = sidebarMenu.some(
-        (item) => filteredKeys.includes(item.name) && item.path === pathname
-      );
-
-      if (!isCurrentPathAllowed) {
+        // Navigate to first allowed path
         const firstAllowed = sidebarMenu.find((item) =>
           filteredKeys.includes(item.name)
         );
         if (firstAllowed) {
-          hasRedirected.current = true;
           router.push(firstAllowed.path);
         }
-      } else {
-        hasRedirected.current = true;
-      }
-    });
-  }, [userID]);
+      });
+    }
+  }, []);
 
   const RemoveLocalValues = () => {
     localStorage.removeItem("experienceData");
@@ -193,18 +186,6 @@ const Sidebar = () => {
       : pathname === linkPath;
   };
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        console.log("User signed out");
-        localStorage.clear();
-        router.push("/signIn");
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-      });
-  };
-
   return (
     <section className="p-5 h-full overflow-y-auto">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
@@ -245,11 +226,7 @@ const Sidebar = () => {
             ))}
         </div>
         <div className="px-2">
-          <Link
-            href="/logout"
-            onClick={handleLogout}
-            className="flex items-center gap-3"
-          >
+          <Link href="/logout" className="flex items-center gap-3">
             <Image src={logout} alt="Logout not found" width={24} height={24} />
             <p className="text_size_4">Logout</p>
           </Link>

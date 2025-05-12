@@ -56,7 +56,7 @@ const AddNewUser: React.FC = () => {
     formState: { errors },
     reset,
   } = useForm<AddUserFormData>({
-    resolver: yupResolver(addUserSchema),
+    resolver: yupResolver(addUserSchema) as any,
   });
 
   // Create User
@@ -138,9 +138,9 @@ const AddNewUser: React.FC = () => {
       console.error("Error updating user:", error);
     }
   };
- 
+
   // Check user exists or not
-  const fetchDataByEmpID = async (empID: string) => {
+  const fetchDataByEmpID = async (empID: any) => {
     const fetchQuery = query(
       collection(db, "accessControl"),
       where("empID", "==", empID)
@@ -162,6 +162,7 @@ const AddNewUser: React.FC = () => {
   };
 
   const onSubmit = async (data: AddUserFormData) => {
+    console.log("data : ", data);
     const checkDataIsExistsOrNot = await fetchDataByEmpID(data.empID);
 
     if (checkDataIsExistsOrNot) {
