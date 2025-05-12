@@ -38,8 +38,9 @@
 // };
 // export default EmpLeaveCounts;
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+// import { useYearChange } from "../utils/customHooks/useYearChange";
 
 type ItemValue = {
   totalLeave: string;
@@ -53,7 +54,6 @@ interface LeaveData {
   id: string;
   empID: string;
   leaveStatus: "Pending" | "Approved" | "Rejected" | "Cancelled";
-  // Other fields can remain if needed
 }
 
 const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
@@ -61,18 +61,33 @@ const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
   const [rejectedCount, setRejectedCount] = useState<number>(0);
   const [approvedCount, setApprovedCount] = useState<number>(0);
 
+  // const yearChanged = useYearChange();
+
+  // const yearChanged = true;
+
   const empID =
     typeof window !== "undefined"
       ? localStorage.getItem("empID")?.toString()?.toUpperCase()
       : null;
 
-      // console.log("emp", empID);
-      
+  // console.log("emp", empID);
+
+  const currentYear = new Date().getFullYear();
+
+  // Start of year (Jan 1, 00:00:00 UTC) as ISO string
+  const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0)).toISOString();
+
+  // End of year (Dec 31, 23:59:59.999 UTC) as ISO string
+  const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)).toISOString();
+
+
   useEffect(() => {
     const fetchDataByEmpID = async () => {
       const fetchQuery = query(
         collection(db, "leaveStatus"),
-        where("empID", "==", empID)
+        where("empID", "==", empID),
+        where("createdAt", ">=", startOfYear),
+        where("createdAt", "<=", endOfYear)
       );
 
       const querySnapshot = await getDocs(fetchQuery);
@@ -99,6 +114,50 @@ const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
 
     fetchDataByEmpID();
   }, []);
+
+  // Function to fetch employee data and update totalLeave
+  // const fetchAndUpdateLeave = async () => {
+  //   const empID = localStorage.getItem("empID");
+  //   if (!empID) {
+  //     alert("Employee ID not found.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const employeesRef = collection(db, "employeeDetails");
+  //     const q = query(employeesRef, where("empID", "==", empID));
+  //     const querySnapshot = await getDocs(q);
+
+  //     if (querySnapshot.empty) {
+  //       alert("Employee details not found.");
+  //       return;
+  //     }
+
+  //     const employeeData = querySnapshot.docs[0].data();
+  //     // console.log("EmpData", employeeData);
+
+  //     if (yearChanged) {
+  //       const updatedTotalLeave = "0";
+
+  //       // Update Firestore document with the new totalLeave
+  //       const employeeDocRef = doc(db, "employeeDetails", querySnapshot.docs[0].id);
+  //       await updateDoc(employeeDocRef, {
+  //         totalLeave: updatedTotalLeave,
+  //       });
+
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating totalLeave:", error);
+  //   }
+  // };
+
+  // Trigger the fetchAndUpdateLeave function when yearChanged is true
+  // useEffect(() => {
+  //   if (yearChanged) {
+  //     fetchAndUpdateLeave();
+  //   }
+  // }, [yearChanged]);
+
 
   return (
     <article className="flex justify-around p-5 gap-5 border h-48 border-[#E4E4E4] bg-white rounded-md">

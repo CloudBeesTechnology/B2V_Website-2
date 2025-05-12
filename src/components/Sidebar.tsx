@@ -27,6 +27,8 @@ import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import { auth } from "@/lib/firebaseConfig";
+import { signOut } from "firebase/auth";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -131,11 +133,25 @@ const Sidebar = () => {
         setAllowedMenuItems(filteredKeys);
 
         // Navigate to first allowed path
-        const firstAllowed = sidebarMenu.find((item) =>
-          filteredKeys.includes(item.name)
+        // const firstAllowed = sidebarMenu.find((item) =>
+        //   filteredKeys.includes(item.name)
+        // );
+        // if (firstAllowed) {
+        //   router.push(firstAllowed.path);
+        // }
+
+        const isCurrentPathAllowed = sidebarMenu.some(
+          (item) => filteredKeys.includes(item.name) && item.path === pathname
         );
-        if (firstAllowed) {
-          router.push(firstAllowed.path);
+
+        if (!isCurrentPathAllowed) {
+          const firstAllowed = sidebarMenu.find((item) =>
+            filteredKeys.includes(item.name)
+          );
+          if (firstAllowed) {
+            router.push(firstAllowed.path);
+            console.log("RE-directing ");
+          }
         }
       });
     }
@@ -183,6 +199,18 @@ const Sidebar = () => {
       : pathname === linkPath;
   };
 
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("User signed out");
+        localStorage.clear();
+        router.push("/signIn");
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
+  };
+
   return (
     <section className="p-5 h-full overflow-y-auto">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
@@ -223,7 +251,11 @@ const Sidebar = () => {
             ))}
         </div>
         <div className="px-2">
-          <Link href="/logout" className="flex items-center gap-3">
+          <Link
+            href="/logout"
+            onClick={handleLogout}
+            className="flex items-center gap-3"
+          >
             <Image src={logout} alt="Logout not found" width={24} height={24} />
             <p className="text_size_4">Logout</p>
           </Link>

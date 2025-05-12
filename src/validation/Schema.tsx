@@ -46,18 +46,18 @@ export const personalInfoSchema = z.object({
   address: z.string().nonempty("Address is required"),
   contact: z.string().min(1, "Contact is required"),
   doj: z.string().nonempty("Date of Join is required"),
-  alternateNo: z
-    .string()
-    .optional(),
+  alternateNo: z.string().optional(),
   email: z.string().email("Invalid email address"),
   lang: z.string().min(1, "Language is required"),
+  role: z.string().nonempty("Role is required"),
   religion: z.string().optional(),
-  proof:z.any().optional(),
+  proof: z.any().optional(),
   department: z.string().optional(),
   position: z.string().optional(),
   totalLeave: z.string().optional(),
   manager: z.string().optional(),
   leadEmpID: z.string().optional(),
+  effectiveDate: z.string().optional(),
   profilePhoto: z.any().optional(),
 });
 
@@ -86,7 +86,7 @@ export const familySchema = z.object({
   husbandName: z.string().optional(),
   wifeName: z.string().optional(),
   child: z.string().optional(),
-  familyPNo:  z.string().optional(),
+  familyPNo: z.string().optional(),
   familyAddress: z.string().optional(),
 });
 

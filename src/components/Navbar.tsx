@@ -1,32 +1,60 @@
-"use client";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   IoNotificationsOutline,
   IoSearchSharp,
   IoMicOutline,
 } from "react-icons/io5";
-import { FaSortDown } from "react-icons/fa";
 import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
-import { auth } from "@/lib/firebaseConfig";
-import { signOut } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+
+
+interface EmployeeData {
+  name?: string;
+  position?: string;
+  profilePhoto?: string;
+  department?: string;
+  empID?: string;
+}
 
 const Navbar = () => {
-  const router = useRouter();
+  const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        console.log("User signed out");
-        localStorage.clear();
-        router.push("/signIn");
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
+  const fetchAndUpdateLeave = async () => {
+    const empID = localStorage.getItem("empID");
+    if (!empID) {
+      alert("Employee ID not found.");
+      return;
+    }
+
+    try {
+      const employeesRef = collection(db, "employeeDetails");
+      const q = query(employeesRef, where("empID", "==", empID));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        alert("Employee details not found.");
+        return;
+      }
+
+      const data = querySnapshot.docs[0].data() as EmployeeData;
+      setEmployeeData({
+        ...data,
+        profilePhoto: data?.profilePhoto
       });
+
+    } catch (error) {
+      console.error("Error updating totalLeave:", error);
+    }
   };
 
+  useEffect(() => {
+    fetchAndUpdateLeave();
+  }, []);
+
+  const photo = employeeData?.profilePhoto
+  
   return (
     <section className="bg-morelite_grey px-5 py-3 flex w-full sticky top-0 z-[100]">
       <div className="flex justify-end items-center w-full gap-4 ">
@@ -50,23 +78,18 @@ const Navbar = () => {
         </article>
         <article className="flex gap-3">
           <article className="text-[13px] my-auto">
-            <p className="text-gray font-bold">Name</p>
-            <p className="text-medium_gray font-medium">Position</p>
+            <p className="text-gray font-bold">{employeeData?.name}</p>
+            <p className="text-medium_gray font-medium">{employeeData?.position}</p>
           </article>
-          <div className="bg-white rounded-md max-w-[50px] w-full">
+           <div className="rounded-full h-[36px] w-[36px] overflow-hidden border-2 border-white">
             <Image
-              src={avatar}
+              src={photo || avatar}
               alt="profile not found"
-              className="bg-cover w-full"
+              width={36}
+              height={36}
+              className="object-cover w-full h-full"
             />
           </div>
-          <p
-            className="text-gray text-xl cursor-pointer"
-            onClick={handleLogout}
-          >
-            <FaSortDown />
-            Logout
-          </p>
         </article>
       </div>
     </section>
