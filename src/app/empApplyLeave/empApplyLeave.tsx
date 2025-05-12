@@ -19,9 +19,9 @@ import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
 
 export type Holiday = {
-  date: string; // Required
-  name?: string; // Optional
-  description?: string; // Optional
+  date: string; 
+  name?: string; 
+  description?: string; 
   [key: string]: any;
 };
 
@@ -46,7 +46,6 @@ const EmpApplyLeave = () => {
       alert("Employee ID not found.");
       return;
     }
-
     // Fetch employee details to get leadEmpID and managerEmpID
     try {
       const employeesRef = collection(db, "employeeDetails");
@@ -73,11 +72,7 @@ const EmpApplyLeave = () => {
 
       // Check for overlapping leave dates
       const leaveStatusRef = collection(db, "leaveStatus");
-      const leaveQuery = query(
-        leaveStatusRef,
-        where("empID", "==", empID),
-        where("leaveStatus", "in", ["Pending", "Approved"])
-      );
+      const leaveQuery = query(leaveStatusRef, where("empID", "==", empID));
       const leaveSnapshot = await getDocs(leaveQuery);
 
       const isOverlap = leaveSnapshot.docs.some((doc) => {
@@ -85,12 +80,33 @@ const EmpApplyLeave = () => {
         const leaveStart = new Date(leave.startDate);
         const leaveEnd = new Date(leave.endDate);
 
-        // Check if the requested date range overlaps with an existing leave
-        return (
-          (start <= leaveEnd && start >= leaveStart) ||
-          (end <= leaveEnd && end >= leaveStart) ||
-          (start <= leaveStart && end >= leaveEnd)
-        );
+
+        const leadStatus = leave.leadStatus;
+        const managerStatus = leave.managerStatus;
+
+        const hasLead = !!leadEmpID;
+        const hasManager = !!managerEmpID;
+
+        // Check if the leave is rejected
+        const isRejected =
+          leadStatus === "Rejected" || managerStatus === "Rejected";
+          
+        const isApprovedOrPending =
+          (hasLead && (leadStatus === "Pending" || leadStatus === "Approved")) ||
+          (hasManager && (managerStatus === "Pending" || managerStatus === "Approved"));
+
+        // If the leave is rejected, ignore it
+        if (isRejected) return false;
+
+        // Check for overlap
+        if (isApprovedOrPending) {
+          const isOverlap =
+            (start <= leaveEnd && start >= leaveStart) ||
+            (end <= leaveEnd && end >= leaveStart) ||
+            (start <= leaveStart && end >= leaveEnd);
+
+          return isOverlap;
+        }
       });
 
       if (isOverlap) {
@@ -136,13 +152,14 @@ const EmpApplyLeave = () => {
       } else {
         leaveDetails.takenDay = "0";
       }
-      // console.log(leaveDetails, "drfg");
+
+      console.log(leaveDetails, "LeaveDetails");
 
       await setDoc(doc(db, "leaveStatus", createdAt), {
         ...leaveDetails,
       });
 
-      setShowPopup(true);
+      // setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");
@@ -239,6 +256,7 @@ const EmpApplyLeave = () => {
               />
             </div>
           </div>
+          
           <div className="center pt-2 py-2">
             <button
               type="submit"

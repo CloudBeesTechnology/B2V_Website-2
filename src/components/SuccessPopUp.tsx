@@ -11,7 +11,7 @@ export const SuccessPopUp = ({path}:TableProps) => {
       <div className="max-w-sm w-full bg-white p-5 rounded-md flex flex-col gap-5 center shadow-2xl">
         <Image src={ok} alt="not found gif" width={70} />
         <p className="text-gray text-center text-lg">
-          Successfully Submit Data!
+          Successfully Submited Data!
         </p>
         <div className="center">
 

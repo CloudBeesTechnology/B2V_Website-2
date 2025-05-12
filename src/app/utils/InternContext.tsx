@@ -1,7 +1,6 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 import { RequestInternData } from '../internship/internshipTable'; // Import RequestInternData from types.ts
 
-// Allow setEditIntern to accept both RequestInternData and null
 interface InternContextType {
   editIntern: RequestInternData | null;
   setEditIntern: (intern: RequestInternData | null) => void; // Allow null here

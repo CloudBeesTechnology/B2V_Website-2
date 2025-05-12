@@ -18,7 +18,7 @@ export const LeaveManagementHome = () => {
   return (
     <div className="py-14 px-6">
       <h1 className="text-[22px] font-normal leading-[32px] mb-6">
-        Leave Management
+        Leave Tracking
       </h1>
       <div className="grid grid-cols-3 gap-6">
         {tiles
