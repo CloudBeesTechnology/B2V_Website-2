@@ -40,7 +40,7 @@ const EmpApplyLeavePage: React.FC = () => {
           }
 
           const empData = docSnap.docs[0].data();
-          console.log("Employee Data:", empData);
+          // console.log("Employee Data:", empData);
           setEmpLeave(empData);
         } catch (error) {
           console.error("Error fetching employee data:", error);

@@ -480,7 +480,7 @@ export const PersonalInfoForm = () => {
               <div className="border border-[#D9D9D9] px-4 py-1 rounded-sm">
                 <input
                   id="effectiveDate"
-                  type="tel"
+                 type="date"
                   className="outline-none py-1 w-full"
                   {...register("effectiveDate")}
                 />

@@ -19,6 +19,7 @@ const EmpHistoryOfLeave = () => {
   ];
   const [empLeave, setEmpLeave] = useState<Array<any>>([]);
   const [secondaryEmpLeave, setSecondaryEmpLeave] = useState<Array<any>>([]);
+  const [allYearLeaveData, setAllYearLeaveData] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -36,59 +37,76 @@ const EmpHistoryOfLeave = () => {
           const dateB = new Date(b.data().createdAt).getTime();
           return dateB - dateA; // descending: latest first
         })
-        .map((doc) => {
-          const data = doc.data();
-          let finalStatus = "";
-      
-          if (
-            (data.leadEmpID &&
-              data.leadStatus === "Approved" &&
-              data.managerStatus === "Approved") ||
-            (!data.leadEmpID && data.managerStatus === "Approved")
-          ) {
-            finalStatus = "Approved";
-          } else if (
-            (data.leadEmpID && data.leadStatus === "Rejected") ||
-            (!data.leadEmpID && data.managerStatus === "Rejected") ||
-            (data.leadEmpID &&
-              data.leadStatus === "Approved" &&
-              data.managerStatus === "Rejected")
-          ) {
-            finalStatus = "Rejected";
-          } else {
-            finalStatus = "Pending";
-          }
-      
-          return {
-            docId: doc.id,
-            empID: data.empID,
-            leaveStatus: data.leaveStatus,
-            leaveType: data.leaveType,
-            takenDay: data.takenDay,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            leaveReason: data.leaveReason,
-            leadEmpID: data.leadEmpID,
-            managerEmpID: data.managerEmpID,
-            createdAt: data.createdAt,
-            leadStatus: data.leadStatus,
-            managerStatus: data.managerStatus,
-            leadRemarks: data.leadRemarks,
-            managerRemarks: data.managerRemarks,
-            name: "",
-            remarks: data.remarks || "",
-            leadName: "",
-            managerName: "",
-            department: "",
-            finalStatus,
-          };
-        })
-        .filter((item) => item.empID === empID);
-      
+          .map((doc) => {
+            const data = doc.data();
+            let finalStatus = "";
+
+            if (
+              (data.leadEmpID &&
+                data.leadStatus === "Approved" &&
+                data.managerStatus === "Approved") ||
+              (!data.leadEmpID && data.managerStatus === "Approved")
+            ) {
+              finalStatus = "Approved";
+            } else if (
+              (data.leadEmpID && data.leadStatus === "Rejected") ||
+              (!data.leadEmpID && data.managerStatus === "Rejected") ||
+              (data.leadEmpID &&
+                data.leadStatus === "Approved" &&
+                data.managerStatus === "Rejected")
+            ) {
+              finalStatus = "Rejected";
+            } else {
+              finalStatus = "Pending";
+            }
+
+            return {
+              docId: doc.id,
+              empID: data.empID,
+              leaveStatus: data.leaveStatus,
+              leaveType: data.leaveType,
+              takenDay: data.takenDay,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              leaveReason: data.leaveReason,
+              leadEmpID: data.leadEmpID,
+              managerEmpID: data.managerEmpID,
+              createdAt: data.createdAt,
+              leadStatus: data.leadStatus,
+              managerStatus: data.managerStatus,
+              leadRemarks: data.leadRemarks,
+              managerRemarks: data.managerRemarks,
+              name: "",
+              remarks: data.remarks || "",
+              leadName: "",
+              managerName: "",
+              department: "",
+              finalStatus,
+            };
+          })
+          .filter((item) => item.empID === empID);
+
+        setAllYearLeaveData(leaveList);
+
+        const currentYear = new Date().getFullYear();
+        const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0)).getTime();
+        const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)).getTime();
+
+        const currentYearLeaveData = leaveList
+          .filter(item => {
+            const createdAt = new Date(item.createdAt).getTime();
+            return createdAt >= startOfYear && createdAt <= endOfYear;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          });
+
         // console.log(leaveList, "leavelist");
 
-        setSecondaryEmpLeave(leaveList);
-        setEmpLeave(leaveList);
+        setSecondaryEmpLeave(currentYearLeaveData);
+        setEmpLeave(currentYearLeaveData);
       } catch (error) {
         console.error("Error fetching leave data:", error);
       } finally {
@@ -107,7 +125,7 @@ const EmpHistoryOfLeave = () => {
   return (
     <section>
       <EmpLeaveDateFilter
-        empLeave={empLeave}
+        empLeave={allYearLeaveData}
         handleFilteredData={(filteredData) =>
           setSecondaryEmpLeave(filteredData)
         }

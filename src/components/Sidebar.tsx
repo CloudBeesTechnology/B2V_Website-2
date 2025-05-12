@@ -24,18 +24,22 @@ import logout from "../../public/assets/sidebar/Logout.svg";
 import logo from "../../public/assets/logo/logo.png";
 import Link from "next/link";
 import clsx from "clsx";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 
 const Sidebar = () => {
   const pathname = usePathname();
-  // const [storedPermissions, setStoredPermissions] = useState<string[]>([]);
+  const router = useRouter();
   const [allowedMenuItems, setAllowedMenuItems] = useState<string[]>([]);
-  type UserRole = "EMPLOYEE" | "INTERN" | "ADMIN";
+
   const userRole =
     typeof window !== "undefined"
-      ? (localStorage.getItem("userRole")?.toUpperCase() as UserRole | null)
+      ? (localStorage.getItem("userRole")?.toUpperCase() as
+          | "EMPLOYEE"
+          | "INTERN"
+          | "ADMIN"
+          | null)
       : null;
 
   const userID =
@@ -44,12 +48,7 @@ const Sidebar = () => {
       : null;
 
   const sidebarMenu = [
-    {
-      icons: overview,
-      icons2: whiteoverview,
-      name: "Overview",
-      path: "/",
-    },
+    { icons: overview, icons2: whiteoverview, name: "Overview", path: "/" },
     {
       icons: employee,
       icons2: whiteemployee,
@@ -68,32 +67,20 @@ const Sidebar = () => {
       name: "Internship",
       path: "/internship",
     },
-    {
-      icons: user,
-      icons2: whiteuser,
-      name: "User",
-      path: "/user",
-    },
+    { icons: user, icons2: whiteuser, name: "User", path: "/user" },
     {
       icons: leavemanagement,
       icons2: whiteleavemanagement,
       name: "Leave Management",
       path: "/leavemanagement",
     },
-
     {
       icons: timesheet,
       icons2: whitetimesheet,
       name: "Timesheet",
       path: "/timesheet",
     },
-
-    {
-      icons: report,
-      icons2: whitereport,
-      name: "Report",
-      path: "/report",
-    },
+    { icons: report, icons2: whitereport, name: "Report", path: "/report" },
     {
       icons: employee,
       icons2: whiteemployee,
@@ -127,41 +114,68 @@ const Sidebar = () => {
         where("empID", "==", empID)
       );
 
-      const [listUserDetails] = await Promise.all([getDocs(userQuery)]);
-
-      const userData = listUserDetails.docs[0]?.data() || {};
-
+      const userSnapshot = await getDocs(userQuery);
+      const userData = userSnapshot.docs[0]?.data() || {};
       return { ...userData };
     };
 
-    // let userRole =
-    //   typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
-
     if (userID) {
       getUserAndPermissions(userID).then((data) => {
-        const flatPermissions = Object?.keys(data.setPermission);
+        const flatPermissions = Object.keys(data.setPermission || {});
+        const filteredKeys = flatPermissions.filter(
+          (key) =>
+            Array.isArray(data.setPermission?.[key]) &&
+            data.setPermission[key].length > 0
+        );
 
-        setAllowedMenuItems(flatPermissions);
+        setAllowedMenuItems(filteredKeys);
+
+        // Navigate to first allowed path
+        const firstAllowed = sidebarMenu.find((item) =>
+          filteredKeys.includes(item.name)
+        );
+        if (firstAllowed) {
+          router.push(firstAllowed.path);
+        }
       });
     }
   }, []);
-
-  // console.log("storedPermissions : ", storedPermissions);
 
   const RemoveLocalValues = () => {
     localStorage.removeItem("experienceData");
     localStorage.removeItem("personalInfo");
     localStorage.removeItem("educationData");
   };
+
   const isLinkActive = (linkName: string, linkPath: string) => {
     const customPaths: Record<string, string[]> = {
+      Employee: ["/employee", "/allEmployee", "/employeeDetails"],
+      Attendance: ["/attendance"],
+      Internship: [
+        "/internship",
+        "/internship/tabs",
+        "/internship/addInternship",
+        "/internship/internStatus",
+      ],
+      User: ["/user", "/user/credentialRequest", "/user/addUser"],
       "Leave Management": [
         "/leavemanagement",
         "/leaveapproval",
         "/leavehistory",
+        "/permission",
+        "/permissionhistory",
       ],
-      Employee: ["/employee", "/employeedetails", "/employeepersonal"],
-      // Add more modules and paths here if needed
+      Timesheet: ["/timesheet"],
+      Report: [
+        "/report",
+        "/report/reportDetails",
+        "/report/leaveData",
+        "/report/records",
+      ],
+      "Upcoming Holidays": ["/empUpcomingHolidays"],
+      "Apply Leave": ["/empApplyLeave"],
+      Task: ["/internTask"],
+      Settings: ["/settings"],
     };
 
     return customPaths[linkName]
@@ -192,21 +206,16 @@ const Sidebar = () => {
                     onClick={RemoveLocalValues}
                     className="flex items-center gap-3"
                   >
-                    {isLinkActive(link.name, link.path) ? (
-                      <Image
-                        src={link.icons2}
-                        alt={`${link.name} not found`}
-                        width={24}
-                        height={24}
-                      />
-                    ) : (
-                      <Image
-                        src={link.icons}
-                        alt={`${link.name} not found`}
-                        width={24}
-                        height={24}
-                      />
-                    )}
+                    <Image
+                      src={
+                        isLinkActive(link.name, link.path)
+                          ? link.icons2
+                          : link.icons
+                      }
+                      alt={`${link.name} not found`}
+                      width={24}
+                      height={24}
+                    />
                     <p className="text_size_4">{link.name}</p>
                   </Link>
                 </div>
