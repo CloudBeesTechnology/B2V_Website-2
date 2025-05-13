@@ -29,7 +29,7 @@ interface PersonalInfoFormData {
   proof?: string | null;
   department?: string;
   position?: string;
-  role: string;
+  // role: string;
   totalLeave?: string;
   manager?: string;
   leadEmpID?: string;
@@ -137,26 +137,26 @@ export const PersonalInfoForm = () => {
     return await getDownloadURL(storageRef);
   };
 
-  const updateUserRole = async (email: string, role: string) => {
-    try {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("email", "==", email));
-      const querySnapshot = await getDocs(q);
+  // const updateUserRole = async (email: string, role: string) => {
+  //   try {
+  //     const usersRef = collection(db, "users");
+  //     const q = query(usersRef, where("email", "==", email));
+  //     const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach(async (docSnapshot) => {
-          await updateDoc(docSnapshot.ref, {
-            role: role
-          });
-        });
-      } else {
-        console.warn(`No user found with email: ${email}`);
-      }
-    } catch (error) {
-      console.error("Error updating user role:", error);
-      throw error;
-    }
-  };
+  //     if (!querySnapshot.empty) {
+  //       querySnapshot.forEach(async (docSnapshot) => {
+  //         await updateDoc(docSnapshot.ref, {
+  //           role: role
+  //         });
+  //       });
+  //     } else {
+  //       console.warn(`No user found with email: ${email}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating user role:", error);
+  //     throw error;
+  //   }
+  // };
 
   const onSubmit = async (data: PersonalInfoFormData) => {
     setIsUploading(true);
@@ -184,7 +184,7 @@ export const PersonalInfoForm = () => {
       };
 
       // Update user role in the users collection
-      await updateUserRole(data.email, data.role);
+      // await updateUserRole(data.email, data.role);
 
       localStorage.setItem("personalInfo", JSON.stringify(dataToStore));
       router.push("/employeeDetails?tab=educationInfo");
@@ -472,7 +472,7 @@ export const PersonalInfoForm = () => {
             </div>
           </div>
           <div className="flex justify-between mt-5">
-            <div className="flex flex-col gap-2 w-[30%]">
+            {/* <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="manager" className="text-[15px] text-gray">
                Role
               </label>
@@ -492,7 +492,7 @@ export const PersonalInfoForm = () => {
               {errors.role && (
                 <span className="text-red text-sm">{errors.role.message}</span>
               )}
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-2 w-[30%]">
               <label htmlFor="manager" className="text-[15px] text-gray">
@@ -593,6 +593,7 @@ export const PersonalInfoForm = () => {
     </section>
   );
 };
+
 
 // "use client";
 // import { useForm } from "react-hook-form";

@@ -53,7 +53,7 @@ const Intern: React.FC = () => {
   return (
     <main>
       <h1 className="flex gap-2 items-center text-mediumlite_grey text_size_2 my-5">
-        <Link href="/internship" className="text-3xl">
+        <Link href="/internship" className="text-3xl hover:text-blue-600 transition-colors">
           <MdOutlineKeyboardBackspace />
         </Link>
         Internship
