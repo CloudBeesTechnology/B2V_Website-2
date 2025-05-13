@@ -4,7 +4,7 @@ import {
   addUserSchema,
 } from "@/app/services/validations/adminPortalValidation/userValidation";
 import FormField from "@/app/utils/formField";
-import Searchbox from "@/app/utils/searchbox";
+import SearchDisplay from "@/app/utils/searchDisplay";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -56,7 +56,7 @@ const AddNewUser: React.FC = () => {
     formState: { errors },
     reset,
   } = useForm<AddUserFormData>({
-    resolver: yupResolver(addUserSchema),
+    resolver: yupResolver(addUserSchema) as any,
   });
 
   // Create User
@@ -103,10 +103,9 @@ const AddNewUser: React.FC = () => {
     try {
       if (existingUser.id) {
         const filteredModules = Object.fromEntries(
-          Object.entries(selectedModules).filter(
-            ([_, sections]) => sections.length > 0
-          )
+          Object.entries(selectedModules).filter(([key]) => isNaN(Number(key)))
         );
+
         const userRef = doc(db, "accessControl", existingUser.id);
 
         let updatedData = {
@@ -115,7 +114,6 @@ const AddNewUser: React.FC = () => {
           createdAt: new Date().toISOString(),
         };
 
-        console.log("updatedData : ", updatedData);
         await updateDoc(userRef, {
           ...updatedData,
         });
@@ -138,9 +136,9 @@ const AddNewUser: React.FC = () => {
       console.error("Error updating user:", error);
     }
   };
- 
+
   // Check user exists or not
-  const fetchDataByEmpID = async (empID: string) => {
+  const fetchDataByEmpID = async (empID: any) => {
     const fetchQuery = query(
       collection(db, "accessControl"),
       where("empID", "==", empID)
@@ -162,6 +160,7 @@ const AddNewUser: React.FC = () => {
   };
 
   const onSubmit = async (data: AddUserFormData) => {
+    console.log("data : ", data);
     const checkDataIsExistsOrNot = await fetchDataByEmpID(data.empID);
 
     if (checkDataIsExistsOrNot) {
@@ -224,7 +223,7 @@ const AddNewUser: React.FC = () => {
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
 
-        <Searchbox
+        <SearchDisplay
           allUser={allUser}
           handleSelect={handleSelect}
           parentRef={parentRef}

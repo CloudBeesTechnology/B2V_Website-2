@@ -15,7 +15,7 @@ const page = () => {
   return (
     <main>
       <Overview />
-      <EmpOverview />
+      <EmpOverview /> 
     </main>
   );
 };

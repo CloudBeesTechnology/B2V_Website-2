@@ -49,6 +49,7 @@ export const personalInfoSchema = z.object({
   alternateNo: z.string().optional(),
   email: z.string().email("Invalid email address"),
   lang: z.string().min(1, "Language is required"),
+  role: z.string().nonempty("Role is required"),
   religion: z.string().optional(),
   proof: z.any().optional(),
   department: z.string().optional(),

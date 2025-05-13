@@ -17,12 +17,12 @@ interface RequestInternData {
   category: string;
   courseContent: string;
   email: string;
-  status: string;
+  courceStatus: string;
 }
 
 interface StatusUpdateData {
   intID: string;
-  status: string;
+  courceStatus: string;
 }
 
 const InternStatus = () => {
@@ -47,7 +47,7 @@ const InternStatus = () => {
     fetchData();
   }, []);
 
-  const onSubmit = async ({ intID, status }: StatusUpdateData) => {
+  const onSubmit = async ({ intID, courceStatus }: StatusUpdateData) => {
     try {
       // Query the 'Internship' collection to find the document with the matching intID
       const querySnapshot = await getDocs(collection(db, "Internship"));
@@ -71,30 +71,30 @@ const InternStatus = () => {
       // Reference to the document that needs to be updated
       const docRef = doc(db, "Internship", docRefToUpdate);
   
-      // Update the 'status' field and the 'updatedAt' field
+      // Update the 'courceStatus' field and the 'updatedAt' field
       await updateDoc(docRef, {
-        status,           // Update the status
+        courceStatus,           // Update the courceStatus
         updatedAt: new Date().toISOString(), // Add a timestamp for the update
       });
   
       // Log success
-      console.log("status updated for intID:", intID);
+      console.log("courceStatus updated for intID:", intID);
   
-      // Update the internData state to reflect the new status
+      // Update the internData state to reflect the new courceStatus
       setInternData((prevData) =>
         prevData.map((intern) =>
-          intern.intID === intID ? { ...intern, status } : intern
+          intern.intID === intID ? { ...intern, courceStatus } : intern
         )
       );
   
       // Optionally refresh the page or perform additional actions
       router.refresh(); // Or use your own method to update UI
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error updating courceStatus:", error);
     }
   };
   
-  const filteredData = internData.filter((item) => item.status === filter);
+  const filteredData = internData.filter((item) => item.courceStatus === filter);
 
   return (
     <section className=" my-3 p-4">
@@ -159,13 +159,13 @@ const InternStatus = () => {
                 <td className="center py-5">
                   <select
                     className="text-sm px-2 py-1 rounded border bg-white text-gray-700"
-                    value={intern.status}
+                    value={intern.courceStatus}
                     onChange={(e) => {
                       const selectedStatus = e.target.value;
-                      if (selectedStatus !== intern.status) {
+                      if (selectedStatus !== intern.courceStatus) {
                         onSubmit({
                           intID: intern.intID,
-                          status: selectedStatus,
+                          courceStatus: selectedStatus,
                         });
                       }
                     }}
