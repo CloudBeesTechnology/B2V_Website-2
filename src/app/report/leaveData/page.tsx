@@ -2,12 +2,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { db } from "@/lib/firebaseConfig";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
 
 interface CombinedData {
@@ -22,8 +17,8 @@ interface CombinedData {
   startDate: string;
   endDate: string;
   days: number;
-  effectiveDate: string,
-  managerStatus: string
+  effectiveDate: string;
+  managerStatus: string;
 }
 
 const LeaveData: React.FC = () => {
@@ -52,7 +47,6 @@ const LeaveData: React.FC = () => {
           const empSnap = await getDocs(empQuery);
           const empDoc = empSnap.docs[0]?.data();
 
-
           if (empDoc) {
             combined.push({
               empID: leave.empID,
@@ -67,7 +61,7 @@ const LeaveData: React.FC = () => {
               takenDay: leave.takenDay,
               days: leave.days,
               effectiveDate: empDoc.effectiveDate,
-              managerStatus: leave.managerStatus
+              managerStatus: leave.managerStatus,
             });
           }
         }
@@ -80,7 +74,6 @@ const LeaveData: React.FC = () => {
     };
     fetchData();
   }, []);
-
 
   // const calculateRemainingLeave = (leaves: CombinedData[]): number => {
   //   if (!leaves.length) return 0;
@@ -98,7 +91,6 @@ const LeaveData: React.FC = () => {
   //   console.log("Effective Date:", effectiveDate.toISOString());
   //   console.log("Eligibility Date (+1yr):", eligibilityDate.toISOString());
   //   console.log("Today:", now.toISOString());
-
 
   //   let remaining = 0;
 
@@ -174,10 +166,7 @@ const LeaveData: React.FC = () => {
 
       const datePointer = new Date(accrualStart);
 
-      while (
-        datePointer.getFullYear() === currentYear &&
-        datePointer <= now
-      ) {
+      while (datePointer.getFullYear() === currentYear && datePointer <= now) {
         remaining += 1;
         datePointer.setMonth(datePointer.getMonth() + 1);
       }
@@ -211,7 +200,6 @@ const LeaveData: React.FC = () => {
     return (
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
     );
-
 
   return (
     <main>
@@ -296,13 +284,16 @@ const LeaveData: React.FC = () => {
                 0
               );
 
-              const totalApprovedLeaveDays = employeeLeaves.reduce((total, leave) => {
-                const leaveStart = new Date(leave.startDate);
-                if (leaveStart.getFullYear() === new Date().getFullYear()) {
-                  total += parseFloat(leave.takenDay) || 0;
-                }
-                return total;
-              }, 0);
+              const totalApprovedLeaveDays = employeeLeaves.reduce(
+                (total, leave) => {
+                  const leaveStart = new Date(leave.startDate);
+                  if (leaveStart.getFullYear() === new Date().getFullYear()) {
+                    total += parseFloat(leave.takenDay) || 0;
+                  }
+                  return total;
+                },
+                0
+              );
 
               const remainingLeave = calculateRemainingLeave(filteredLeaves);
 
@@ -325,7 +316,10 @@ const LeaveData: React.FC = () => {
                         <td className="py-4">
                           {DateFormat(entry.endDate) || "N/A"}
                         </td>
-                        <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase() + entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
+                        <td className="py-4 ">
+                          {entry.leaveType.charAt(0).toUpperCase() +
+                            entry.leaveType.slice(1).toLowerCase() || "N/A"}
+                        </td>
                         <td className="py-4 h-[80px]">
                           <div className="overflow-y-auto h-[80px]">
                             {entry.leaveReason || "N/A"}
@@ -348,12 +342,18 @@ const LeaveData: React.FC = () => {
                   </tr> */}
                   <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300">
                     <td colSpan={8} className="py-4 text-lg text-gray-700">
-                      Total for <span className="text-indigo-600">{filteredLeaves[0].name}</span>
+                      Total for{" "}
+                      <span className="text-indigo-600">
+                        {filteredLeaves[0].name}
+                      </span>
                     </td>
-                    <td className="py-4 text-blue-700 text-lg">{totalTakenDays || 0}</td>
+                    <td className="py-4 text-blue-700 text-lg">
+                      {totalTakenDays || 0}
+                    </td>
                     <td
-                      className={`relative group py-4 text-lg font-bold ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'
-                        }`}
+                      className={`relative group py-4 text-lg font-bold ${
+                        remainingLeave <= 1 ? "text-red-500" : "text-green-600"
+                      }`}
                     >
                       {remainingLeave}
                       {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
@@ -361,14 +361,11 @@ const LeaveData: React.FC = () => {
                       </span> */}
                     </td>
                   </tr>
-
                 </React.Fragment>
               );
             })}
           </tbody>
-          
         </table>
-        
       </section>
     </main>
   );
