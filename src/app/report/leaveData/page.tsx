@@ -11,7 +11,13 @@ import {
 } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
 import { exportLeaveReport } from "@/app/utils/exportLeaveReport";
-import { FloatingActionButton } from "../../utils/FloatingActionButton"; 
+import { FloatingActionButton } from "../../utils/FloatingActionButton";
+import SearchBox from "@/app/utils/searchbox";
+
+interface leaveDataType {
+  empID?: string;
+  [key: string]: any;
+}
 
 interface CombinedData {
   empID: string;
@@ -25,12 +31,13 @@ interface CombinedData {
   startDate: string;
   endDate: string;
   days: number;
-  effectiveDate: string,
-  managerStatus: string
+  effectiveDate: string;
+  managerStatus: string;
 }
 
 const LeaveData: React.FC = () => {
   const [leaveData, setLeaveData] = useState<CombinedData[]>([]);
+  const [filteredLeaveData, setFilteredLeaveData] = useState<CombinedData[]>([]);
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -83,6 +90,14 @@ const LeaveData: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handleFilter = (filteredData: leaveDataType | any) => {
+    if (Array.isArray(filteredData) && filteredData.length > 0) {
+      setFilteredLeaveData(filteredData);
+    } else {
+      setFilteredLeaveData(leaveData);
+    }
+  };
 
   const calculateRemainingLeave = (leaves: CombinedData[]): number => {
     if (!leaves.length) return 0;
@@ -143,7 +158,7 @@ const LeaveData: React.FC = () => {
     return 0;
   };
 
-  const groupedData = leaveData.reduce((acc, entry) => {
+  const groupedData = filteredLeaveData.reduce((acc, entry) => {
     acc[entry.empID] = acc[entry.empID] || [];
     acc[entry.empID].push(entry);
     return acc;
@@ -188,7 +203,9 @@ const LeaveData: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="mt-auto">{/* <Searchbox /> */}</div>
+        <div className="mt-auto">
+          <SearchBox primaryData={leaveData} handleFilter={handleFilter} />
+        </div>
       </section>
       <section className="bg-white rounded-xl p-5 my-7">
         <table className="table-fixed w-full">
@@ -207,7 +224,7 @@ const LeaveData: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {Object.values(groupedData).map((employeeLeaves, empIndex) => {
+            {groupedData && Object.values(groupedData).length > 0 ? (Object.values(groupedData).map((employeeLeaves, empIndex) => {
               // Parse the selected start and end dates
               const startFilterDate = startDate ? new Date(startDate) : null;
               const endFilterDate = endDate ? new Date(endDate) : null;
@@ -253,33 +270,34 @@ const LeaveData: React.FC = () => {
 
               return (
                 <React.Fragment key={employeeLeaves[0].empID}>
-                  {filteredLeaves.map((entry, idx) => {
-                    // console.log(entry,"entery");
-                    return (
-                      <tr
-                        key={`${empIndex}-${idx}`}
-                        className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
-                      >
-                        <td className="py-4">{entry.empID || "N/A"}</td>
-                        <td className="py-4">{entry.name || "N/A"}</td>
-                        <td className="py-4">{entry.position || "N/A"}</td>
-                        <td className="py-4">{entry.totalLeave || 0}</td>
-                        <td className="py-4">
-                          {DateFormat(entry.startDate) || "N/A"}
-                        </td>
-                        <td className="py-4">
-                          {DateFormat(entry.endDate) || "N/A"}
-                        </td>
-                        <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase() + entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
-                        <td className="py-4 h-[80px]">
-                          <div className="overflow-y-auto h-[80px]">
-                            {entry.leaveReason || "N/A"}
-                          </div>
-                        </td>
-                        <td className="py-4">{entry.takenDay || "N/A"}</td>
-                      </tr>
-                    );
-                  })}
+                  {Array.isArray(filteredLeaves) && filteredLeaves.length > 0
+                    ? filteredLeaves.map((entry, idx) => {
+                      // console.log(entry,"entery");
+                      return (
+                        <tr
+                          key={`${empIndex}-${idx}`}
+                          className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
+                        >
+                          <td className="py-4">{entry.empID || "N/A"}</td>
+                          <td className="py-4">{entry.name || "N/A"}</td>
+                          <td className="py-4">{entry.position || "N/A"}</td>
+                          <td className="py-4">{entry.totalLeave || 0}</td>
+                          <td className="py-4">
+                            {DateFormat(entry.startDate) || "N/A"}
+                          </td>
+                          <td className="py-4">
+                            {DateFormat(entry.endDate) || "N/A"}
+                          </td>
+                          <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase() + entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
+                          <td className="py-4 h-[80px]">
+                            <div className="overflow-y-auto h-[80px]">
+                              {entry.leaveReason || "N/A"}
+                            </div>
+                          </td>
+                          <td className="py-4">{entry.takenDay || "N/A"}</td>
+                        </tr>
+                      );
+                    }) : ""}
                   {/* Summary row */}
                   {/* <tr className="text-center font-semibold bg-gray-100">
                     <td colSpan={8} className="py-4">Total for {filteredLeaves[0].name}</td>
@@ -291,9 +309,9 @@ const LeaveData: React.FC = () => {
                       </span>
                     </td>
                   </tr> */}
-                  <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300">
+                  <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 transition-all duration-300">
                     <td colSpan={8} className="py-4 text-lg text-gray-700">
-                      Total for <span className="text-indigo-600">{filteredLeaves[0].name}</span>
+                      Total for <span className="text-primary">{filteredLeaves[0].name}</span>
                     </td>
                     <td className="py-4 text-blue-700 text-lg">{totalTakenDays || 0}</td>
                     <td
@@ -309,7 +327,13 @@ const LeaveData: React.FC = () => {
 
                 </React.Fragment>
               );
-            })}
+            })) : (
+              <tr className="text-center text-gray text_size_4">
+                <td colSpan={10} className="py-4">
+                  No data Available.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         <div>
