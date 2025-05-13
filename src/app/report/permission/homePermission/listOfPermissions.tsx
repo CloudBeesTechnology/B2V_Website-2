@@ -78,3 +78,4 @@ export default ListOfPermissions;
 //                   ? "bg-lite_blue text-medium_blue"
 //                   : ""
 //               }
+
