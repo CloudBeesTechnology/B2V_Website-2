@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -27,7 +26,8 @@ import Link from "next/link";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebaseConfig";
+import { signOut } from "firebase/auth";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -108,6 +108,37 @@ const Sidebar = () => {
     },
   ];
 
+  const customPaths: Record<string, string[]> = {
+    Employee: ["/employee", "/allEmployee", "/employeeDetails"],
+    Attendance: ["/attendance"],
+    Internship: [
+      "/internship",
+      "/internship/tabs",
+      "/internship/addInternship",
+      "/internship/internStatus",
+    ],
+    User: ["/user", "/user/credentialRequest", "/user/addUser"],
+    "Leave Management": [
+      "/leavemanagement",
+      "/leaveapproval",
+      "/leavehistory",
+      "/permission",
+      "/permissionhistory",
+    ],
+    Timesheet: ["/timesheet"],
+    Report: [
+      "/report",
+      "/report/reportDetails",
+      "/report/leaveData",
+      "/report/records",
+      "/report/permission",
+    ],
+    "Upcoming Holidays": ["/empUpcomingHolidays"],
+    "Apply Leave": ["/empApplyLeave"],
+    Task: ["/internTask"],
+    Settings: ["/settings"],
+  };
+
   let onetimeExecute = false;
   useEffect(() => {
     const getUserAndPermissions = async (empID: string) => {
@@ -133,10 +164,12 @@ const Sidebar = () => {
 
         setAllowedMenuItems(filteredKeys);
 
+        if (pathname !== "/") return;
         // Navigate to first allowed path
         const firstAllowed = sidebarMenu.find((item) =>
           filteredKeys.includes(item.name)
         );
+
         if (firstAllowed) {
           router.push(firstAllowed.path);
         }
@@ -151,41 +184,50 @@ const Sidebar = () => {
   };
 
   const isLinkActive = (linkName: string, linkPath: string) => {
-    const customPaths: Record<string, string[]> = {
-      Employee: ["/employee", "/allEmployee", "/employeeDetails"],
-      Attendance: ["/attendance"],
-      Internship: [
-        "/internship",
-        "/internship/tabs",
-        "/internship/addInternship",
-        "/internship/internStatus",
-      ],
-      User: ["/user", "/user/credentialRequest", "/user/addUser"],
-      "Leave Management": [
-        "/leavemanagement",
-        "/leaveapproval",
-        "/leavehistory",
-        "/permission",
-        "/permissionhistory",
-      ],
-      Timesheet: ["/timesheet"],
-      Report: [
-        "/report",
-        "/report/reportDetails",
-        "/report/leaveData",
-        "/report/records",
-      ],
-      "Upcoming Holidays": ["/empUpcomingHolidays"],
-      "Apply Leave": ["/empApplyLeave"],
-      Task: ["/internTask"],
-      Settings: ["/settings"],
-    };
+    // const customPaths: Record<string, string[]> = {
+    //   Employee: ["/employee", "/allEmployee", "/employeeDetails"],
+    //   Attendance: ["/attendance"],
+    //   Internship: [
+    //     "/internship",
+    //     "/internship/tabs",
+    //     "/internship/addInternship",
+    //     "/internship/internStatus",
+    //   ],
+    //   User: ["/user", "/user/credentialRequest", "/user/addUser"],
+    //   "Leave Management": [
+    //     "/leavemanagement",
+    //     "/leaveapproval",
+    //     "/leavehistory",
+    //     "/permission",
+    //     "/permissionhistory",
+    //   ],
+    //   Timesheet: ["/timesheet"],
+    //   Report: [
+    //     "/report",
+    //     "/report/reportDetails",
+    //     "/report/leaveData",
+    //     "/report/records",
+    //   ],
+    //   "Upcoming Holidays": ["/empUpcomingHolidays"],
+    //   "Apply Leave": ["/empApplyLeave"],
+    //   Task: ["/internTask"],
+    //   Settings: ["/settings"],
+    // };
 
     return customPaths[linkName]
       ? customPaths[linkName].includes(pathname)
       : pathname === linkPath;
   };
-
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        localStorage.clear();
+        router.push("/signIn");
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
+  };
   return (
     <section className="p-5 h-full overflow-y-auto">
       <div className="max-w-[100px] w-full h-20 mx-auto center">
@@ -226,10 +268,10 @@ const Sidebar = () => {
             ))}
         </div>
         <div className="px-2">
-          <Link href="/logout" className="flex items-center gap-3">
+          <button onClick={handleLogout} className="flex items-center gap-3">
             <Image src={logout} alt="Logout not found" width={24} height={24} />
             <p className="text_size_4">Logout</p>
-          </Link>
+          </button>
         </div>
       </div>
     </section>

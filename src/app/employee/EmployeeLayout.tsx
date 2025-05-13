@@ -18,7 +18,7 @@ export default function EmployeeLayout() {
       <div className="text-mediumlite_grey text_size_2 mt-5">
         <h1 className="flex gap-2 items-center">
           {" "}
-          <Link href="/employee" className="text-3xl">
+          <Link href="/employee" className="text-3xl hover:text-blue-600 transition-colors">
             <MdOutlineKeyboardBackspace />
           </Link>
           Employee

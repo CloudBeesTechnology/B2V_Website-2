@@ -8,7 +8,6 @@ import Searchbox from "@/app/utils/searchbox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { IoArrowBack } from "react-icons/io5";
 import SetPermissionBox from "./setPermission";
 import { useEffect, useRef, useState } from "react";
 
@@ -24,7 +23,29 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 
+
+// merged types
+// Define types
+interface Employee {
+  id: string;
+  empID: string;
+  name: string;
+  department: string;
+  // Add more employee fields as needed
+}
+
+interface Access {
+  id: string;
+    [key: string]: any;
+  // Add more access control fields as needed
+}
+
+interface MergedUser extends Employee {
+  [key: string]: any; // allow dynamic access fields
+}
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 interface User {
   id: string;
   [key: string]: any;
@@ -54,9 +75,13 @@ const AddNewUser: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
     reset,
   } = useForm<AddUserFormData>({
     resolver: yupResolver(addUserSchema) as any,
+    defaultValues: {
+      role: "", // Set default value here
+    }
   });
 
   // Create User
@@ -69,6 +94,8 @@ const AddNewUser: React.FC = () => {
       );
       let finalData = {
         empID: data.empID,
+        email: data.email,
+        role: data.role,
         setPermission: filteredModules,
         createdAt: new Date().toISOString(),
       };
@@ -82,10 +109,12 @@ const AddNewUser: React.FC = () => {
           name: "",
           empID: "",
           email: "",
+          role: "",
           department: "",
           position: "",
           phone: "",
         });
+router.push("/user")
         setSelectedModules({});
       }
     } catch (error) {
@@ -96,6 +125,7 @@ const AddNewUser: React.FC = () => {
 
   // Update User
   const updateUser = async (checkDataIsExistsOrNot: any, data: any) => {
+    console.log(data)
     const existingUser = checkDataIsExistsOrNot as {
       empId: string;
       [key: string]: any;
@@ -111,6 +141,8 @@ const AddNewUser: React.FC = () => {
 
         let updatedData = {
           empID: data.empID,
+          email: data.email,
+          role: data.role,
           setPermission: filteredModules,
           createdAt: new Date().toISOString(),
         };
@@ -125,11 +157,13 @@ const AddNewUser: React.FC = () => {
           name: "",
           empID: "",
           email: "",
+          role: "",
           department: "",
           position: "",
           phone: "",
         });
-
+// window.location.reload();
+router.push("/user")
         setSelectedModules({});
       } else {
         console.log("No user found with the given empId.");
@@ -162,9 +196,8 @@ const AddNewUser: React.FC = () => {
   };
 
   const onSubmit = async (data: AddUserFormData) => {
-    console.log("data : ", data);
+ 
     const checkDataIsExistsOrNot = await fetchDataByEmpID(data.empID);
-
     if (checkDataIsExistsOrNot) {
       updateUser(checkDataIsExistsOrNot, data);
     } else if (checkDataIsExistsOrNot === false) {
@@ -174,13 +207,33 @@ const AddNewUser: React.FC = () => {
 
   useEffect(() => {
     const getUsers = async () => {
-      const querySnapshot = await getDocs(collection(db, "employeeDetails"));
-      const users = querySnapshot.docs.map((doc) => ({
+      const empSnap = await getDocs(collection(db, "employeeDetails"));
+      const accessSnap = await getDocs(collection(db, "accessControl"));
+
+      const employees: Employee[] = empSnap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
-      setAllUser(users);
+      })) as Employee[];
+
+      const accessControls: Access[] = accessSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Access[];
+
+      const mergedData: MergedUser[] = employees.map((emp) => {
+        const access = accessControls.find((acc) => acc.empID === emp.empID) || null;
+        return {
+          ...emp,
+           ...(access || {}),
+        };
+      });
+
+
+
+      setAllUser(mergedData);
+      console.log("Merged Data:", mergedData);
     };
+
     getUsers();
   }, []);
 
@@ -199,11 +252,12 @@ const AddNewUser: React.FC = () => {
       }));
 
       const result = getUserDetails[0];
-
+      
       reset({
         name: user.name || "",
         empID: user.empID || "",
         email: user.email || "",
+        role: user.role || "",
         department: user.department || "",
         position: user.position || "",
         phone: user.contact || "",
@@ -215,13 +269,15 @@ const AddNewUser: React.FC = () => {
       alert("Something wrong in the code");
     }
   };
+const role = watch("role");
+console.log(role,"checkingRole");
 
   return (
     <main ref={parentRef}>
       <section className="flex justify-between items-center my-10">
-        <IoArrowBack
+        <MdOutlineKeyboardBackspace
           onClick={() => router.back()}
-          className="text-[22px] text-gray cursor-pointer"
+          className="text-3xl text-gray cursor-pointer hover:text-blue-600 transition-colors"
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
 
@@ -282,7 +338,25 @@ const AddNewUser: React.FC = () => {
               register={register}
               errors={errors?.department?.message}
             />
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 ">
+            <div className="space-y-4 mt-10">
+              <p className="font-semibold">Select Role:</p>
+
+              <div className="flex flex-col justify-between space-y-4 border border-lite_gray bg-white py-5">
+                <FormField
+                  label="Select Role"
+                  name="role"
+                  type="radio"
+                  module="user"
+                  register={register}
+                  errors={errors?.role?.message}
+                  options={["Admin", "Manager", "Lead", "Employee", "Intern"]}
+                  value={role ?? undefined} 
+                />
+              </div>
+            </div>
             <SetPermissionBox
               selectedModules={selectedModules}
               setSelectedModules={setSelectedModules}

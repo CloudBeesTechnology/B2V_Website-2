@@ -24,9 +24,10 @@ import * as yup from "yup";
 
 export const addUserSchema = yup.object({
   name: yup.string().notRequired(),
-  empID: yup.string().notRequired(),
+  email: yup.string().required("Email ID is Required"),
   phone: yup.string().notRequired(),
-  email: yup.string().notRequired(),
+  empID: yup.string().notRequired(),
+  role: yup.string().notRequired(),
   position: yup.string().notRequired(),
   department: yup.string().notRequired(),
   // permission: yup.string().notRequired(),
