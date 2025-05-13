@@ -131,16 +131,13 @@ const Sidebar = () => {
       "/report/reportDetails",
       "/report/leaveData",
       "/report/records",
+      "/report/permission",
     ],
     "Upcoming Holidays": ["/empUpcomingHolidays"],
     "Apply Leave": ["/empApplyLeave"],
     Task: ["/internTask"],
     Settings: ["/settings"],
   };
-
-  const isMatched = Object.values(customPaths).some((paths) =>
-    paths.includes(pathname)
-  );
 
   let onetimeExecute = false;
   useEffect(() => {

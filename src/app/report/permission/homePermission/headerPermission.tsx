@@ -18,7 +18,7 @@ const HeaderPermission: React.FC<propsType> = ({
     <section>
       <header className="flex justify-between items-center">
         <div>
-          <DateFilter allPermissions={allPermissions} />
+          <DateFilter />
         </div>
         <div className="text-gray text-2xl font-medium">Permission Report</div>
         <div>
