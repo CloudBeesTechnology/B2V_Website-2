@@ -238,7 +238,7 @@ const LeaveHistory = () => {
             </div>
           </div>
         </div>
-        <div className="mt-auto">{/* <Searchbox /> */}</div>
+        <div className="mt-auto">{/* < /> */}</div>
       </section>
       <section className="py-7 bg-white rounded-xl px-10 space-y-7 my-10  overflow-x-auto">
         {/* <LeaveTable /> */}

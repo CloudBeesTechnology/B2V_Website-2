@@ -1,5 +1,5 @@
 "use client";
-import Searchbox from "@/app/utils/searchbox";
+import SearchDisplay from "@/app/utils/searchDisplay";
 import { useState } from "react";
 
 const AttendanceTab: React.FC = () => {

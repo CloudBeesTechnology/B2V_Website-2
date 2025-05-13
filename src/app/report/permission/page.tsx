@@ -1,11 +1,9 @@
-import HeaderPermission from "./homePermission/headerPermission";
-import ListOfPermissions from "./homePermission/listOfPermissions";
+import HomePermission from "./homePermission/page";
 
 const Permission: React.FC = () => {
   return (
     <main>
-      <HeaderPermission />
-      <ListOfPermissions />
+      <HomePermission />
     </main>
   );
 };

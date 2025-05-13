@@ -1,14 +1,28 @@
-import Searchbox from "@/app/utils/searchbox";
+"use client";
+import DateFilter from "@/app/utils/dateFilter";
+import SearchBox from "@/app/utils/searchbox";
 
-const HeaderPermission: React.FC = () => {
+interface permissionObj {
+  empID?: string;
+  [keys: string]: any;
+}
+interface propsType {
+  allPermissions: permissionObj[];
+  handleFilter: (filteredData: permissionObj) => void;
+}
+const HeaderPermission: React.FC<propsType> = ({
+  allPermissions,
+  handleFilter,
+}) => {
   return (
     <section>
       <header className="flex justify-between items-center">
-        <div>dateFilter</div>
+        <div>
+          <DateFilter allPermissions={allPermissions} />
+        </div>
         <div className="text-gray text-2xl font-medium">Permission Report</div>
         <div>
-          {/* <Searchbox /> */}
-          searchBox
+          <SearchBox primaryData={allPermissions} handleFilter={handleFilter} />
         </div>
       </header>
     </section>

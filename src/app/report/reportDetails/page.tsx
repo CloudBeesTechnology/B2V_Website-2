@@ -1,5 +1,5 @@
 "use client";
-import Searchbox from "@/app/utils/searchbox";
+
 import ReportData from "./reportData";
 
 const ReportDetails: React.FC = () => {

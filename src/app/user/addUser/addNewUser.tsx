@@ -4,7 +4,7 @@ import {
   addUserSchema,
 } from "@/app/services/validations/adminPortalValidation/userValidation";
 import FormField from "@/app/utils/formField";
-import Searchbox from "@/app/utils/searchbox";
+import SearchDisplay from "@/app/utils/searchDisplay";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -223,7 +223,7 @@ const AddNewUser: React.FC = () => {
         />
         <h2 className="text-2xl font-semibold">ADD NEW USER</h2>
 
-        <Searchbox
+        <SearchDisplay
           allUser={allUser}
           handleSelect={handleSelect}
           parentRef={parentRef}
