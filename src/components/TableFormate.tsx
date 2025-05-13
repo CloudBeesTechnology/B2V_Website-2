@@ -73,6 +73,17 @@ interface allEmployee {
   email: string;
   createdAt?: string;
 }
+interface allEmployeeReport {
+  profile?: string;
+  empID: string;
+  name: string;
+  position: string;
+  department: string;
+  contact: string;
+  email: string;
+  doj:string;
+  createdAt?: string;
+}
 
 interface TableProps {
   heading?: string[];
@@ -83,8 +94,10 @@ interface TableProps {
     | "LeaveApproval"
     | "empLeave"
     | "empPermission"
-    | "permissionList";
+    | "permissionList"
+    | "AllEmpReport";
   allEmp?: allEmployee[];
+  allEmployeeReport?: allEmployeeReport[];
   leaveApproval?: LA[];
   permissionList?: permissionList[];
   secondaryEmpPermission?: empPermission[];
@@ -98,7 +111,7 @@ export const TableFormate = ({
   heading,
   ovla = [],
   list,
-  allEmp,
+  allEmp,allEmployeeReport,
   leaveApproval,
   permissionList,
   secondaryEmpPermission,
@@ -123,18 +136,18 @@ export const TableFormate = ({
 
   return (
     <>
-      <table className="w-full border-collapse table-fixed">
-        {heading && (
-          <thead className="text-mediumlite_grey text-sm font-bold w-full">
-            <tr className="text-center border-b border-morelite_grey">
-              {heading.map((val, index) => (
-                <th key={index} className="py-2 px-4">
-                  {val}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        )}
+        <table className="w-full border-collapse overflow-x-auto">
+          {heading && (
+            <thead className="text-mediumlite_grey text-sm font-bold w-full">
+              <tr className="text-center border-b border-morelite_grey overflow-x-auto w-full">
+                {heading.map((val, index) => (
+                  <th key={index} className="py-2 px-4 ">
+                    {val}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
         <tbody>
           {list === "OVLA" &&
             ovla.slice(0, 4).map((val, index) => (
@@ -352,6 +365,46 @@ export const TableFormate = ({
                   </span>
                 </td>
               </tr>
+            ))}
+          {list === "AllEmpReport" &&
+            allEmployeeReport
+              ?.sort((a, b) => {
+                const numA = parseInt(a.empID?.replace(/\D/g, "") || "0");
+                const numB = parseInt(b.empID?.replace(/\D/g, "") || "0");
+                return numA - numB; // For ascending order. Use b - a for descending.
+              })
+
+              .map((val, index) => (
+                <tr
+                  key={index}
+                  className="text-center text-sm text-medium_gray border-b border-morelite_grey w-full border"
+                >
+                  <td className=" py-2 px-4 min-w-[250px] w-full center gap-2 border">
+                    <Image
+                      src={val.profile || avatar}
+                      width={25}
+                      height={25}
+                      alt={`${val.name} profile`}
+                      className="rounded-full"
+                    />
+                    {val.empID || "N/A"}
+                  </td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border ">{val.name || "N/A"}</td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border ">{val.position || "N/A"}</td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border ">{val.department || "N/A"}</td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border ">{val.contact || "N/A"}</td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border  break-words overflow-hidden">
+                    {val.email || "N/A"}
+                  </td>
+                  <td className=" py-2 px-4 min-w-[250px] w-full border ">{val.doj || "N/A"}</td>
+                  <td
+                    className="text-center text-primary py-2 px-4 min-w-[250px] w-full border"
+                    onClick={() => viewData?.(val)}
+                  >
+                    View
+                  </td>
+                 
+                </tr>
             ))}
         </tbody>
       </table>

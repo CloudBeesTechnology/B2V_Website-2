@@ -1,9 +1,9 @@
 "use client"; // if you're using app directory (Next.js 13+)
 
 import Image from "next/image";
-import employeeDetails from "../../../public/assets/report/reportTailIcons/employeeDetails.svg";
-import Certificate from "../../../public/assets/report/reportTailIcons/Cerificate.svg";
-import leaveData from "../../../public/assets/report/reportTailIcons/LeaveData.svg";
+import employeeDetails from "../../../public/assets/report/reportTailIcons/employee.svg";
+import Certificate from "../../../public/assets/report/reportTailIcons/candidate.svg";
+import leaveData from "../../../public/assets/report/reportTailIcons/permission.svg";
 import { useRouter } from "next/navigation";
 
 type CardType = {
@@ -14,14 +14,14 @@ type CardType = {
 
 const tiles: CardType[] = [
   {
-    image: employeeDetails,
+    image: Certificate,
     title: "Attendance Report",
-    route: "/report/reportDetails",
+    route: "/report",
   },
   {
     image: employeeDetails,
     title: "Employee Details",
-    route: "/report/reportDetails",
+    route: "/report/employeeDetails",
   },
   {
     image: leaveData,
@@ -29,7 +29,7 @@ const tiles: CardType[] = [
     route: "/report/leaveData",
   },
   {
-    image: Certificate,
+    image: leaveData,
     title: "Candidate records",
     route: "/report/records",
   },

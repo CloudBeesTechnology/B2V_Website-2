@@ -47,7 +47,7 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
     { label: "Field of Study", key: "study" },
     { label: "School", key: "school" },
     { label: "Master Degree", key: "master" },
-    { label: "Field", key: "field" },
+    { label: "Field of Study", key: "field" },
     { label: "High School", key: "highSchool" },
     { label: "Courses", key: "courses" },
   ];

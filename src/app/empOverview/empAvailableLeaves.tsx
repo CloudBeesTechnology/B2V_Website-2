@@ -17,7 +17,6 @@
 
 // const EmpAvailableLeaves: React.FC<TotalLeaveData> = ({ data }) => {
 
-
 //   useEffect(() => {
 //     const fetchDataByEmpID = async () => {
 //       const fetchQuery = query(
@@ -90,6 +89,9 @@ interface LeaveData {
   id: string;
   empID: string;
   leaveStatus: "Pending" | "Approved" | "Rejected" | "Cancelled";
+  leadStatus: string;
+  managerStatus: string;
+  leadEmpID: string;
   // Other fields can remain if needed
 }
 
@@ -103,8 +105,8 @@ const EmpAvailableLeaves: React.FC<TotalLeaveData> = ({ data }) => {
       ? localStorage.getItem("empID")?.toString()?.toUpperCase()
       : null;
 
-      console.log("emp", empID);
-      
+  console.log("emp", empID);
+
   useEffect(() => {
     const fetchDataByEmpID = async () => {
       const fetchQuery = query(
@@ -120,15 +122,26 @@ const EmpAvailableLeaves: React.FC<TotalLeaveData> = ({ data }) => {
           ...doc.data(),
         })) as LeaveData[];
 
-
-        const pending = results.filter(leave => leave.leaveStatus === "Pending").length;
-        const rejected = results.filter(leave => leave.leaveStatus === "Rejected").length;
-        const approved = results.filter(leave => leave.leaveStatus === "Approved").length;
+        const pending = results.filter(
+          (leave) =>
+            leave.leadStatus === "Pending" && leave.managerStatus === "Pending"
+        ).length;
+        const rejected = results.filter(
+          (leave) =>
+            leave.leadStatus === "Rejected" ||
+            (leave.leadStatus === "Approved" &&
+              leave.managerStatus === "Rejected") ||
+            (!leave.leadEmpID && leave.managerStatus === "Rejected")
+        ).length;
+        const approved = results.filter(
+          (leave) =>
+            leave.leadStatus === "Approved" ||
+            leave.managerStatus === "Approved"
+        ).length;
 
         setPendingCount(pending);
         setRejectedCount(rejected);
         setApprovedCount(approved);
-
       } else {
         console.log("No matching documents.");
       }
@@ -148,23 +161,17 @@ const EmpAvailableLeaves: React.FC<TotalLeaveData> = ({ data }) => {
       </div>
       <div className="center flex-col gap-2 border border-[#D1DEE7] w-full rounded-md">
         <p className="text-gray text_size_4">Approved</p>
-        <p className="text-2xl font-medium text-[#1C40AE]">
-          {approvedCount}
-        </p>
+        <p className="text-2xl font-medium text-[#1C40AE]">{approvedCount}</p>
         <p className="text-12px font-medium text-medium_gray">Leave Requests</p>
       </div>
       <div className="center flex-col gap-2 border border-[#D1DEE7] w-full rounded-md">
         <p className="text-gray text_size_4">Pending</p>
-        <p className="text-2xl font-medium text-[#E1982B]">
-          {pendingCount}
-        </p>
+        <p className="text-2xl font-medium text-[#E1982B]">{pendingCount}</p>
         <p className="text-12px font-medium text-medium_gray">Leave Requests</p>
       </div>
       <div className="center flex-col gap-2 border border-[#E3CFD4] w-full rounded-md">
         <p className="text-gray text_size_4">Rejected</p>
-        <p className="text-2xl font-medium text-[#E83265]">
-          {rejectedCount}
-        </p>
+        <p className="text-2xl font-medium text-[#E83265]">{rejectedCount}</p>
         <p className="text-12px font-medium text-medium_gray">Leave Requests</p>
       </div>
     </article>

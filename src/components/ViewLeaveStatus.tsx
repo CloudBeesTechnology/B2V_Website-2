@@ -87,7 +87,7 @@ export const ViewLeaveStatus = ({
           ...updateData,
           managerDate: dateStatus,
           managerStatus: status,
-          ...(status === "Rejected" && { manageRemarks: remarksText }),
+          ...(status === "Rejected" && { managerRemarks: remarksText }),
         };
       }
       // console.log(updateData, "mnjuyyt");
@@ -109,7 +109,7 @@ export const ViewLeaveStatus = ({
       console.error("Failed to update leave status:", err);
     }
   };
-  console.log(hiddenBtn);
+  console.log(leaveData);
 
   return (
     <section className="fixed inset-0 w-full bg-[#07060788] z-[99999] flex items-center justify-center">
@@ -162,7 +162,7 @@ export const ViewLeaveStatus = ({
             <p className="flex w-[90%]">
               <span className="font-semibold flex-1">Durations</span> :{" "}
               <span className="flex-1 pl-2">
-                {leaveData?.takenDay || "N/A"}
+                {leaveData?.takenDay||leaveData?.duration || "N/A"}
               </span>
             </p>
             <p className="flex w-[90%]">
