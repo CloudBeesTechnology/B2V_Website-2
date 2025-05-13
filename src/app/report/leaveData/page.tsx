@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebaseConfig"; // adjust based on your firebase config path
+import React from "react";
+import { db } from "@/lib/firebaseConfig";
 import {
   collection,
   getDocs,
   query,
   where,
-  DocumentData,
 } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
 
@@ -21,8 +21,9 @@ interface CombinedData {
   takenDay: string;
   startDate: string;
   endDate: string;
-  // remaining?: string;
   days: number;
+  effectiveDate: string,
+  managerStatus: string
 }
 
 const LeaveData: React.FC = () => {
@@ -35,12 +36,14 @@ const LeaveData: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const leaveStatusSnap = await getDocs(collection(db, "leaveStatus"));
+        const leaveStatusQuery = query(
+          collection(db, "leaveStatus"),
+          where("managerStatus", "==", "Approved")
+        );
+        const leaveStatusSnap = await getDocs(leaveStatusQuery);
         const leaveStatusDocs = leaveStatusSnap.docs.map((doc) => doc.data());
 
         const combined: CombinedData[] = [];
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
         for (const leave of leaveStatusDocs) {
           const empQuery = query(
             collection(db, "employeeDetails"),
@@ -48,54 +51,26 @@ const LeaveData: React.FC = () => {
           );
           const empSnap = await getDocs(empQuery);
           const empDoc = empSnap.docs[0]?.data();
-          // console.log(empDoc,"empDoc");
+
 
           if (empDoc) {
-            let remaining = 0;
-            let totalLeavesTaken = 0;
-            for (let month = 1; month <= currentMonth; month++) {
-              // Calculate total leaves taken in each month
-              const monthlyLeaves = leaveStatusDocs.filter(
-                (l) =>
-                  l.empID === leave.empID &&
-                  new Date(l.startDate).getMonth() + 1 === month &&
-                  new Date(l.startDate).getFullYear() === currentYear
-              );
-
-              const totalDaysTaken = monthlyLeaves.reduce(
-                (sum, l) => sum + (parseFloat(l.takenDay) || 0),
-                0
-              );
-
-              // Add 1 leave each month
-              remaining += 1;
-              totalLeavesTaken += totalDaysTaken;
-
-              // Subtract leaves taken in this month
-              if (totalDaysTaken >= remaining) {
-                remaining = 0;
-              } else {
-                remaining -= totalDaysTaken;
-              }
-            }
             combined.push({
               empID: leave.empID,
               name: empDoc.name,
               position: empDoc.position,
               totalLeave: empDoc.totalLeave,
-              leaveDate: leave.date, // adjust field name if different
-              startDate: leave.startDate, // adjust field name if different
-              endDate: leave.endDate, // adjust field name if different
-              leaveType: leave.leaveType, // adjust field name if different
-              leaveReason: leave.leaveReason, // adjust field name if different
-              takenDay: leave.takenDay, // adjust field name if different
-              days: leave.days, // adjust field name if different
-              // remaining: remaining.toString(),
+              leaveDate: leave.date,
+              startDate: leave.startDate,
+              endDate: leave.endDate,
+              leaveType: leave.leaveType,
+              leaveReason: leave.leaveReason,
+              takenDay: leave.takenDay,
+              days: leave.days,
+              effectiveDate: empDoc.effectiveDate,
+              managerStatus: leave.managerStatus
             });
           }
         }
-        // console.log(combined, "combined");
-
         setLeaveData(combined);
       } catch (error) {
         console.log(error);
@@ -105,15 +80,139 @@ const LeaveData: React.FC = () => {
     };
     fetchData();
   }, []);
-  if (loading)
-    return (
-      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
-    );
+
+
+  // const calculateRemainingLeave = (leaves: CombinedData[]): number => {
+  //   if (!leaves.length) return 0;
+
+  //   const effectiveDate = new Date(leaves[0].effectiveDate);
+  //   const eligibilityDate = new Date(effectiveDate);
+  //   eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 1);
+
+  //   const now = new Date();
+  //   // const now = new Date('2026-01-01T00:00:00Z');
+
+  //   const currentYear = now.getFullYear();
+
+  //   console.log("=== Summary Row ===");
+  //   console.log("Effective Date:", effectiveDate.toISOString());
+  //   console.log("Eligibility Date (+1yr):", eligibilityDate.toISOString());
+  //   console.log("Today:", now.toISOString());
+
+
+  //   let remaining = 0;
+
+  //   const isEligible =
+  //     now.getFullYear() > eligibilityDate.getFullYear() ||
+  //     (now.getFullYear() === eligibilityDate.getFullYear() &&
+  //       now.getMonth() >= eligibilityDate.getMonth());
+
+  //   if (isEligible) {
+  //     const accrualStart = new Date(
+  //       Math.max(
+  //         new Date(currentYear, 0, 1).getTime(),
+  //         eligibilityDate.getTime()
+  //       )
+  //     );
+
+  //     const datePointer = new Date(accrualStart);
+
+  //     while (
+  //       datePointer.getFullYear() === currentYear &&
+  //       datePointer <= now
+  //     ) {
+  //       remaining += 1;
+  //       datePointer.setMonth(datePointer.getMonth() + 1);
+  //     }
+
+  //     const leaveTakenThisYear = leaves.reduce((total, leave) => {
+  //       const leaveStart = new Date(leave.startDate);
+  //       if (leaveStart.getFullYear() === currentYear) {
+  //         total += parseFloat(leave.takenDay) || 0;
+  //       }
+  //       return total;
+  //     }, 0);
+
+  //     console.log("Leave earned this year:", remaining);
+  //     console.log("Leave taken this year:", leaveTakenThisYear);
+
+  //     remaining -= leaveTakenThisYear;
+  //     return Math.max(0, remaining);
+  //   }
+
+  //   return 0;
+  // };
+  const calculateRemainingLeave = (leaves: CombinedData[]): number => {
+    if (!leaves.length) return 0;
+
+    const effectiveDate = new Date(leaves[0].effectiveDate);
+    const eligibilityDate = new Date(effectiveDate);
+    eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 1);
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    // console.log("=== Summary Row ===");
+    // console.log("Effective Date:", effectiveDate.toISOString());
+    // console.log("Eligibility Date (+1yr):", eligibilityDate.toISOString());
+    // console.log("Today:", now.toISOString());
+
+    let remaining = 0;
+
+    const isEligible =
+      now.getFullYear() > eligibilityDate.getFullYear() ||
+      (now.getFullYear() === eligibilityDate.getFullYear() &&
+        now.getMonth() >= eligibilityDate.getMonth());
+
+    if (isEligible) {
+      const accrualStart = new Date(
+        Math.max(
+          new Date(currentYear, 0, 1).getTime(),
+          eligibilityDate.getTime()
+        )
+      );
+
+      const datePointer = new Date(accrualStart);
+
+      while (
+        datePointer.getFullYear() === currentYear &&
+        datePointer <= now
+      ) {
+        remaining += 1;
+        datePointer.setMonth(datePointer.getMonth() + 1);
+      }
+
+      // Count ALL approved leaves for the current year (both past and future)
+      const totalApprovedLeaveDays = leaves.reduce((total, leave) => {
+        const leaveStart = new Date(leave.startDate);
+        if (leaveStart.getFullYear() === currentYear) {
+          total += parseFloat(leave.takenDay) || 0;
+        }
+        return total;
+      }, 0);
+
+      // console.log("Leave earned this year:", remaining);
+      // console.log("Total approved leaves (past + future):", totalApprovedLeaveDays);
+
+      remaining -= totalApprovedLeaveDays;
+      return Math.max(0, remaining);
+    }
+
+    return 0;
+  };
+
   const groupedData = leaveData.reduce((acc, entry) => {
     acc[entry.empID] = acc[entry.empID] || [];
     acc[entry.empID].push(entry);
     return acc;
   }, {} as Record<string, CombinedData[]>);
+
+  if (loading)
+    return (
+      <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
+    );
+
+
   return (
     <main>
       <header className="center text-2xl font-medium text-gray my-10">
@@ -183,7 +282,6 @@ const LeaveData: React.FC = () => {
                     leaveEndDate <= endFilterDate
                   );
                 }
-
                 // Default to current month if no range selected
                 return (
                   leaveStartDate.getMonth() + 1 === currentMonth &&
@@ -198,14 +296,20 @@ const LeaveData: React.FC = () => {
                 0
               );
 
-              const remainingDays =
-                parseFloat(employeeLeaves[0].totalLeave) - totalTakenDays;
+              const totalApprovedLeaveDays = employeeLeaves.reduce((total, leave) => {
+                const leaveStart = new Date(leave.startDate);
+                if (leaveStart.getFullYear() === new Date().getFullYear()) {
+                  total += parseFloat(leave.takenDay) || 0;
+                }
+                return total;
+              }, 0);
+
+              const remainingLeave = calculateRemainingLeave(filteredLeaves);
 
               return (
-                <>
+                <React.Fragment key={employeeLeaves[0].empID}>
                   {filteredLeaves.map((entry, idx) => {
                     // console.log(entry,"entery");
-
                     return (
                       <tr
                         key={`${empIndex}-${idx}`}
@@ -221,98 +325,50 @@ const LeaveData: React.FC = () => {
                         <td className="py-4">
                           {DateFormat(entry.endDate) || "N/A"}
                         </td>
-                        <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase()+entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
+                        <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase() + entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
                         <td className="py-4 h-[80px]">
                           <div className="overflow-y-auto h-[80px]">
                             {entry.leaveReason || "N/A"}
                           </div>
                         </td>
                         <td className="py-4">{entry.takenDay || "N/A"}</td>
-                        {/* <td className="py-4">{entry.remaining}</td> */}
                       </tr>
                     );
                   })}
                   {/* Summary row */}
-                  <tr className="text-center font-semibold bg-gray-100">
-                    <td colSpan={8 } className="py-4">Total for {filteredLeaves[0].name}</td>
-
-                    <td className="py-4">{totalTakenDays || 0}</td>
-                    <td className="py-4">{remainingDays || 0}</td>
+                  {/* <tr className="text-center font-semibold bg-gray-100">
+                    <td colSpan={8} className="py-4">Total for {filteredLeaves[0].name}</td>
+                        <td className="py-4">{totalTakenDays || 0}</td>
+                    <td className="relative group py-4 ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'}">
+                      {remainingLeave}
+                      <span className="invisible group-hover:visible absolute z-10 left-1/2 transform -translate-x-1/2 text-xs p-1 rounded shadow-lg border">
+                        Includes {totalApprovedLeaveDays} approved days (past + future)
+                      </span>
+                    </td>
+                  </tr> */}
+                  <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300">
+                    <td colSpan={8} className="py-4 text-lg text-gray-700">
+                      Total for <span className="text-indigo-600">{filteredLeaves[0].name}</span>
+                    </td>
+                    <td className="py-4 text-blue-700 text-lg">{totalTakenDays || 0}</td>
+                    <td
+                      className={`relative group py-4 text-lg font-bold ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'
+                        }`}
+                    >
+                      {remainingLeave}
+                      {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
+                        Includes <span className="font-semibold">{totalApprovedLeaveDays}</span> approved days (past + present + future)
+                      </span> */}
+                    </td>
                   </tr>
-                </>
+
+                </React.Fragment>
               );
             })}
           </tbody>
-
-          {/* <tbody>
-            {Object.values(groupedData).filter((month)=> month.startDate && month.endDate === current Month).map((employeeLeaves, empIndex) => {
-              const totalTakenDays = employeeLeaves.reduce(
-                (sum, leave) => sum + (parseFloat(leave.takenDay) || 0),
-                0
-              );
-              const remainingDays =
-                parseFloat(employeeLeaves[0].totalLeave) - totalTakenDays;
-
-              return (
-                <>
-                  {employeeLeaves.map((entry, idx) => (
-                    <tr
-                      key={`${empIndex}-${idx}`}
-                      className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
-                    >
-                      <td className="py-4">{entry.empID || "N/A"}</td>
-                      <td className="py-4">{entry.name || "N/A"}</td>
-                      <td className="py-4">{entry.position || "N/A"}</td>
-                      <td className="py-4">{entry.totalLeave || 0}</td>
-                      <td className="py-4">
-                        {DateFormat(entry.startDate) || "N/A"}
-                      </td>
-                      <td className="py-4">
-                        {DateFormat(entry.endDate) || "N/A"}
-                      </td>
-                      <td className="py-4">{entry.takenDay || "N/A"}</td>
-                      <td className="py-4 h-[80px]">
-                        <div className="overflow-y-auto h-[80px]">
-                          {entry.leaveReason || "N/A"}
-                        </div>
-                      </td>
-                      <td className="py-4">{entry.remaining}</td>
-                    </tr>
-                  ))}
-                  {/* Summary row */}
-          {/* <tr className="text-center font-semibold bg-gray-100">
-                    <td colSpan={6}>Total for {employeeLeaves[0].name}</td>
-                    <td>{totalTakenDays}</td>
-                    <td>-</td>
-                    <td>{remainingDays}</td>
-                  </tr>
-                </>
-              );
-            })}
-          </tbody> */}
-          {/* <tbody>
-            {leaveData.map((entry, idx) => (
-              <tr
-                key={idx}
-                className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
-              >
-                <td className="py-4">{entry.empID || "N/A"}</td>
-                <td className="py-4">{entry.name || "N/A"}</td>
-                <td className="py-4">{entry.position || "N/A"}</td>
-                <td className="py-4">{entry.totalLeave || 0}</td>
-                <td className="py-4">{DateFormat(entry.startDate) || "N/A"}</td>
-                <td className="py-4">{DateFormat(entry.endDate) || "N/A"}</td>
-                <td className="py-4">{entry.takenDay || "N/A"}</td>
-                <td className="py-4 h-[80px]">
-                  <div className=" overflow-y-auto h-[80px] ">
-                    {entry.leaveReason}
-                  </div>
-                </td>
-                <td className="py-4">{entry.remaining}</td>
-              </tr>
-            ))}
-          </tbody> */}
+          
         </table>
+        
       </section>
     </main>
   );

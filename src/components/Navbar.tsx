@@ -81,7 +81,7 @@ const Navbar = () => {
             <p className="text-gray font-bold">{employeeData?.name}</p>
             <p className="text-medium_gray font-medium">{employeeData?.position}</p>
           </article>
-           <div className="rounded-full h-[36px] w-[36px] overflow-hidden border-2 border-white">
+           <div className="rounded-md h-[36px] w-[36px] overflow-hidden">
             <Image
               src={photo || avatar}
               alt="profile not found"
