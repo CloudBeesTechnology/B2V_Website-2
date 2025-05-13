@@ -241,7 +241,9 @@ export const TableFormate = ({
                   className="text-center text-sm text-medium_gray border-b border-morelite_grey"
                 >
                   <td className=" py-3 px-4">{val.empID || "N/A"}</td>
-                  <td className=" py-3 px-4">{val?.fromTime || "N/A"} to {val?.toTime || "N/A"} </td>
+                  <td className=" py-3 px-4">
+                    {val?.fromTime || "N/A"} to {val?.toTime || "N/A"}{" "}
+                  </td>
                   <td className=" py-3 px-4">{val?.totalHours || "N/A"}</td>
 
                   <td className=" py-3 px-4">
@@ -275,8 +277,6 @@ export const TableFormate = ({
 
           {list === "permissionList" &&
             permissionList?.map((val, index) => {
-
-              
               return (
                 <tr
                   key={index}
@@ -333,7 +333,8 @@ export const TableFormate = ({
                   {val.endDate ? DateFormat(val.endDate) : "N/A"}
                 </td>
                 <td className=" py-3 px-4 border-b border-t border-morelite_grey">
-                  {val.leaveType.charAt(0).toUpperCase() + val.leaveType.slice(1).toLowerCase() || "N/A"}
+                  {val.leaveType.charAt(0).toUpperCase() +
+                    val.leaveType.slice(1).toLowerCase() || "N/A"}
                 </td>
                 <td className=" py-3 px-4">
                   <span
