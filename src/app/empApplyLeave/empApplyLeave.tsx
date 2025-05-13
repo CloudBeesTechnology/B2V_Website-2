@@ -153,13 +153,13 @@ const EmpApplyLeave = () => {
         leaveDetails.takenDay = "0";
       }
 
-      console.log(leaveDetails, "LeaveDetails");
+      // console.log(leaveDetails, "LeaveDetails");
 
       await setDoc(doc(db, "leaveStatus", createdAt), {
         ...leaveDetails,
       });
 
-      // setShowPopup(true);
+      setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");
