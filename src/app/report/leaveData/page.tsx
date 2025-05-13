@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import React from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/lib/firebaseConfig";
+import { MdOutlineDownloading } from "react-icons/md";
 import {
   collection,
   getDocs,
@@ -9,6 +10,8 @@ import {
   where,
 } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
+import { exportLeaveReport } from "@/app/utils/exportLeaveReport";
+import { FloatingActionButton } from "../../utils/FloatingActionButton";
 
 interface CombinedData {
   empID: string;
@@ -81,67 +84,6 @@ const LeaveData: React.FC = () => {
     fetchData();
   }, []);
 
-
-  // const calculateRemainingLeave = (leaves: CombinedData[]): number => {
-  //   if (!leaves.length) return 0;
-
-  //   const effectiveDate = new Date(leaves[0].effectiveDate);
-  //   const eligibilityDate = new Date(effectiveDate);
-  //   eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 1);
-
-  //   const now = new Date();
-  //   // const now = new Date('2026-01-01T00:00:00Z');
-
-  //   const currentYear = now.getFullYear();
-
-  //   console.log("=== Summary Row ===");
-  //   console.log("Effective Date:", effectiveDate.toISOString());
-  //   console.log("Eligibility Date (+1yr):", eligibilityDate.toISOString());
-  //   console.log("Today:", now.toISOString());
-
-
-  //   let remaining = 0;
-
-  //   const isEligible =
-  //     now.getFullYear() > eligibilityDate.getFullYear() ||
-  //     (now.getFullYear() === eligibilityDate.getFullYear() &&
-  //       now.getMonth() >= eligibilityDate.getMonth());
-
-  //   if (isEligible) {
-  //     const accrualStart = new Date(
-  //       Math.max(
-  //         new Date(currentYear, 0, 1).getTime(),
-  //         eligibilityDate.getTime()
-  //       )
-  //     );
-
-  //     const datePointer = new Date(accrualStart);
-
-  //     while (
-  //       datePointer.getFullYear() === currentYear &&
-  //       datePointer <= now
-  //     ) {
-  //       remaining += 1;
-  //       datePointer.setMonth(datePointer.getMonth() + 1);
-  //     }
-
-  //     const leaveTakenThisYear = leaves.reduce((total, leave) => {
-  //       const leaveStart = new Date(leave.startDate);
-  //       if (leaveStart.getFullYear() === currentYear) {
-  //         total += parseFloat(leave.takenDay) || 0;
-  //       }
-  //       return total;
-  //     }, 0);
-
-  //     console.log("Leave earned this year:", remaining);
-  //     console.log("Leave taken this year:", leaveTakenThisYear);
-
-  //     remaining -= leaveTakenThisYear;
-  //     return Math.max(0, remaining);
-  //   }
-
-  //   return 0;
-  // };
   const calculateRemainingLeave = (leaves: CombinedData[]): number => {
     if (!leaves.length) return 0;
 
@@ -212,6 +154,9 @@ const LeaveData: React.FC = () => {
       <div className="text-center text-gray-500 my-20 text-lg">Loading...</div>
     );
 
+  const handleDownloadExcel = () => {
+    exportLeaveReport(groupedData, startDate, endDate, calculateRemainingLeave);
+  };
 
   return (
     <main>
@@ -366,9 +311,16 @@ const LeaveData: React.FC = () => {
               );
             })}
           </tbody>
-          
         </table>
-        
+        <div>
+          <FloatingActionButton
+            icon={<MdOutlineDownloading size={32} />}
+            onClick={handleDownloadExcel}
+            backgroundColor="primary"
+            iconColor="text-white"
+            className="bg-primary"
+          />
+        </div>
       </section>
     </main>
   );
