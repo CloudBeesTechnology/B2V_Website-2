@@ -53,7 +53,9 @@ type TotalLeaveData = {
 interface LeaveData {
   id: string;
   empID: string;
-  leaveStatus: "Pending" | "Approved" | "Rejected" | "Cancelled";
+  leaveStatus: "Pending" | "Approved" | "Rejected" | "Cancelled";leadStatus: string;
+  managerStatus: string;
+  leadEmpID: string;
 }
 
 const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
@@ -99,9 +101,23 @@ const EmpLeaveCounts: React.FC<TotalLeaveData> = ({ data }) => {
         })) as LeaveData[];
 
 
-        const pending = results.filter(leave => leave.leaveStatus === "Pending").length;
-        const rejected = results.filter(leave => leave.leaveStatus === "Rejected").length;
-        const approved = results.filter(leave => leave.leaveStatus === "Approved").length;
+         const pending = results.filter(
+          (leave) =>
+            leave.leadStatus === "Pending" && leave.managerStatus === "Pending"
+        ).length;
+        const rejected = results.filter(
+          (leave) =>
+            leave.leadStatus === "Rejected" ||
+            (leave.leadStatus === "Approved" &&
+              leave.managerStatus === "Rejected") ||
+            (!leave.leadEmpID && leave.managerStatus === "Rejected")
+        ).length;
+        const approved = results.filter(
+          (leave) =>
+            leave.leadStatus === "Approved" ||
+            leave.managerStatus === "Approved"
+        ).length;
+
 
         setPendingCount(pending);
         setRejectedCount(rejected);
