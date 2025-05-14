@@ -184,35 +184,35 @@ const Sidebar = () => {
   };
 
   const isLinkActive = (linkName: string, linkPath: string) => {
-    const customPaths: Record<string, string[]> = {
-      Employee: ["/employee", "/allEmployee", "/employeeDetails"],
-      Attendance: ["/attendance"],
-      Internship: [
-        "/internship",
-        "/internship/tabs",
-        "/internship/addInternship",
-        "/internship/internStatus",
-      ],
-      User: ["/user", "/user/credentialRequest", "/user/addUser"],
-      "Leave Management": [
-        "/leavemanagement",
-        "/leaveapproval",
-        "/leavehistory",
-        "/permission",
-        "/permissionhistory",
-      ],
-      Timesheet: ["/timesheet"],
-      Report: [
-        "/report",
-        "/report/reportDetails",
-        "/report/leaveData",
-        "/report/records",
-      ],
-      "Upcoming Holidays": ["/empUpcomingHolidays"],
-      "Apply Leave": ["/empApplyLeave"],
-      Task: ["/internTask"],
-      Settings: ["/settings"],
-    };
+    // const customPaths: Record<string, string[]> = {
+    //   Employee: ["/employee", "/allEmployee", "/employeeDetails"],
+    //   Attendance: ["/attendance"],
+    //   Internship: [
+    //     "/internship",
+    //     "/internship/tabs",
+    //     "/internship/addInternship",
+    //     "/internship/internStatus",
+    //   ],
+    //   User: ["/user", "/user/credentialRequest", "/user/addUser"],
+    //   "Leave Management": [
+    //     "/leavemanagement",
+    //     "/leaveapproval",
+    //     "/leavehistory",
+    //     "/permission",
+    //     "/permissionhistory",
+    //   ],
+    //   Timesheet: ["/timesheet"],
+    //   Report: [
+    //     "/report",
+    //     "/report/reportDetails",
+    //     "/report/leaveData",
+    //     "/report/records",
+    //   ],
+    //   "Upcoming Holidays": ["/empUpcomingHolidays"],
+    //   "Apply Leave": ["/empApplyLeave"],
+    //   Task: ["/internTask"],
+    //   Settings: ["/settings"],
+    // };
 
     return customPaths[linkName]
       ? customPaths[linkName].includes(pathname)

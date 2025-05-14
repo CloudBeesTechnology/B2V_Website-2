@@ -8,10 +8,17 @@ interface objectType {
 }
 interface propsType {
   primaryData: objectType[];
+  storeFilteredData?: objectType[] | any;
   handleFilter: (filteredData: objectType) => void;
+  identify?: string;
 }
 
-const SearchBox: React.FC<propsType> = ({ primaryData, handleFilter }) => {
+const SearchBox: React.FC<propsType> = ({
+  primaryData,
+  storeFilteredData,
+  handleFilter,
+  identify,
+}) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
@@ -37,8 +44,10 @@ const SearchBox: React.FC<propsType> = ({ primaryData, handleFilter }) => {
       });
     if (searchTerm) {
       handleFilter(filteredData);
-    } else {
-      handleFilter([]);
+    } else if (!searchTerm && identify === "forReportPermission") {
+      handleFilter(storeFilteredData);
+    } else if (!searchTerm && identify === "leaveDataReport") {
+      handleFilter(primaryData);
     }
   }, [searchTerm]);
   return (

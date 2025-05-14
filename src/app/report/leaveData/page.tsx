@@ -3,12 +3,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineDownloading } from "react-icons/md";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
 import { exportLeaveReport } from "@/app/utils/exportLeaveReport";
 import { FloatingActionButton } from "../../utils/FloatingActionButton";
@@ -18,6 +13,7 @@ interface leaveDataType {
   empID?: string;
   [key: string]: any;
 }
+
 
 interface CombinedData {
   empID: string;
@@ -62,7 +58,6 @@ const LeaveData: React.FC = () => {
           const empSnap = await getDocs(empQuery);
           const empDoc = empSnap.docs[0]?.data();
 
-
           if (empDoc) {
             combined.push({
               empID: leave.empID,
@@ -77,11 +72,12 @@ const LeaveData: React.FC = () => {
               takenDay: leave.takenDay,
               days: leave.days,
               effectiveDate: empDoc.effectiveDate,
-              managerStatus: leave.managerStatus
+              managerStatus: leave.managerStatus,
             });
           }
         }
         setLeaveData(combined);
+        setFilteredLeaveData(combined);
       } catch (error) {
         console.log(error);
       } finally {
@@ -131,10 +127,7 @@ const LeaveData: React.FC = () => {
 
       const datePointer = new Date(accrualStart);
 
-      while (
-        datePointer.getFullYear() === currentYear &&
-        datePointer <= now
-      ) {
+      while (datePointer.getFullYear() === currentYear && datePointer <= now) {
         remaining += 1;
         datePointer.setMonth(datePointer.getMonth() + 1);
       }
@@ -204,7 +197,7 @@ const LeaveData: React.FC = () => {
           </div>
         </div>
         <div className="mt-auto">
-          <SearchBox primaryData={leaveData} handleFilter={handleFilter} />
+          <SearchBox primaryData={leaveData} handleFilter={handleFilter} identify={"leaveDataReport"}/>
         </div>
       </section>
       <section className="bg-white rounded-xl p-5 my-7">
@@ -223,50 +216,54 @@ const LeaveData: React.FC = () => {
               <th className="py-3">Remaining</th>
             </tr>
           </thead>
+
           <tbody>
             {groupedData && Object.values(groupedData).length > 0 ? (Object.values(groupedData).map((employeeLeaves, empIndex) => {
               // Parse the selected start and end dates
               const startFilterDate = startDate ? new Date(startDate) : null;
               const endFilterDate = endDate ? new Date(endDate) : null;
 
-              // Filter leaves based on the selected date range
-              const filteredLeaves = employeeLeaves.filter((leave) => {
-                const leaveStartDate = new Date(leave.startDate);
-                const leaveEndDate = new Date(leave.endDate);
+                // Filter leaves based on the selected date range
+                const filteredLeaves = employeeLeaves.filter((leave) => {
+                  const leaveStartDate = new Date(leave.startDate);
+                  const leaveEndDate = new Date(leave.endDate);
 
-                // If no date range is selected, default to current month
-                const currentMonth = new Date().getMonth() + 1;
-                const currentYear = new Date().getFullYear();
+                  // If no date range is selected, default to current month
+                  const currentMonth = new Date().getMonth() + 1;
+                  const currentYear = new Date().getFullYear();
 
-                if (startFilterDate && endFilterDate) {
+                  if (startFilterDate && endFilterDate) {
+                    return (
+                      leaveStartDate >= startFilterDate &&
+                      leaveEndDate <= endFilterDate
+                    );
+                  }
+                  // Default to current month if no range selected
                   return (
-                    leaveStartDate >= startFilterDate &&
-                    leaveEndDate <= endFilterDate
+                    leaveStartDate.getMonth() + 1 === currentMonth &&
+                    leaveStartDate.getFullYear() === currentYear
                   );
-                }
-                // Default to current month if no range selected
-                return (
-                  leaveStartDate.getMonth() + 1 === currentMonth &&
-                  leaveStartDate.getFullYear() === currentYear
+                });
+
+                if (filteredLeaves.length === 0) return null;
+
+                const totalTakenDays = filteredLeaves.reduce(
+                  (sum, leave) => sum + (parseFloat(leave.takenDay) || 0),
+                  0
                 );
-              });
 
-              if (filteredLeaves.length === 0) return null;
+                const totalApprovedLeaveDays = employeeLeaves.reduce(
+                  (total, leave) => {
+                    const leaveStart = new Date(leave.startDate);
+                    if (leaveStart.getFullYear() === new Date().getFullYear()) {
+                      total += parseFloat(leave.takenDay) || 0;
+                    }
+                    return total;
+                  },
+                  0
+                );
 
-              const totalTakenDays = filteredLeaves.reduce(
-                (sum, leave) => sum + (parseFloat(leave.takenDay) || 0),
-                0
-              );
-
-              const totalApprovedLeaveDays = employeeLeaves.reduce((total, leave) => {
-                const leaveStart = new Date(leave.startDate);
-                if (leaveStart.getFullYear() === new Date().getFullYear()) {
-                  total += parseFloat(leave.takenDay) || 0;
-                }
-                return total;
-              }, 0);
-
-              const remainingLeave = calculateRemainingLeave(filteredLeaves);
+                const remainingLeave = calculateRemainingLeave(filteredLeaves);
 
               return (
                 <React.Fragment key={employeeLeaves[0].empID}>
@@ -317,9 +314,9 @@ const LeaveData: React.FC = () => {
                     <td
                       className={`relative group py-4 text-lg font-bold ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'
                         }`}
-                    >
-                      {remainingLeave}
-                      {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
+                      >
+                        {remainingLeave}
+                        {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
                         Includes <span className="font-semibold">{totalApprovedLeaveDays}</span> approved days (past + present + future)
                       </span> */}
                     </td>
