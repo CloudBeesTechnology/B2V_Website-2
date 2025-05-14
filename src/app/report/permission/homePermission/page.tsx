@@ -113,7 +113,7 @@ const HomePermission: React.FC = () => {
       </div>
     );
   return (
-    <div>
+    <div >
       <HeaderPermission
         allPermissions={allPermissions}
         storeFilteredData={storeFilteredData}
@@ -121,6 +121,7 @@ const HomePermission: React.FC = () => {
         handleDateFilter={handleDateFilter}
       />
       <ListOfPermissions secondaryPermissions={secondaryPermissions} />
+
     </div>
   );
 };
