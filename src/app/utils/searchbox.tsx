@@ -35,8 +35,8 @@ const SearchBox: React.FC<propsType> = ({
 
         // Priority order: empID  > name
         const getPriority = (item: any): number => {
-          if (item.empID.toString().toUpperCase().includes(term)) return 0;
-          if (item.name.toString().toUpperCase().includes(term)) return 1;
+          if (item?.empID?.toString().toUpperCase().includes(term)) return 0;
+          if (item?.name?.toString().toUpperCase().includes(term)) return 1;
           return 3;
         };
 
