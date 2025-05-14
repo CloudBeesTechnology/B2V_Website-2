@@ -27,6 +27,7 @@ const HomePermission: React.FC = () => {
   const [secondaryPermissions, setSecondaryPermissions] = useState<
     MergedData[]
   >([]);
+  const [storeFilteredData, setStoreFilteredData] = useState<MergedData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,6 +78,7 @@ const HomePermission: React.FC = () => {
 
         setAllPermissions(merged);
         setSecondaryPermissions(filteredData);
+        setStoreFilteredData(filteredData);
       } catch (error) {
         console.error("Error merging data:", error);
       } finally {
@@ -88,8 +90,18 @@ const HomePermission: React.FC = () => {
   }, []);
 
   const handleFilter = (filteredData: permissionObj | any) => {
-    if (filteredData) {
+    if (Array.isArray(filteredData) && filteredData.length > 0) {
       setSecondaryPermissions(filteredData);
+    } else {
+      setSecondaryPermissions(storeFilteredData);
+    }
+  };
+
+  const handleDateFilter = (filterByDate: permissionObj | any) => {
+    if (Array.isArray(filterByDate) && filterByDate.length > 0) {
+      setSecondaryPermissions(filterByDate);
+    } else {
+      setSecondaryPermissions(storeFilteredData);
     }
   };
 
@@ -104,6 +116,7 @@ const HomePermission: React.FC = () => {
       <HeaderPermission
         allPermissions={allPermissions}
         handleFilter={handleFilter}
+        handleDateFilter={handleDateFilter}
       />
       <ListOfPermissions secondaryPermissions={secondaryPermissions} />
     </div>

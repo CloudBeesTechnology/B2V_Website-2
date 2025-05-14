@@ -8,6 +8,7 @@ export const internshipSchema = z.object({
   contact: z.string().min(5, "Contact number must be at 5 digits above"),
   category: z.string().min(1, "Category is required"),
   gender: z.string().min(1, "Gender is required"),
+  // role: z.string().min(1, "Role is required"),
   courseContent: z.string().min(1, "Course Content is required"),
   doj: z.string().min(1, "Date of Joining is required"),
   durationStart: z.string().min(1, "Duration Start is required"),

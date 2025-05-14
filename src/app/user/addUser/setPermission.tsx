@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { FaRegCircle, FaCircleCheck } from "react-icons/fa6";
 import { RiArrowDownSFill, RiArrowRightSFill } from "react-icons/ri";
 
@@ -66,10 +67,12 @@ const modulesData: Submodule[] = [
 const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
   selectedModules,
   setSelectedModules,
+  
 }) => {
   const [openSubmodules, setOpenSubmodules] = useState<{
     [key: string]: boolean;
   }>({});
+const { register, handleSubmit, watch } = useForm();
 
   const isSubmoduleChecked = (submodule: string, sections: string[]) => {
     const selected = selectedModules[submodule];
@@ -117,8 +120,11 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
   };
 
   return (
-    <section>
-      <h2 className=" text-[#303030] text_size_4 mb-3">Set Permissions</h2>
+    <section className="">
+      
+
+      <div className="mt-10">
+        <h2 className=" text-[#303030] text_size_4 mb-3">Set Permissions</h2>
       <div className="border border-lite_gray rounded p-4 bg-white">
         <div className="flex text_size_3 text-gray  pb-2">
           <h2 className="pl-3">Modules</h2>
@@ -182,6 +188,7 @@ const SetPermissionBox: React.FC<SetPermissionBoxProps> = ({
             </div>
           );
         })}
+      </div>
       </div>
       {/* Selected Output */}
     </section>

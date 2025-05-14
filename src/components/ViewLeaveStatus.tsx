@@ -109,7 +109,7 @@ export const ViewLeaveStatus = ({
       console.error("Failed to update leave status:", err);
     }
   };
-  console.log(leaveData);
+  // console.log(leaveData);
 
   return (
     <section className="fixed inset-0 w-full bg-[#07060788] z-[99999] flex items-center justify-center">

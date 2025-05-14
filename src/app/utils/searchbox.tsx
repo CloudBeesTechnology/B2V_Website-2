@@ -35,8 +35,11 @@ const SearchBox: React.FC<propsType> = ({ primaryData, handleFilter }) => {
 
         return getPriority(a) - getPriority(b);
       });
-
-    handleFilter(filteredData);
+    if (searchTerm) {
+      handleFilter(filteredData);
+    } else {
+      handleFilter([]);
+    }
   }, [searchTerm]);
   return (
     <div className="flex">
