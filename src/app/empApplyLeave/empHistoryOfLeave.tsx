@@ -43,7 +43,7 @@ const EmpHistoryOfLeave = () => {
 
             if (
               (data.leadEmpID &&
-                data.leadStatus === "Approved" &&
+                data.leadStatus === "Approved" ||
                 data.managerStatus === "Approved") ||
               (!data.leadEmpID && data.managerStatus === "Approved")
             ) {
