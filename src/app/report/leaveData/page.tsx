@@ -3,15 +3,16 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebaseConfig";
 import { MdOutlineDownloading } from "react-icons/md";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { DateFormat } from "@/components/DateFormate";
 import { exportLeaveReport } from "@/app/utils/exportLeaveReport";
-import { FloatingActionButton } from "../../utils/FloatingActionButton"; 
+import { FloatingActionButton } from "../../utils/FloatingActionButton";
+import SearchBox from "@/app/utils/searchbox";
+
+interface leaveDataType {
+  empID?: string;
+  [key: string]: any;
+}
 
 interface CombinedData {
   empID: string;
@@ -25,12 +26,15 @@ interface CombinedData {
   startDate: string;
   endDate: string;
   days: number;
-  effectiveDate: string,
-  managerStatus: string
+  effectiveDate: string;
+  managerStatus: string;
 }
 
 const LeaveData: React.FC = () => {
   const [leaveData, setLeaveData] = useState<CombinedData[]>([]);
+  const [filteredLeaveData, setFilteredLeaveData] = useState<CombinedData[]>(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -55,7 +59,6 @@ const LeaveData: React.FC = () => {
           const empSnap = await getDocs(empQuery);
           const empDoc = empSnap.docs[0]?.data();
 
-
           if (empDoc) {
             combined.push({
               empID: leave.empID,
@@ -70,11 +73,12 @@ const LeaveData: React.FC = () => {
               takenDay: leave.takenDay,
               days: leave.days,
               effectiveDate: empDoc.effectiveDate,
-              managerStatus: leave.managerStatus
+              managerStatus: leave.managerStatus,
             });
           }
         }
         setLeaveData(combined);
+        setFilteredLeaveData(combined);
       } catch (error) {
         console.log(error);
       } finally {
@@ -83,6 +87,14 @@ const LeaveData: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handleFilter = (filteredData: leaveDataType | any) => {
+    if (Array.isArray(filteredData) && filteredData.length > 0) {
+      setFilteredLeaveData(filteredData);
+    } else {
+      setFilteredLeaveData([]);
+    }
+  };
 
   const calculateRemainingLeave = (leaves: CombinedData[]): number => {
     if (!leaves.length) return 0;
@@ -116,10 +128,7 @@ const LeaveData: React.FC = () => {
 
       const datePointer = new Date(accrualStart);
 
-      while (
-        datePointer.getFullYear() === currentYear &&
-        datePointer <= now
-      ) {
+      while (datePointer.getFullYear() === currentYear && datePointer <= now) {
         remaining += 1;
         datePointer.setMonth(datePointer.getMonth() + 1);
       }
@@ -143,7 +152,7 @@ const LeaveData: React.FC = () => {
     return 0;
   };
 
-  const groupedData = leaveData.reduce((acc, entry) => {
+  const groupedData = filteredLeaveData.reduce((acc, entry) => {
     acc[entry.empID] = acc[entry.empID] || [];
     acc[entry.empID].push(entry);
     return acc;
@@ -188,7 +197,13 @@ const LeaveData: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="mt-auto">{/* <Searchbox /> */}</div>
+        <div className="mt-auto">
+          <SearchBox
+            primaryData={leaveData}
+            handleFilter={handleFilter}
+            identify={"leaveDataReport"}
+          />
+        </div>
       </section>
       <section className="bg-white rounded-xl p-5 my-7">
         <table className="table-fixed w-full">
@@ -206,82 +221,97 @@ const LeaveData: React.FC = () => {
               <th className="py-3">Remaining</th>
             </tr>
           </thead>
+
           <tbody>
-            {Object.values(groupedData).map((employeeLeaves, empIndex) => {
-              // Parse the selected start and end dates
-              const startFilterDate = startDate ? new Date(startDate) : null;
-              const endFilterDate = endDate ? new Date(endDate) : null;
+            {groupedData && Object.values(groupedData).length > 0 ? (
+              Object.values(groupedData).map((employeeLeaves, empIndex) => {
+                // Parse the selected start and end dates
+                const startFilterDate = startDate ? new Date(startDate) : null;
+                const endFilterDate = endDate ? new Date(endDate) : null;
 
-              // Filter leaves based on the selected date range
-              const filteredLeaves = employeeLeaves.filter((leave) => {
-                const leaveStartDate = new Date(leave.startDate);
-                const leaveEndDate = new Date(leave.endDate);
+                // Filter leaves based on the selected date range
+                const filteredLeaves = employeeLeaves.filter((leave) => {
+                  const leaveStartDate = new Date(leave.startDate);
+                  const leaveEndDate = new Date(leave.endDate);
 
-                // If no date range is selected, default to current month
-                const currentMonth = new Date().getMonth() + 1;
-                const currentYear = new Date().getFullYear();
+                  // If no date range is selected, default to current month
+                  const currentMonth = new Date().getMonth() + 1;
+                  const currentYear = new Date().getFullYear();
 
-                if (startFilterDate && endFilterDate) {
-                  return (
-                    leaveStartDate >= startFilterDate &&
-                    leaveEndDate <= endFilterDate
-                  );
-                }
-                // Default to current month if no range selected
-                return (
-                  leaveStartDate.getMonth() + 1 === currentMonth &&
-                  leaveStartDate.getFullYear() === currentYear
-                );
-              });
-
-              if (filteredLeaves.length === 0) return null;
-
-              const totalTakenDays = filteredLeaves.reduce(
-                (sum, leave) => sum + (parseFloat(leave.takenDay) || 0),
-                0
-              );
-
-              const totalApprovedLeaveDays = employeeLeaves.reduce((total, leave) => {
-                const leaveStart = new Date(leave.startDate);
-                if (leaveStart.getFullYear() === new Date().getFullYear()) {
-                  total += parseFloat(leave.takenDay) || 0;
-                }
-                return total;
-              }, 0);
-
-              const remainingLeave = calculateRemainingLeave(filteredLeaves);
-
-              return (
-                <React.Fragment key={employeeLeaves[0].empID}>
-                  {filteredLeaves.map((entry, idx) => {
-                    // console.log(entry,"entery");
+                  if (startFilterDate && endFilterDate) {
                     return (
-                      <tr
-                        key={`${empIndex}-${idx}`}
-                        className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
-                      >
-                        <td className="py-4">{entry.empID || "N/A"}</td>
-                        <td className="py-4">{entry.name || "N/A"}</td>
-                        <td className="py-4">{entry.position || "N/A"}</td>
-                        <td className="py-4">{entry.totalLeave || 0}</td>
-                        <td className="py-4">
-                          {DateFormat(entry.startDate) || "N/A"}
-                        </td>
-                        <td className="py-4">
-                          {DateFormat(entry.endDate) || "N/A"}
-                        </td>
-                        <td className="py-4 ">{entry.leaveType.charAt(0).toUpperCase() + entry.leaveType.slice(1).toLowerCase() || "N/A"}</td>
-                        <td className="py-4 h-[80px]">
-                          <div className="overflow-y-auto h-[80px]">
-                            {entry.leaveReason || "N/A"}
-                          </div>
-                        </td>
-                        <td className="py-4">{entry.takenDay || "N/A"}</td>
-                      </tr>
+                      leaveStartDate >= startFilterDate &&
+                      leaveEndDate <= endFilterDate
                     );
-                  })}
-                  {/* Summary row */}
-                  {/* <tr className="text-center font-semibold bg-gray-100">
+                  }
+                  // Default to current month if no range selected
+                  return (
+                    leaveStartDate.getMonth() + 1 === currentMonth &&
+                    leaveStartDate.getFullYear() === currentYear
+                  );
+                });
+
+                if (filteredLeaves.length === 0) return null;
+
+                const totalTakenDays = filteredLeaves.reduce(
+                  (sum, leave) => sum + (parseFloat(leave.takenDay) || 0),
+                  0
+                );
+
+                const totalApprovedLeaveDays = employeeLeaves.reduce(
+                  (total, leave) => {
+                    const leaveStart = new Date(leave.startDate);
+                    if (leaveStart.getFullYear() === new Date().getFullYear()) {
+                      total += parseFloat(leave.takenDay) || 0;
+                    }
+                    return total;
+                  },
+                  0
+                );
+
+                const remainingLeave = calculateRemainingLeave(filteredLeaves);
+
+                return (
+                  <React.Fragment key={employeeLeaves[0].empID}>
+                    {Array.isArray(filteredLeaves) && filteredLeaves.length > 0
+                      ? filteredLeaves.map((entry, idx) => {
+                          // console.log(entry,"entery");
+                          return (
+                            <tr
+                              key={`${empIndex}-${idx}`}
+                              className="text-center border-b border-[#D2D2D240] text_size_4 text-gray"
+                            >
+                              <td className="py-4">{entry.empID || "N/A"}</td>
+                              <td className="py-4">{entry.name || "N/A"}</td>
+                              <td className="py-4">
+                                {entry.position || "N/A"}
+                              </td>
+                              <td className="py-4">{entry.totalLeave || 0}</td>
+                              <td className="py-4">
+                                {DateFormat(entry.startDate) || "N/A"}
+                              </td>
+                              <td className="py-4">
+                                {DateFormat(entry.endDate) || "N/A"}
+                              </td>
+                              <td className="py-4 ">
+                                {entry.leaveType.charAt(0).toUpperCase() +
+                                  entry.leaveType.slice(1).toLowerCase() ||
+                                  "N/A"}
+                              </td>
+                              <td className="py-4 h-[80px]">
+                                <div className="overflow-y-auto h-[80px]">
+                                  {entry.leaveReason || "N/A"}
+                                </div>
+                              </td>
+                              <td className="py-4">
+                                {entry.takenDay || "N/A"}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : ""}
+                    {/* Summary row */}
+                    {/* <tr className="text-center font-semibold bg-gray-100">
                     <td colSpan={8} className="py-4">Total for {filteredLeaves[0].name}</td>
                         <td className="py-4">{totalTakenDays || 0}</td>
                     <td className="relative group py-4 ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'}">
@@ -291,25 +321,39 @@ const LeaveData: React.FC = () => {
                       </span>
                     </td>
                   </tr> */}
-                  <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300">
-                    <td colSpan={8} className="py-4 text-lg text-gray-700">
-                      Total for <span className="text-indigo-600">{filteredLeaves[0].name}</span>
-                    </td>
-                    <td className="py-4 text-blue-700 text-lg">{totalTakenDays || 0}</td>
-                    <td
-                      className={`relative group py-4 text-lg font-bold ${remainingLeave <= 1 ? 'text-red-500' : 'text-green-600'
+                    <tr className="text-center font-semibold bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300">
+                      <td colSpan={8} className="py-4 text-lg text-gray-700">
+                        Total for{" "}
+                        <span className="text-indigo-600">
+                          {filteredLeaves[0].name}
+                        </span>
+                      </td>
+                      <td className="py-4 text-blue-700 text-lg">
+                        {totalTakenDays || 0}
+                      </td>
+                      <td
+                        className={`relative group py-4 text-lg font-bold ${
+                          remainingLeave <= 1
+                            ? "text-red-500"
+                            : "text-green-600"
                         }`}
-                    >
-                      {remainingLeave}
-                      {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
+                      >
+                        {remainingLeave}
+                        {/* <span className="invisible group-hover:visible absolute z-10 bottom-[50px] left-1/2 -translate-x-1/2 mt-2 w-56 text-sm bg-white text-gray-800 p-2 rounded-md shadow-xl border border-gray-200 transition-opacity duration-300">
                         Includes <span className="font-semibold">{totalApprovedLeaveDays}</span> approved days (past + present + future)
                       </span> */}
-                    </td>
-                  </tr>
-
-                </React.Fragment>
-              );
-            })}
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              <tr className="text-center text-gray text_size_4">
+                <td colSpan={10} className="py-4">
+                  No data Available.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         <div>

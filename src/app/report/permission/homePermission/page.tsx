@@ -93,7 +93,12 @@ const HomePermission: React.FC = () => {
     if (Array.isArray(filteredData) && filteredData.length > 0) {
       setSecondaryPermissions(filteredData);
     } else {
+<<<<<<< HEAD
       setSecondaryPermissions(storeFilteredData);
+=======
+      // storeFilteredData
+      setSecondaryPermissions([]);
+>>>>>>> bded8305d73f0c4ded7062702277b3f558255238
     }
   };
 
@@ -115,6 +120,7 @@ const HomePermission: React.FC = () => {
     <div>
       <HeaderPermission
         allPermissions={allPermissions}
+        storeFilteredData={storeFilteredData}
         handleFilter={handleFilter}
         handleDateFilter={handleDateFilter}
       />
