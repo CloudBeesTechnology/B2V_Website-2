@@ -17,17 +17,19 @@ import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
+import { functions } from '@/lib/firebaseConfig';
+import { httpsCallable } from 'firebase/functions';
 
 export type Holiday = {
-  date: string; 
-  name?: string; 
-  description?: string; 
+  date: string;
+  name?: string;
+  description?: string;
   [key: string]: any;
 };
 
 const EmpApplyLeave = () => {
   const { publicHolidays } = useFetchHolidayList();
-  // console.log(publicHolidays,"7986453210");
+  // console.log(publicHolidays,"7986453210"); 
   const [showPopup, setShowPopup] = useState(false);
   const {
     register,
@@ -90,7 +92,7 @@ const EmpApplyLeave = () => {
         // Check if the leave is rejected
         const isRejected =
           leadStatus === "Rejected" || managerStatus === "Rejected";
-          
+
         const isApprovedOrPending =
           (hasLead && (leadStatus === "Pending" || leadStatus === "Approved")) ||
           (hasManager && (managerStatus === "Pending" || managerStatus === "Approved"));
@@ -159,7 +161,20 @@ const EmpApplyLeave = () => {
         ...leaveDetails,
       });
 
-      setShowPopup(true);
+      const sendEmail = httpsCallable(functions, 'sendLeaveEmail');
+      await sendEmail({
+        empID: empID,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        leaveType: data.leaveType,
+        leaveReason: data.leaveReason,
+        recipientEmail: "hariharanofficial2812@gmail.com"
+      });
+
+      
+      console.log("Log", sendEmail);
+      
+      // setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");
@@ -256,7 +271,7 @@ const EmpApplyLeave = () => {
               />
             </div>
           </div>
-          
+
           <div className="center pt-2 py-2">
             <button
               type="submit"

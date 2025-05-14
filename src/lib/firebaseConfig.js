@@ -2,7 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
-import { Messaging } from "firebase/messaging";
+import { getMessaging } from "firebase/messaging";
+import { getFunctions } from "firebase/functions"; 
+// import { Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIsPp1bKVw33CevWV_79q35xCtcY8kGws",
@@ -18,13 +20,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const rtdb = getDatabase(app);
-let messaging= null;
-if (typeof window !== "undefined" && typeof navigator !== "undefined") {
-  const { getMessaging } = require("firebase/messaging");
+const functions = getFunctions(app); 
+
+let messaging = null;
+if (typeof window !== "undefined") {
   messaging = getMessaging(app);
 }
 
-export { app, auth, db, rtdb,messaging, RecaptchaVerifier };
+// let messaging= null;
+// if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+//   const { getMessaging } = require("firebase/messaging");
+//   messaging = getMessaging(app);
+// }
+
+export { app, auth, db, rtdb, messaging, functions, RecaptchaVerifier };
 
 // if (typeof window !== "undefined") {
 //   import("firebase/messaging").then(({ getMessaging }) => {
