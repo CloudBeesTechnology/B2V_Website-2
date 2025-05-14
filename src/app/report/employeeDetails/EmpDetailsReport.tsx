@@ -97,7 +97,7 @@ export const EmpDetailsReportTable = () => {
         {allEmp && allEmp.length > 0 ? (
           <TableFormate
             heading={Heading}
-            allEmp={allEmp ?? []}
+             allEmployeeReport={allEmp ?? []}
             list="AllEmpReport"
             ovla={[]}
             leaveApproval={[]}
