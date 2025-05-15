@@ -73,6 +73,58 @@ interface allEmployee {
   email: string;
   createdAt?: string;
 }
+interface Course {
+  academic: string;
+  course: string;
+}
+interface Experience {
+  company: string;
+  dept: string;
+  location: string;
+  manager: string;
+  work: string;
+  year: string;
+}
+interface allEmployeeReport {
+  profile?: string;
+  empID: string;
+  name: string;
+  position: string;
+  department: string;
+  contact: string;
+  email: string;
+  doj: string;
+  dob: string;
+  gender: string;
+  address: string;
+  alternateNo: string;
+  religion: string;
+  lang: string;
+  proof: string;
+  totalLeave: string;
+  manager: string;
+  leadEmpID: string;
+  effectiveDate: string;
+  degree: string;
+  study: string;
+  school: string;
+  master: string;
+  field: string;
+  highSchool: string;
+  courses: Course[];
+  experiences: Experience[];
+  father: string;
+  mother: string;
+  siblings: string;
+
+  personalStatus: string;
+  husbandName: string;
+  wifeName: string;
+  child: string;
+  familyPNo: string;
+  familyAddress: string;
+  createdAt?: string;
+}
 
 interface TableProps {
   heading?: string[];
@@ -83,8 +135,10 @@ interface TableProps {
     | "LeaveApproval"
     | "empLeave"
     | "empPermission"
-    | "permissionList";
+    | "permissionList"
+    | "AllEmpReport";
   allEmp?: allEmployee[];
+  allEmployeeReport?: allEmployeeReport[];
   leaveApproval?: LA[];
   permissionList?: permissionList[];
   secondaryEmpPermission?: empPermission[];
@@ -99,6 +153,7 @@ export const TableFormate = ({
   ovla = [],
   list,
   allEmp,
+  allEmployeeReport,
   leaveApproval,
   permissionList,
   secondaryEmpPermission,
@@ -123,12 +178,12 @@ export const TableFormate = ({
 
   return (
     <>
-      <table className="w-full border-collapse table-fixed">
+      <table className="w-full border-collapse overflow-x-auto">
         {heading && (
           <thead className="text-mediumlite_grey text-sm font-bold w-full">
-            <tr className="text-center border-b border-morelite_grey">
+            <tr className="text-center border-b border-morelite_grey overflow-x-auto w-full">
               {heading.map((val, index) => (
-                <th key={index} className="py-2 px-4">
+                <th key={index} className="py-2 px-4 min-w-[200px] w-full">
                   {val}
                 </th>
               ))}
@@ -353,6 +408,195 @@ export const TableFormate = ({
                 </td>
               </tr>
             ))}
+
+          {list === "AllEmpReport" &&
+            allEmployeeReport
+              ?.sort((a, b) => {
+                const numA = parseInt(a.empID?.replace(/\D/g, "") || "0");
+                const numB = parseInt(b.empID?.replace(/\D/g, "") || "0");
+                return numA - numB; // For ascending order. Use b - a for descending.
+              })
+
+              .map((val, index) => {
+              
+
+                return (
+                  <tr
+                    key={index}
+                    className="text-center text-sm text-medium_gray border-b border-morelite_grey w-full border"
+                  >
+                    <td className=" py-2 px-4 min-w-[250px] w-full center gap-2 ">
+                      <Image
+                        src={val.profile || avatar}
+                        width={25}
+                        height={25}
+                        alt={`${val.name} profile`}
+                        className="rounded-full"
+                      />
+                      {val.empID || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.name || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.position || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.department || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.contact || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full   break-words overflow-hidden">
+                      {val.email || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {DateFormat(val.doj) || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {DateFormat(val.dob) || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.gender || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.address || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.alternateNo || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.religion || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.lang || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.proof ? (
+                        <a href={val.proof} target="_blank">
+                          View Document
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.totalLeave || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.manager || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.leadEmpID || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {DateFormat(val.effectiveDate) || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.degree || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.study || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.school || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.master || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.field || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.highSchool || "N/A"}
+                    </td>
+
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.courses && val.courses.length > 0
+                        ? val.courses.map((course, index) => (
+                            <div key={index}>
+                              {index + 1}.
+                              <span className="font-semibold px-1">
+                                Course:
+                              </span>{" "}
+                              {course.course || "N/A"},
+                              <span className="font-semibold px-1">
+                                Academic:
+                              </span>{" "}
+                              {course.academic || "N/A"}
+                            </div>
+                          ))
+                        : "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.experiences && val.experiences.length > 0
+                        ? val.experiences.map((exp, index) => (
+                            <div key={index}>
+                              {index + 1}.
+                              <span className="font-semibold px-1">
+                                Company:
+                              </span>{" "}
+                              {exp.company || "N/A"},
+                              <span className="font-semibold px-1">
+                                Department:
+                              </span>{" "}
+                              {exp.dept || "N/A"}
+                              <span className="font-semibold px-1">
+                                Location:
+                              </span>{" "}
+                              {exp.location || "N/A"}
+                              <span className="font-semibold px-1">
+                                Manager:
+                              </span>{" "}
+                              {exp.manager || "N/A"}
+                              <span className="font-semibold px-1">
+                                Work:
+                              </span>{" "}
+                              {exp.work || "N/A"}
+                              <span className="font-semibold px-1">
+                                Year:
+                              </span>{" "}
+                              {exp.year || "N/A"}
+                            </div>
+                          ))
+                        : "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.father || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.mother || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.siblings || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.personalStatus || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.husbandName || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.wifeName || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.child || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.familyPNo || "N/A"}
+                    </td>
+                    <td className=" py-2 px-4 min-w-[250px] w-full  ">
+                      {val.familyAddress || "N/A"}
+                    </td>
+                    <td
+                      className="text-center text-primary py-2 px-4 min-w-[250px] w-full "
+                      onClick={() => viewData?.(val)}
+                    >
+                      View
+                    </td>
+                  </tr>
+                );
+              })}
         </tbody>
       </table>
 

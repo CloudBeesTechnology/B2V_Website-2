@@ -8,11 +8,13 @@ interface permissionObj {
 }
 interface propsType {
   allPermissions: permissionObj[];
+  storeFilteredData: permissionObj[];
   handleFilter: (filteredData: permissionObj) => void;
   handleDateFilter: (filterByDate: permissionObj) => void;
 }
 const HeaderPermission: React.FC<propsType> = ({
   allPermissions,
+  storeFilteredData,
   handleFilter,
   handleDateFilter,
 }) => {
@@ -27,7 +29,12 @@ const HeaderPermission: React.FC<propsType> = ({
         </div>
         <div className="text-gray text-2xl font-medium">Permission Report</div>
         <div>
-          <SearchBox primaryData={allPermissions} handleFilter={handleFilter} />
+          <SearchBox
+            primaryData={allPermissions}
+            storeFilteredData={storeFilteredData}
+            handleFilter={handleFilter}
+            identify={"forReportPermission"}
+          />
         </div>
       </header>
     </section>
