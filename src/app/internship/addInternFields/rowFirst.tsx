@@ -14,20 +14,20 @@ const RowFirst: React.FC<FormProps> = ({ register, errors }) => {
       {/* Dynamic Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
         <FormField
-          label="First Name"
-          name="firstName"
+          label="Name"
+          name="name"
           type="text"
           register={register}
-          errors={errors?.firstName?.message}
+          errors={errors?.name?.message}
         />
 
-        <FormField
+        {/* <FormField
           label="Last Name"
           name="lastName"
           type="text"
           register={register}
           errors={errors?.lastName?.message}
-        />
+        /> */}
 
         <FormField
           label="Date of Birth"

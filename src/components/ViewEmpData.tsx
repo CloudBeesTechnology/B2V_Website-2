@@ -22,6 +22,8 @@ interface TableProps {
 }
 
 export const ViewEmpData = ({ allEmp, close }: TableProps) => {
+  console.log(allEmp, "view");
+
   const personalFields: { label: string; key: string }[] = [
     { label: "Name", key: "name" },
     { label: "Date of Birth", key: "dob" },
@@ -34,13 +36,13 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
     { label: "Email", key: "email" },
     { label: "Language", key: "lang" },
     { label: "Religion", key: "religion" },
-    { label: "Proof", key: "proof" },
     { label: "Department", key: "department" },
     { label: "Position", key: "position" },
     { label: "Total Leave", key: "totalLeave" },
     { label: "Manager", key: "manager" },
     { label: "Lead", key: "leadEmpID" },
     { label: "Effective Date", key: "effectiveDate" },
+    { label: "Proof", key: "proof" },
   ];
   const educMenu = [
     { label: "Degree", key: "degree" },
@@ -103,12 +105,34 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
                     <div key={key} className="flex w-full">
                       <p className="px-2 py-1 font-semibold w-1/3">{label}</p>
                       <p className="px-2 py-1 font-semibold w-1/12">:</p>
-                      <p className="px-2 py-1 w-1/2">
-                        {["dob", "doj", "effectiveDate"].includes(key) &&
-                        allEmp[key]
-                          ? DateFormat(allEmp[key])
-                          : allEmp[key] || "N/A"}
-                      </p>
+
+                      {/* Date Fields */}
+                      {["dob", "doj", "effectiveDate"].includes(key) ? (
+                        <p className="px-2 py-1 w-1/2">
+                          {allEmp[key] ? DateFormat(allEmp[key]) : "N/A"}
+                        </p>
+                      ) : // Proof Link
+                      key === "proof" ? (
+                        <p className="px-2 py-1 w-1/2">
+                          {allEmp[key] && typeof allEmp[key] === "string" ? (
+                            <a
+                              href={allEmp[key]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline"
+                            >
+                              View Document
+                            </a>
+                          ) : (
+                            "N/A"
+                          )}
+                        </p>
+                      ) : (
+                        // Other Fields
+                        <p className="px-2 py-1 w-1/2">
+                          {allEmp[key] || "N/A"}
+                        </p>
+                      )}
                     </div>
                   )
               )}
