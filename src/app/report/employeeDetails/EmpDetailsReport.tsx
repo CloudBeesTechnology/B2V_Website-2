@@ -148,13 +148,13 @@ export const EmpDetailsReportTable = () => {
       }
 
       const coursesData = val?.courses?.map((course: any, index: number) => {
-        return `${index + 1} Course: ${course?.course || "N/A"} ,Academic: ${
+        return `${index + 1}.) Course: ${course?.course || "N/A"} ,Academic: ${
           course?.academic || "N/A"
         }`;
       });
       const experiencesData = val?.experiences?.map(
         (exp: any, index: number) => {
-          return `${index + 1} Company: ${exp?.company || "N/A"}, Department: ${
+          return `${index + 1}.) Company: ${exp?.company || "N/A"}, Department: ${
             exp?.dept || "N/A"
           }, Location: ${exp.location || "N/A"}, Manager: ${
             exp.manager || "N/A"

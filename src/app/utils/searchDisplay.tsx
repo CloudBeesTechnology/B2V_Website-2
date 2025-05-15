@@ -22,7 +22,7 @@ const SearchDisplay: React.FC<SearchboxProps> = ({
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const matchFields = ["empID", "name"];
+  const matchFields = ["empID", "name","intID"];
 
   const getMatchPriority = (value: string, searchTerm: string): number => {
     const lowerVal = value?.toLowerCase() || "";
@@ -106,7 +106,7 @@ const SearchDisplay: React.FC<SearchboxProps> = ({
               onClick={() => handleDropdownSelect(user)}
               className="px-4 py-2 cursor-pointer hover:bg-[#f3f4f6]"
             >
-              {user.name} ({user.empID})
+              {user.name} ({user.empID ||user.intID})
             </li>
           ))}
         </ul>

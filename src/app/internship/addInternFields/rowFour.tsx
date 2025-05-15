@@ -42,6 +42,20 @@ const RowFour: React.FC<FormProps> = ({ register, errors }) => {
           options={["Mentor 1", "Mentor 2", "Mentor 3"]}
         />
       </div>
+      <div className="flex flex-col gap-2 mt-7 ">
+                <label htmlFor="address" className="text-[#303030] text_size_4 pb-1">
+                  Address 
+                </label>
+                <div className="border border-[#E2E2E2] text-[#202020] bg-[#f5f7fb] text_size_4 p-2 rounded outline-none">
+                  <textarea
+                    id="address"
+                   {...register("address")}
+                   rows={2}
+                     className="outline-none py-1 w-full"
+                  />
+                </div>
+             
+              </div>
     </section>
   );
 };

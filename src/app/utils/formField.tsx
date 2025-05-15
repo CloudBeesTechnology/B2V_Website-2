@@ -28,7 +28,7 @@ const FormField: React.FC<FormFieldProps> = ({
   
   return (
     <div className="flex flex-col">
-      {/* <label className="text-[#303030] text_size_4 pb-1">{label}</label> */}
+      <label className="text-[#303030] text_size_4 pb-1">{label}</label>
 
 
       {/* Radio buttons */}

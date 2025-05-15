@@ -13,21 +13,23 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { useForm } from "react-hook-form";
+import axios from 'axios';
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
 
+
 export type Holiday = {
-  date: string; 
-  name?: string; 
-  description?: string; 
+  date: string;
+  name?: string;
+  description?: string;
   [key: string]: any;
 };
 
 const EmpApplyLeave = () => {
   const { publicHolidays } = useFetchHolidayList();
-  // console.log(publicHolidays,"7986453210");
+  // console.log(publicHolidays,"7986453210"); 
   const [showPopup, setShowPopup] = useState(false);
   const {
     register,
@@ -90,7 +92,7 @@ const EmpApplyLeave = () => {
         // Check if the leave is rejected
         const isRejected =
           leadStatus === "Rejected" || managerStatus === "Rejected";
-          
+
         const isApprovedOrPending =
           (hasLead && (leadStatus === "Pending" || leadStatus === "Approved")) ||
           (hasManager && (managerStatus === "Pending" || managerStatus === "Approved"));
@@ -158,6 +160,26 @@ const EmpApplyLeave = () => {
       await setDoc(doc(db, "leaveStatus", createdAt), {
         ...leaveDetails,
       });
+
+      // Send email to the manager
+      const managerEmail = employeeData.managerEmail;
+
+      const emailData = {
+        empName: employeeData.name,
+        leaveType: data.leaveType,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        leaveReason: data.leaveReason,
+        managerEmail: managerEmail,
+      };
+
+      // Send email notification to manager
+      try {
+        await axios.post('/api/sendLeaveEmail', emailData);
+        console.log('Leave email sent successfully');
+      } catch (error) {
+        console.error('Error sending leave email:', error);
+      }
 
       setShowPopup(true);
     } catch (error) {
@@ -256,7 +278,7 @@ const EmpApplyLeave = () => {
               />
             </div>
           </div>
-          
+
           <div className="center pt-2 py-2">
             <button
               type="submit"

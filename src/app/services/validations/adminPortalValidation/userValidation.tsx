@@ -30,6 +30,7 @@ export const addUserSchema = yup.object({
   role: yup.string().notRequired(),
   position: yup.string().notRequired(),
   department: yup.string().notRequired(),
+  intID: yup.string().notRequired(),
   // permission: yup.string().notRequired(),
 });
 
