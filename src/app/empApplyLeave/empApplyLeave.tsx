@@ -13,12 +13,12 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { useForm } from "react-hook-form";
+import axios from 'axios';
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
-import { functions } from '@/lib/firebaseConfig';
-import { httpsCallable } from 'firebase/functions';
+
 
 export type Holiday = {
   date: string;
@@ -161,20 +161,27 @@ const EmpApplyLeave = () => {
         ...leaveDetails,
       });
 
-      const sendEmail = httpsCallable(functions, 'sendLeaveEmail');
-      await sendEmail({
-        empID: empID,
+      // Send email to the manager
+      const managerEmail = employeeData.managerEmail;
+
+      const emailData = {
+        empName: employeeData.name,
+        leaveType: data.leaveType,
         startDate: data.startDate,
         endDate: data.endDate,
-        leaveType: data.leaveType,
         leaveReason: data.leaveReason,
-        recipientEmail: "hariharanofficial2812@gmail.com"
-      });
+        managerEmail: managerEmail,
+      };
 
-      
-      console.log("Log", sendEmail);
-      
-      // setShowPopup(true);
+      // Send email notification to manager
+      try {
+        await axios.post('/api/sendLeaveEmail', emailData);
+        console.log('Leave email sent successfully');
+      } catch (error) {
+        console.error('Error sending leave email:', error);
+      }
+
+      setShowPopup(true);
     } catch (error) {
       console.error("Error applying for leave:", error);
       alert("There was an error submitting your leave request.");

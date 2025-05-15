@@ -20,7 +20,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const rtdb = getDatabase(app);
-const functions = getFunctions(app); 
+// const functions = getFunctions(app); 
 
 let messaging = null;
 if (typeof window !== "undefined") {
@@ -33,7 +33,7 @@ if (typeof window !== "undefined") {
 //   messaging = getMessaging(app);
 // }
 
-export { app, auth, db, rtdb, messaging, functions, RecaptchaVerifier };
+export { app, auth, db, rtdb, messaging, getFunctions, RecaptchaVerifier };
 
 // if (typeof window !== "undefined") {
 //   import("firebase/messaging").then(({ getMessaging }) => {
