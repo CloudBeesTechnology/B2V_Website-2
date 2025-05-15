@@ -13,11 +13,11 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { useForm } from "react-hook-form";
-import axios from 'axios';
 import useFetchHolidayList from "../utils/customHooks/useFetchHolidayList";
 import checkNonWorkingDays from "../utils/customHooks/checkNonWorkingDays";
 import { useState } from "react";
 import { SuccessPopUp } from "@/components/SuccessPopUp";
+import { sendMail } from "../utils/sendMail";
 
 
 export type Holiday = {
@@ -41,6 +41,42 @@ const EmpApplyLeave = () => {
   });
 
   const isHalfDay = watch("halfDay");
+
+
+  const sendLeaveEmail = async (
+    employeeData: any,
+    data: LeaveFormData,
+    isHalfDay: boolean
+  ) => {
+    const from = "hariharancbt28@gmail.com";
+    const to = "veda.thiyagarajan@gmail.com";
+    // const to = "hariharanofficial2812@gmail.com";
+    const subject = `Leave Request from ${employeeData.name}`;
+    const text = `
+Hi,
+
+${employeeData.name} has submitted a leave request.
+
+Leave Type: ${data.leaveType}
+Start Date: ${data.startDate}
+End Date: ${data.endDate}
+Half Day: ${isHalfDay ? "Yes" : "No"}
+Reason: ${data.leaveReason}
+
+Please review the request in the employee portal.
+
+Thanks,
+HR System
+`;
+
+    try {
+      await sendMail(from, to, subject, text);
+      console.log("Leave email sent successfully");
+    } catch (error) {
+      console.error("Error sending leave email:", error);
+    }
+  };
+
 
   const onSubmit = async (data: LeaveFormData) => {
     const empID = localStorage.getItem("empID");
@@ -161,25 +197,7 @@ const EmpApplyLeave = () => {
         ...leaveDetails,
       });
 
-      // Send email to the manager
-      const managerEmail = employeeData.managerEmail;
-
-      const emailData = {
-        empName: employeeData.name,
-        leaveType: data.leaveType,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        leaveReason: data.leaveReason,
-        managerEmail: managerEmail,
-      };
-
-      // Send email notification to manager
-      try {
-        await axios.post('/api/sendLeaveEmail', emailData);
-        console.log('Leave email sent successfully');
-      } catch (error) {
-        console.error('Error sending leave email:', error);
-      }
+      await sendLeaveEmail(employeeData, data, isHalfDay ?? false);
 
       setShowPopup(true);
     } catch (error) {
