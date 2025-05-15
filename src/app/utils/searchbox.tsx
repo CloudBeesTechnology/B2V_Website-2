@@ -48,6 +48,10 @@ const SearchBox: React.FC<propsType> = ({
       handleFilter(storeFilteredData);
     } else if (!searchTerm && identify === "leaveDataReport") {
       handleFilter(primaryData);
+    } else if (!searchTerm && identify === "empDetailsReport") {
+      handleFilter(primaryData);
+    } else {
+      handleFilter(primaryData);
     }
   }, [searchTerm]);
   return (

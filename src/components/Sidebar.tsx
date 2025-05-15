@@ -140,6 +140,11 @@ const Sidebar = () => {
   };
 
   let onetimeExecute = false;
+  const handleNavigation = (path: string) => {
+    RemoveLocalValues(); // your existing cleanup logic
+    router.push(path); // navigate without reloading
+  };
+
   useEffect(() => {
     const getUserAndPermissions = async (empID: string) => {
       const userQuery = query(
@@ -163,7 +168,7 @@ const Sidebar = () => {
         );
 
         setAllowedMenuItems(filteredKeys);
-
+        console.log("I am calling");
         if (pathname !== "/") return;
         // Navigate to first allowed path
         const firstAllowed = sidebarMenu.find((item) =>
@@ -218,6 +223,7 @@ const Sidebar = () => {
       ? customPaths[linkName].includes(pathname)
       : pathname === linkPath;
   };
+
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
@@ -246,10 +252,11 @@ const Sidebar = () => {
                       : "px-2 py-2"
                   )}
                 >
-                  <Link
-                    href={link.path}
-                    onClick={RemoveLocalValues}
-                    className="flex items-center gap-3"
+                  <div
+                    onClick={() => {
+                      handleNavigation(link.path);
+                    }}
+                    className="flex items-center gap-3 cursor-pointer"
                   >
                     <Image
                       src={
@@ -262,12 +269,12 @@ const Sidebar = () => {
                       height={24}
                     />
                     <p className="text_size_4">{link.name}</p>
-                  </Link>
+                  </div>
                 </div>
               </div>
             ))}
         </div>
-        <div className="px-2">
+        <div className="px-2 mt-auto">
           <button onClick={handleLogout} className="flex items-center gap-3">
             <Image src={logout} alt="Logout not found" width={24} height={24} />
             <p className="text_size_4">Logout</p>
