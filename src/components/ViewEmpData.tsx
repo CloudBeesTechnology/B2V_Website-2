@@ -4,7 +4,9 @@ import { IoMdCloseCircle } from "react-icons/io";
 import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
 import { DateFormat } from "./DateFormate";
 import html2pdf from "html2pdf.js";
-
+import { IoMdDownload } from "react-icons/io";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 interface allEmployee {
   profile?: string;
   empID: string;
@@ -24,6 +26,7 @@ interface TableProps {
 
 export const ViewEmpData = ({ allEmp, close }: TableProps) => {
   const printRef = useRef<HTMLDivElement>(null);
+
   const personalFields: { label: string; key: string }[] = [
     { label: "Name", key: "name" },
     { label: "Date of Birth", key: "dob" },
@@ -74,45 +77,26 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
   ];
 
   const handleDownloadPDF = () => {
-    // if (printRef.current) {
-    //   const element = printRef.current;
-    //   const opt = {
-    //     margin: 0.5,
-    //     filename: `${allEmp?.name || "employee"}_details.pdf`,
-    //     image: { type: "jpeg", quality: 0.98 },
-    //     html2canvas: { scale: 2 },
-    //     jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-    //   };
-
-    //   html2pdf().from(element).set(opt).save();
-    // }
-
     const content = printRef.current;
     if (!content) return;
 
-    const images = content.querySelectorAll("img");
-    const promises = Array.from(images).map((img) => {
-      return new Promise<void>((resolve) => {
-        if (img.complete) {
-          resolve();
-        } else {
-          img.onload = () => resolve();
-          img.onerror = () => resolve(); // still resolve even if failed
-        }
-      });
-    });
+    const opt = {
+      margin: [10, 10, 0, 10], // top, left, bottom, right
+      filename: `${allEmp?.name || "employee"}_details.pdf`,
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: {
+        scale: 3,
+        useCORS: true,
+        allowTaint: false,
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+      },
+    };
 
-    Promise.all(promises).then(() => {
-      const opt = {
-        margin: 0.5,
-        filename: `${allEmp?.name || "employee"}_details.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      };
-
-      html2pdf().set(opt).from(content).save();
-    });
+    html2pdf().set(opt).from(content).save();
   };
 
   if (!allEmp)
@@ -126,9 +110,9 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
         {/* Scrollable Content */}
         <div className="overflow-y-auto p-6 max-h-[85vh]">
           <div className="relative">
-            <h1 className="text_size_2 text-center text-gray my-5">
+            {/* <h1 className="text_size_2 text-center text-gray my-5">
               Employee Details
-            </h1>
+            </h1> */}
             <button
               onClick={close}
               className="absolute right-0 top-0 text-gray hover:text-black"
@@ -137,7 +121,8 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
             </button>
           </div>
           <div ref={printRef}>
-            <h2 className="font-bold text-lg mb-2">Personal Information:</h2>
+            <h1 className="text_size_2 text-center my-5">Employee Details</h1>
+            <h2 className="font-bold text-lg mb-2">Personal Information :</h2>
 
             <div className="flex justify-between">
               {/* Left Column - Personal Fields */}
@@ -146,10 +131,13 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
                   ({ label, key }) =>
                     key !== "profilePhoto" && (
                       <div key={key} className="flex w-full">
-                        <p className="px-2 py-1 font-semibold w-1/3">{label}</p>
-                        <p className="px-2 py-1 font-semibold w-1/12">:</p>
+                        <p className="px-2 py-1 font-semibold w-8/10">
+                          {label}
+                        </p>
+                        <p className="px-2 py-1 font-semibold w-1/20 text-right ">
+                          :
+                        </p>
 
-                        {/* Date Fields */}
                         {["dob", "doj", "effectiveDate"].includes(key) ? (
                           <p className="px-2 py-1 w-1/2">
                             {allEmp[key] ? DateFormat(allEmp[key]) : "N/A"}
@@ -185,7 +173,8 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
               <div className="w-1/4 flex justify-center items-start">
                 {allEmp?.profilePhoto ? (
                   <img
-                    src={allEmp.profilePhoto}
+                    src={allEmp?.profilePhoto}
+                    // src="https://thumbs.dreamstime.com/b/pink-flower-rests-sandy-beach-contrasting-natural-landscape-pink-flower-rests-sandy-beach-contrasting-367953686.jpg"
                     alt="Profile"
                     width={150}
                     height={150}
@@ -236,11 +225,13 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
 
                 return (
                   <div key={key} className="flex">
-                    <div className="px-2 py-1 font-semibold flex-1">
+                    <div className="px-2 py-1 font-semibold w-9/20 ">
                       {label}
                     </div>
-                    <div className="px-2 py-1 font-semibold ">:</div>
-                    <div className="px-2 py-1 flex-1">{displayValue}</div>
+                    <div className="px-2 py-1 font-semibold w-1/20 text-right ">
+                      :
+                    </div>
+                    <div className="px-2 py-1 w-11/20 ">{displayValue}</div>
                   </div>
                 );
               })}
@@ -249,11 +240,11 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
             <h2 className="font-bold text-lg  my-5">Experience Information:</h2>
 
             <div className="flex">
-              <div className="flex-1 px-2 py-1 font-semibold align-top">
+              <div className="px-2 py-1 font-semibold align-top w-9/20">
                 Experiences
               </div>
-              <div className="px-2 py-1 font-semibold">:</div>
-              <div className="flex-1 px-2 py-1">
+              <div className="px-2 py-1 font-semibold text-right w-1/20">:</div>
+              <div className=" px-2 py-1 w-11/20">
                 {Array.isArray(allEmp?.experiences) &&
                 allEmp.experiences.length > 0 ? (
                   <ol className="list-decimal pl-5 space-y-2">
@@ -292,21 +283,28 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
             <div>
               {familyMenu.map(({ label, key }) => (
                 <div key={key} className="flex">
-                  <div className="flex-1 px-2 py-1 font-semibold">{label}</div>
-                  <div className="px-2 py-1 font-semibold ">:</div>
-                  <div className="flex-1 px-2 py-1">{allEmp[key] || "N/A"}</div>
+                  <div className="px-2 py-1 font-semibold w-9/20">{label}</div>
+                  <div className="px-2 py-1 font-semibold w-1/20 text-right">
+                    :
+                  </div>
+                  <div className="px-2 py-1 w-11/20">
+                    {allEmp[key] || "N/A"}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="center text-white text_size_4 mb-7">
-          <button
-            className="px-5 py-1.5 bg-primary rounded"
-            onClick={handleDownloadPDF}
-          >
-            Download
-          </button>
+        <div
+          className="center text-white text_size_3 pt-1"
+          onClick={handleDownloadPDF}
+        >
+          <div className="flex justify-between items-center mb-7 gap-2 px-3 py-1.5 bg-primary rounded">
+            <p>Download</p>
+            <i>
+              <IoMdDownload />
+            </i>
+          </div>
         </div>
       </div>
     </section>
