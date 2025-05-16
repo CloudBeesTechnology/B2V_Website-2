@@ -9,64 +9,90 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { db } from "@/lib/firebaseConfig"; // adjust path as needed
+import { db } from "@/lib/firebaseConfig"; // update this path if needed
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
+
+interface MergedUser {
+  docId: string;
+  empID?: string;
+  intID?: string;
+  email: string;
+  status: string;
+  role?: string;
+}
 
 const CredentialReq: React.FC = () => {
   const router = useRouter();
-  const [credentials, setCredentials] = useState<any[]>([]);
+  const [mergedUsers, setMergedUsers] = useState<MergedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState<"Employee" | "Intern">("Employee");
 
-useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const userQuery = query(
-        collection(db, "users"),
-        orderBy("createdAt", "desc") // Firebase handles ordering
-      );
-      const userSnapshot = await getDocs(userQuery);
-      const users = userSnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        docId: doc.id,
-      }));
-      setCredentials(users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-  fetchUsers();
-}, []);
+        // Get users
+        const userQuery = query(
+          collection(db, "users"),
+          orderBy("createdAt", "desc")
+        );
+        const userSnapshot = await getDocs(userQuery);
+        const users = userSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          docId: doc.id,
+        })) as any[];
 
+        // Get accessControl
+        const accessSnapshot = await getDocs(collection(db, "accessControl"));
+        const accessControl = accessSnapshot.docs.map((doc) => doc.data()) as {
+          email: string;
+          role?: string;
+        }[];
+
+        // Merge both datasets by email
+        const merged = users.map((user) => {
+          const matchedAccess = accessControl.find(
+            (acc) => acc.email === user.email
+          );
+          return {
+            docId: user.docId,
+            empID: user.empID,
+            intID: user.intID,
+            email: user.email,
+            status: user.status || "Pending",
+            role: matchedAccess?.role || "N/A",
+          };
+        });
+
+        setMergedUsers(merged);
+      } catch (error) {
+        console.error("Error fetching/merging data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const updateUserStatus = async (docId: string, newStatus: string) => {
     try {
       const userRef = doc(db, "users", docId);
       await updateDoc(userRef, { status: newStatus });
-      setCredentials((prev) =>
-        prev.map((cred) =>
-          cred.docId === docId ? { ...cred, status: newStatus } : cred
+      setMergedUsers((prev) =>
+        prev.map((u) =>
+          u.docId === docId ? { ...u, status: newStatus } : u
         )
       );
     } catch (error) {
-      console.error("Error updating user status:", error);
+      console.error("Error updating status:", error);
     }
   };
 
-  const handleStatusChange = (docId: string, newStatus: string) => {
-    updateUserStatus(docId, newStatus);
-  };
-
-  // 🔍 Filter credentials based on selected user type
-  const filteredCredentials = credentials.filter((cred) => {
-    if (userType === "Employee") return !!cred.empID;
-    if (userType === "Intern") return !!cred.intID;
-    return true; // For "All"
-  });
+  const filteredUsers = mergedUsers.filter((user) =>
+    userType === "Employee" ? !!user.empID : !!user.intID
+  );
 
   if (loading)
     return (
@@ -75,12 +101,15 @@ useEffect(() => {
 
   return (
     <section>
-      <header className="flex justify-start items-center text-[22px] text-gray gap-5 m-10">
-        <MdOutlineKeyboardBackspace onClick={() => router.back()} className="text-3xl cursor-pointer hover:text-blue-600 transition-colors" />
+      <header className="flex items-center gap-4 text-2xl m-10 text-gray-800">
+        <MdOutlineKeyboardBackspace
+          onClick={() => router.back()}
+          className="text-3xl cursor-pointer hover:text-blue-600"
+        />
         <h3>Credential Request</h3>
       </header>
 
-      {/* 🔘 Filter Buttons */}
+      {/* Filter Buttons */}
       <div className="flex gap-4 mb-6 ml-10">
         <button
           onClick={() => setUserType("Employee")}
@@ -100,36 +129,37 @@ useEffect(() => {
         </button>
       </div>
 
-      {/* 🧾 User Table */}
-      {filteredCredentials.length > 0 ? (
+      {/* Table */}
+      {filteredUsers.length > 0 ? (
         <div className="center overflow-x-auto mb-10">
-          <table className="table-fixed w-full max-w-[1500px]">
+          <table className="table-fixed w-full max-w-[1500px] ">
             <thead>
               <tr className="text-center text-white bg-primary">
-                <th className="rounded-tl-md py-3">S.No</th>
+                <th className="py-3">S.No</th>
                 <th className="py-3">Employee ID</th>
-                <th className="py-3">Email ID</th>
-                <th className="py-3">Roles</th>
+                <th className="py-3">Email</th>
+                <th className="py-3">Role</th>
                 <th className="py-3">Status</th>
               </tr>
             </thead>
             <tbody>
-              {filteredCredentials.map((cred, index) => (
+              {filteredUsers.map((user, index) => (
                 <tr
-                  key={cred.docId}
-                  className="text-center text-gray border-b border-[#D2D2D240] bg-white"
+                  key={user.docId}
+              className="text-center text-gray border-b border-[#D2D2D240] bg-white"
+
                 >
                   <td className="py-3">{index + 1}</td>
-                  <td className="py-3">{cred.empID || cred.intID || "-"}</td>
-                  <td className="py-3">{cred.email}</td>
-                  <td className="py-3">{cred.role}</td>
+                  <td className="py-3">{user.empID || user.intID || "-"}</td>
+                  <td className="py-3">{user.email}</td>
+                  <td className="py-3">{user.role}</td>
                   <td className="px-4 py-2">
                     <select
-                      value={cred.status}
+                      value={user.status}
                       onChange={(e) =>
-                        handleStatusChange(cred.docId, e.target.value)
+                        updateUserStatus(user.docId, e.target.value)
                       }
-                      className="border border-gray-300 rounded px-2 py-1 outline-none"
+                      className="border rounded px-2 py-1 outline-none"
                     >
                       <option value="Pending">Pending</option>
                       <option value="Active">Active</option>
@@ -149,6 +179,9 @@ useEffect(() => {
 };
 
 export default CredentialReq;
+
+
+
 
 
 

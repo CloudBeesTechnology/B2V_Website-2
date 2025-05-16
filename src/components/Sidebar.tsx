@@ -29,6 +29,12 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseConfig";
 import { signOut } from "firebase/auth";
 
+interface UserPermissions {
+  setPermission?: {
+    [key: string]: string[];
+  };
+}
+
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -43,10 +49,10 @@ const Sidebar = () => {
           | null)
       : null;
 
-  const userID =
-    typeof window !== "undefined"
-      ? localStorage.getItem("empID")?.toString()?.toUpperCase()
-      : null;
+
+        const empID = typeof window !== "undefined" ? localStorage.getItem("empID") : null;
+  const intID = typeof window !== "undefined" ? localStorage.getItem("intID") : null;
+  const userID = empID || intID;
 
   const sidebarMenu = [
     { icons: overview, icons2: whiteoverview, name: "Overview", path: "/" },
@@ -139,48 +145,48 @@ const Sidebar = () => {
     Settings: ["/settings"],
   };
 
-  let onetimeExecute = false;
-  const handleNavigation = (path: string) => {
-    RemoveLocalValues(); // your existing cleanup logic
-    router.push(path); // navigate without reloading
-  };
-
   useEffect(() => {
-    const getUserAndPermissions = async (empID: string) => {
-      const userQuery = query(
-        collection(db, "accessControl"),
-        where("empID", "==", empID)
-      );
+    const getUserAndPermissions = async (id: string): Promise<UserPermissions> => {
+      try {
+        const queries = [
+          query(collection(db, "accessControl"), where("empID", "==", id)),
+          query(collection(db, "accessControl"), where("intID", "==", id)),
+        ];
 
-      const userSnapshot = await getDocs(userQuery);
-      const userData = userSnapshot.docs[0]?.data() || {};
-      return { ...userData };
+        const querySnapshots = await Promise.all(queries.map((q) => getDocs(q)));
+
+        for (const snapshot of querySnapshots) {
+          if (!snapshot.empty) {
+            return snapshot.docs[0].data() as UserPermissions;
+          }
+        }
+
+        return {};
+      } catch (error) {
+        console.error("Error fetching permissions:", error);
+        return {};
+      }
     };
 
-    if (userID && !onetimeExecute) {
-      onetimeExecute = true;
+    if (userID) {
       getUserAndPermissions(userID).then((data) => {
-        const flatPermissions = Object.keys(data.setPermission || {});
+        const permissions = data.setPermission || {};
+        const flatPermissions = Object.keys(permissions);
         const filteredKeys = flatPermissions.filter(
-          (key) =>
-            Array.isArray(data.setPermission?.[key]) &&
-            data.setPermission[key].length > 0
+          (key) => Array.isArray(permissions[key]) && permissions[key].length > 0
         );
 
         setAllowedMenuItems(filteredKeys);
-        console.log("I am calling");
-        if (pathname !== "/") return;
-        // Navigate to first allowed path
-        const firstAllowed = sidebarMenu.find((item) =>
-          filteredKeys.includes(item.name)
-        );
 
-        if (firstAllowed) {
-          router.push(firstAllowed.path);
+        if (pathname === "/") {
+          const firstAllowed = sidebarMenu.find((item) => filteredKeys.includes(item.name));
+          if (firstAllowed) {
+            router.push(firstAllowed.path);
+          }
         }
       });
     }
-  }, []);
+  }, [userID, pathname, router]);
 
   const RemoveLocalValues = () => {
     localStorage.removeItem("experienceData");
@@ -223,7 +229,6 @@ const Sidebar = () => {
       ? customPaths[linkName].includes(pathname)
       : pathname === linkPath;
   };
-
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
@@ -252,11 +257,10 @@ const Sidebar = () => {
                       : "px-2 py-2"
                   )}
                 >
-                  <div
-                    onClick={() => {
-                      handleNavigation(link.path);
-                    }}
-                    className="flex items-center gap-3 cursor-pointer"
+                  <Link
+                    href={link.path}
+                    onClick={RemoveLocalValues}
+                    className="flex items-center gap-3"
                   >
                     <Image
                       src={
@@ -269,12 +273,12 @@ const Sidebar = () => {
                       height={24}
                     />
                     <p className="text_size_4">{link.name}</p>
-                  </div>
+                  </Link>
                 </div>
               </div>
             ))}
         </div>
-        <div className="px-2 mt-auto">
+        <div className="px-2">
           <button onClick={handleLogout} className="flex items-center gap-3">
             <Image src={logout} alt="Logout not found" width={24} height={24} />
             <p className="text_size_4">Logout</p>

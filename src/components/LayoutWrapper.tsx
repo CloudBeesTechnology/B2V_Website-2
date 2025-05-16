@@ -27,21 +27,42 @@ export default function LayoutWrapper({
   const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const storedSignIn = localStorage.getItem("SignIn");
-    const signedInStatus = !!storedSignIn;
-    setIsSignedIn(signedInStatus);
-    if (!signedInStatus && !isAuthPage) {
-      router.replace("/signIn");
-    }
-  }, [isAuthPage, router]);
+    const checkAuth = () => {
+      const storedSignIn = localStorage.getItem("SignIn");
+      const signedInStatus = !!storedSignIn;
+      setIsSignedIn(signedInStatus);
+      
+      if (!signedInStatus && !isAuthPage) {
+        // Clear any potential cached data
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Redirect to login with no history
+        router.replace("/signIn");
+      }
+    };
+
+    // Check auth on initial load and when path changes
+    checkAuth();
+
+    // Also check auth when window gains focus (user comes back via back button)
+    const handleFocus = () => {
+      checkAuth();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isAuthPage, router, pathname]);
 
   if (isAuthPage) {
     return <main>{children}</main>;
   }
 
-  // While waiting for client-side check
   if (isSignedIn === null) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return isSignedIn ? (
