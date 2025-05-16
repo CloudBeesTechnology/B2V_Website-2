@@ -5,8 +5,9 @@ import avatar from "../../public/assets/navbar/Missing_avatar.svg.png";
 import { DateFormat } from "./DateFormate";
 import html2pdf from "html2pdf.js";
 import { IoMdDownload } from "react-icons/io";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { AiFillPrinter } from "react-icons/ai";
+import printJS from "print-js";
+
 interface allEmployee {
   profile?: string;
   empID: string;
@@ -99,6 +100,21 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
     html2pdf().set(opt).from(content).save();
   };
 
+  const handlePrint = () => {
+    printJS({
+      printable: "print-section",
+      type: "html",
+      targetStyles: ["*"],
+    });
+    // const content = printRef.current;
+    // if (!content) return;
+    // printJS({
+    //   printable: content.innerHTML,
+    //   type: "html",
+    //   targetStyles: ["*"],
+    // });
+  };
+
   if (!allEmp)
     return <div className="text-center py-4">No employee data available.</div>;
 
@@ -120,7 +136,7 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
               <IoMdCloseCircle className="text-3xl" />
             </button>
           </div>
-          <div ref={printRef}>
+          <div ref={printRef} id="print-section">
             <h1 className="text_size_2 text-center my-5">Employee Details</h1>
             <h2 className="font-bold text-lg mb-2">Personal Information :</h2>
 
@@ -295,15 +311,24 @@ export const ViewEmpData = ({ allEmp, close }: TableProps) => {
             </div>
           </div>
         </div>
-        <div
-          className="center text-white text_size_3 pt-1"
-          onClick={handleDownloadPDF}
-        >
-          <div className="flex justify-between items-center mb-7 gap-2 px-3 py-1.5 bg-primary rounded">
-            <p>Download</p>
-            <i>
-              <IoMdDownload />
-            </i>
+
+        <div className="flex justify-center items-center gap-5 mb-4 mt-2">
+          {/* Download Button */}
+          <div onClick={handleDownloadPDF}>
+            <div className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded shadow hover:bg-primary/90 cursor-pointer">
+              <p>Download</p>
+              <IoMdDownload className="text-lg" />
+            </div>
+          </div>
+
+          {/* Print Button */}
+          <div
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded shadow hover:bg-primary/90 cursor-pointer"
+          >
+            <p>Print</p>
+
+            <AiFillPrinter />
           </div>
         </div>
       </div>
