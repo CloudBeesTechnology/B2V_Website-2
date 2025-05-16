@@ -1,4 +1,4 @@
-import ReportDetails from "./reportDetails/page";
+// import ReportDetails from "./reportDetails/page";
 import ReportTiles from "./reportTiles";
 
 const Report: React.FC = () => {

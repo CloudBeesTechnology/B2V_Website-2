@@ -1,16 +1,29 @@
 "use client";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { SignInSchema } from "@/validation/Schema";
 import { useRouter } from "next/navigation";
-import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import Link from "next/link";
-import AuthLayout from "@/components/AuthLayout";
-import signImg from "../../../public/assets/sign/signInImg.png";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  FaEnvelope,
+  FaEye,
+  FaEyeSlash,
+  FaLock,
+} from "react-icons/fa";
+import {
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+
 import { auth, db } from "@/lib/firebaseConfig";
-import { useState } from "react";
+import AuthLayout from "@/components/AuthLayout";
+import { SignInSchema } from "@/validation/Schema";
+import signImg from "../../../public/assets/sign/signInImg.png";
 
 type SignInFormValues = {
   email: string;
@@ -31,71 +44,82 @@ export default function SignIn() {
 
   const onSubmit = async (data: SignInFormValues) => {
     try {
+      // Firebase Authentication
       const userCredential = await signInWithEmailAndPassword(
         auth,
         data.email,
         data.password
       );
+
       const user = userCredential.user;
 
-      const q = query(collection(db, "users"), where("email", "==", data.email));
-      const querySnapshot = await getDocs(q);
+      // Check user status in "users" collection
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", data.email)
+      );
+      const userSnapshot = await getDocs(userQuery);
 
-      if (querySnapshot.empty) {
+      if (userSnapshot.empty) {
         alert("No user found with this email in the database.");
         return;
       }
 
-      const userData = querySnapshot.docs[0].data();
+      const userData = userSnapshot.docs[0].data();
 
       if (userData.status !== "Active") {
-        alert("Oops! You Don’t Have Access. Please Reach Out to Your Administrator.");
+        alert(
+          "Oops! You Don’t Have Access. Please Reach Out to Your Administrator."
+        );
         return;
       }
 
-      // ✅ Store basic user info in localStorage
+      // Store user data in localStorage
       localStorage.setItem("userEmail", userData.email);
       localStorage.setItem("userStatus", userData.status);
       localStorage.setItem("SignIn", JSON.stringify(true));
 
-      // 🔽 NEW: Check userDetails table for role
-      const userDetailsQuery = query(
+      // Fetch user role from "accessControl"
+      const roleQuery = query(
         collection(db, "accessControl"),
         where("email", "==", data.email)
       );
-      const userDetailsSnapshot = await getDocs(userDetailsQuery);
+      const roleSnapshot = await getDocs(roleQuery);
 
-      if (!userDetailsSnapshot.empty) {
-        const userDetailsData = userDetailsSnapshot.docs[0].data();
-        localStorage.setItem("userRole", userDetailsData.role);
+      if (!roleSnapshot.empty) {
+        const roleData = roleSnapshot.docs[0].data();
+        localStorage.setItem("userRole", roleData.role || "Unknown");
       } else {
-        console.warn("No matching user in userDetails collection.");
         localStorage.setItem("userRole", "Unknown");
       }
 
-      // Ensure empID is available before querying employeeDetails
-      if (!userData.empID) {
-        alert("Employee ID not found for this user.");
-        return;
+      // Fetch employee details
+      if (userData.empID) {
+        const empQuery = query(
+          collection(db, "employeeDetails"),
+          where("empID", "==", userData.empID)
+        );
+        const empSnapshot = await getDocs(empQuery);
+        if (!empSnapshot.empty) {
+          const empData = empSnapshot.docs[0].data();
+          localStorage.setItem("empID", empData.empID);
+          localStorage.setItem("name", empData.name || "Unknown");
+        }
       }
 
-      // Query employeeDetails collection by empID
-      const empQ = query(
-        collection(db, "employeeDetails"),
-        where("empID", "==", userData.empID)
-      );
-      const empQuerySnapshot = await getDocs(empQ);
-
-      if (empQuerySnapshot.empty) {
-        alert("No employee details found for this user.");
-        return;
+      // Fetch intern details
+      if (userData.intID) {
+        const intQuery = query(
+          collection(db, "Internship"),
+          where("intID", "==", userData.intID)
+        );
+        const intSnapshot = await getDocs(intQuery);
+        if (!intSnapshot.empty) {
+          const intData = intSnapshot.docs[0].data();
+          localStorage.setItem("intID", intData.intID);
+          localStorage.setItem("name", intData.name || "Unknown");
+        }
       }
-
-      const employeeData = empQuerySnapshot.docs[0].data();
-
-      // ✅ Store employee name and empID in localStorage
-      localStorage.setItem("employeeName", employeeData.name);
-      localStorage.setItem("empID", employeeData.empID);
 
       router.push("/");
     } catch (error: any) {
@@ -105,7 +129,7 @@ export default function SignIn() {
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -117,32 +141,43 @@ export default function SignIn() {
       linkName="Sign Up"
       image={signImg}
     >
-      <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="w-full max-w-md space-y-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        {/* Email Field */}
         <div>
-          <label className="block text_size_10 mb-1 text-gray">Email Address</label>
+          <label className="block text_size_10 mb-1 text-gray">
+            Email Address
+          </label>
           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaEnvelope className="text-primary mr-2" />
             <input
               type="email"
               placeholder="Enter your email"
               {...register("email")}
-              className="w-full focus:outline-none text-lg h-full"
+              className="w-full focus:outline-none text-lg h-full bg-transparent"
             />
           </div>
           {errors.email && (
-            <p className="text-red-500 text-[14px] mt-1">{errors.email.message}</p>
+            <p className="text-red-500 text-[14px] mt-1">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
+        {/* Password Field */}
         <div>
-          <label className="block text_size_10 mb-1 text-gray">Your Password</label>
+          <label className="block text_size_10 mb-1 text-gray">
+            Your Password
+          </label>
           <div className="flex items-center border gap-5 border-primary rounded-md px-3 py-3 bg-[#F9FBFD]">
             <FaLock className="text-primary mr-2" />
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               {...register("password")}
-              className="w-full focus:outline-none text-lg"
+              className="w-full focus:outline-none text-lg bg-transparent"
             />
             <button
               type="button"
@@ -153,7 +188,9 @@ export default function SignIn() {
             </button>
           </div>
           {errors.password && (
-            <p className="text-red-500 text-[14px] mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-[14px] mt-1">
+              {errors.password.message}
+            </p>
           )}
           <Link
             href="/emailVerify"
@@ -163,6 +200,7 @@ export default function SignIn() {
           </Link>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           className="w-full text_size_10 font-bold bg-primary text-white py-3 rounded-md my-10"
